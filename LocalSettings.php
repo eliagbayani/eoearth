@@ -12,7 +12,7 @@
 
 # Protect against web entry
 if ( !defined( 'MEDIAWIKI' ) ) {
-	exit;
+    exit;
 }
 
 // start by eli =====================
@@ -52,13 +52,12 @@ $wgLogo = "$wgResourceBasePath/resources/assets/eol black bg.png";
 
 ## UPO means: this is also a user preference option
 
-
 ## Database settings
-$wgDBtype = "mysql";
-$wgDBserver = "localhost";
-$wgDBname = "wiki_eoearth";
-$wgDBuser = "root";
-$wgDBpassword = "m173";
+$wgDBtype       = "mysql";
+$wgDBserver     = "localhost";
+$wgDBname       = "wiki_eoearth";
+$wgDBuser       = "root";
+$wgDBpassword   = "m173";
 
 # MySQL specific settings
 $wgDBprefix = "";
@@ -217,7 +216,6 @@ require_once "$IP/extensions/ConfirmAccount/ConfirmAccount.php";    //added by E
 require_once("$IP/extensions/EmailUsers/EmailUsers.php");           //added by Eli Oct 20
 wfLoadExtension( 'EmbedVideo' );
 
-
 # End of automatically generated settings.
 # Add more configuration options below.
 
@@ -301,25 +299,24 @@ for($i=0; $i<16; $i++)
 // $wgNamespacePermissionLockdown[NS_SPECIAL]['read'] = array('EoE_Author', 'EoE_Topic_Editor'); --- this is not working...
 
 
-/*
-0 	: 	NS_MAIN 	
-1 	Talk: 	NS_TALK 	
-2 	User: 	NS_USER 	
-3 	User_Talk: 	NS_USER_TALK 	
-4 	Project: 	NS_PROJECT 	
-5 	Project_Talk: 	NS_PROJECT_TALK 	
-6 	File: 	NS_FILE 	
-7 	File_Talk: 	NS_FILE_TALK 	
-8 	MediaWiki: 	NS_MEDIAWIKI 	
-9 	MediaWiki_Talk: 	NS_MEDIAWIKI_TALK 	
-10 	Template: 	NS_TEMPLATE 	
-11 	Template_Talk: 	NS_TEMPLATE_TALK 	
-12 	Help: 	NS_HELP 	
-13 	Help_Talk: 	NS_HELP_TALK 	
-14 	Category: 	NS_CATEGORY 	
-15 	Category_Talk: 	NS_CATEGORY_TALK
+/* Respective index numbers for the different Namespaces:
+0                   NS_MAIN
+1   Talk:           NS_TALK
+2   User:           NS_USER
+3   User_Talk:      NS_USER_TALK
+4   Project:        NS_PROJECT
+5   Project_Talk:   NS_PROJECT_TALK
+6   File:           NS_FILE
+7   File_Talk:      NS_FILE_TALK
+8   MediaWiki:      NS_MEDIAWIKI
+9   MediaWiki_Talk: NS_MEDIAWIKI_TALK
+10  Template:       NS_TEMPLATE
+11  Template_Talk:  NS_TEMPLATE_TALK
+12  Help:           NS_HELP
+13  Help_Talk:      NS_HELP_TALK
+14  Category:       NS_CATEGORY
+15  Category_Talk:  NS_CATEGORY_TALK
 */
-
 
 //=================================================
 
