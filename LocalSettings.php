@@ -80,7 +80,22 @@ $wgEnableUploads = true;
 mkdir /images/temp
 chmod 0777 /images/temp
 */
-$wgTmpDirectory = "$IP/images/temp";
+
+//1. Setup in LocalSettings.php
+// change images folder:
+// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
+// changed to  : /Library/WebServer/Documents/LiteratureEditor_images
+$images_folder      = $IP . "_images";
+$wgUploadDirectory  = $images_folder;               //where MediaWiki uploades images
+$wgUploadPath       = $wgScriptPath . "_images";    //where MediaWiki views images
+$wgDeletedDirectory = "$images_folder/deleted";
+$wgTmpDirectory     = "$images_folder/temp";
+// 2. Setup in Apache vhosts file, inside <VirtualHost *:80></VirtualHost>
+// Alias /LiteratureEditor/images/    "/Library/WebServer/Documents/LiteratureEditor_images/"
+
+// $wgTmpDirectory = "$IP/images/temp"; --- original value
+
+
 
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = "/usr/local/bin/convert";
@@ -341,8 +356,6 @@ $wgConfirmAccountContact = 'eagbayani@eol.org'; // a beaurocrat or EoE_Topic_Edi
 
 
 //all these folders must have write permissions
-// $wgUploadDirectory  = "$IP/images";         //this is the default anyway 
-// $wgDeletedDirectory = "$IP/images/deleted"; //this is the default anyway
 
 $wgFileStore['accountreqs']['directory']       = "$IP/images/accountreqs";
 $wgFileStore['accountreqs']['url'] = null; 
