@@ -41,14 +41,7 @@ class UserMailer {
 	 * @return Status
 	 */
 	protected static function sendWithPear( $mailer, $dest, $headers, $body ) {
-print "<pre>";
-print_r($mailer);
-print_r($dest);
-print_r($headers);
-print "</pre>";
-print( "<br> [$body]</br>");
  		$mailResult = $mailer->send( $dest, $headers, $body );
-print("<br>eli is here 100</br>");
 		# Based on the result return an error string,
 		if ( PEAR::isError( $mailResult ) ) {
 			wfDebug( "PEAR::Mail failed: " . $mailResult->getMessage() . "\n" );
@@ -271,66 +264,50 @@ print("<br>eli is here 100</br>");
 			#
 
 			//start Eli Agbayani Nov 26, 2015
-            // $path = '/usr/local/Cellar/php53/5.3.29_2/lib/php';//FOR MAC MINI
-           //exit("<p>eli is here</p>"); 
-            //$path = '/usr/share/pear';//FOR EOL-ARCHIVE
-            //set_include_path(get_include_path() . PATH_SEPARATOR . $path);
-
+            // $path = '/usr/local/Cellar/php53/5.3.29_2/lib/php';  //FOR MAC MINI
+            // $path = '/usr/share/pear';                           //FOR EOL-ARCHIVE
+            // set_include_path(get_include_path() . PATH_SEPARATOR . $path);
             //end Eli Agbayani
 
-
 			if ( !stream_resolve_include_path( 'Mail.php' ) ) {
-			     print "<br>pear mail is not installed<br>";	
                              throw new MWException( 'PEAR mail package is not installed' );
 			}
 			require_once 'Mail.php';
 
-                        print "<br>pear mail is installed<br>";
 			wfSuppressWarnings();
 
 			// Create the mail object using the Mail::factory method
 			$mail_object =& Mail::factory( 'smtp', $wgSMTP );
 			if ( PEAR::isError( $mail_object ) ) {
-
-				exit("<p>eli is here - PEAR error</p>");
-
-                                wfDebug( "PEAR::Mail factory failed: " . $mail_object->getMessage() . "\n" );
+                wfDebug( "PEAR::Mail factory failed: " . $mail_object->getMessage() . "\n" );
 				wfRestoreWarnings();
 				return Status::newFatal( 'pear-mail-error', $mail_object->getMessage() );
 			}
-                        print("<p>eli is here - 001</p>");
 
 			wfDebug( "Sending mail via PEAR::Mail\n" );
 
 			$headers['Subject'] = self::quotedPrintable( $subject );
-print("<p>eli is here - 002</p>");
 			# When sending only to one recipient, shows it its email using To:
 			if ( count( $to ) == 1 ) {
 				$headers['To'] = $to[0]->toString();
 			}
-print("<p>eli is here - 003</p>");
 			# Split jobs since SMTP servers tends to limit the maximum
 			# number of possible recipients.
 			$chunks = array_chunk( $to, $wgEnotifMaxRecips );
 			foreach ( $chunks as $chunk ) {
-                           //exit("<p>eli is here - 004</p>");
 				$status = self::sendWithPear( $mail_object, $chunk, $headers, $body );
-			exit("<p>eli is here - 005</p>");
-                        	# FIXME : some chunks might be sent while others are not!
+            	# FIXME : some chunks might be sent while others are not!
 				if ( !$status->isOK() ) {
 					wfRestoreWarnings();
 					return $status;
 				}
 			}
 			wfRestoreWarnings();
-                        print "\n" ;
-                        exit("<p>eli is here - PEAR2</p>");
 			return Status::newGood();
 		} else {
 			#
 			# PHP mail()
 			#
-                        #exit("<p>eli is here - PHP mail</p>");
 
 			if ( count( $to ) > 1 ) {
 				$headers['To'] = 'undisclosed-recipients:;';
