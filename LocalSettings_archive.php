@@ -37,10 +37,9 @@ $wgScriptPath = "/eoearth"; // $wgScriptPath = "/w";
 $wgArticlePath = "/eoearth/wiki/$1";
 $wgScriptExtension = ".php";
 
-require_once("config/.htsettings.php");
-
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = $conf['wgServer'];
+$wgServer = "http://editors.eol.org";       //for archive
+// $wgServer = "http://editors.eol.localhost"; //for mac mini
 
 ## The relative URL path to the skins directory
 $wgStylePath = "$wgScriptPath/skins";
@@ -59,9 +58,9 @@ $wgLogo = "$wgResourceBasePath/resources/assets/EoE_logo_white_bg.png";
 $wgDBtype       = "mysql";
 $wgDBserver     = "localhost";
 $wgDBname       = "wiki_eoearth";
-
-$wgDBuser       = $conf['wgDBuser'];
-$wgDBpassword   = $conf['wgDBpassword'];
+$wgDBuser       = "root";
+$wgDBpassword   = "m173!XAbc*";     //for archive
+// $wgDBpassword   = "m173";           //for mac mini
 
 # MySQL specific settings
 $wgDBprefix = "";
@@ -74,8 +73,15 @@ $wgDBmysql5 = false;
 
 ## Shared memory settings
 
-$wgMainCacheType = $conf['wgMainCacheType'];
-$wgMemCachedServers = $conf['wgMemCachedServers'];
+/* for mac mini
+$wgMainCacheType = CACHE_MEMCACHED;
+$wgMemCachedServers = array( '127.0.0.1:11211' );
+*/
+
+// /* for archive
+$wgMainCacheType = CACHE_ACCEL;
+$wgMemCachedServers = array();
+// */
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
@@ -91,11 +97,23 @@ chmod 0777 /images/temp
 /// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
 // changed to  : /Library/WebServer/Documents/LiteratureEditor_images
 
-$images_folder      = $conf['images_folder'];
-$wgUploadDirectory  = $conf['wgUploadDirectory'];   //where MediaWiki uploades images
-$wgUploadPath       = $conf['wgUploadPath'];        //where MediaWiki views images
-$wgDeletedDirectory = $conf['wgDeletedDirectory'];
-$wgTmpDirectory     = $conf['wgTmpDirectory'];
+/* for mac mini
+$images_folder      = $IP . "_images";
+$wgUploadDirectory  = $images_folder;               //where MediaWiki uploades images
+$wgUploadPath       = $wgScriptPath . "_images";    //where MediaWiki views images
+$wgDeletedDirectory = "$images_folder/deleted";
+$wgTmpDirectory     = "$images_folder/temp";
+*/
+
+// /* for archive
+$images_folder      = "/var/www/html/eoearth_images";
+$wgUploadDirectory  = $images_folder;               //where MediaWiki uploades images
+$wgUploadPath       = "/eoearth_images";
+$wgDeletedDirectory = "$images_folder/deleted";
+$wgTmpDirectory     = "$images_folder/temp";
+// */
+
+//echo "<p>[$IP] $images_folder [$wgUploadPath]</p>";
 
 
 // 2. Setup in Apache vhosts file, inside <VirtualHost *:80></VirtualHost>
@@ -104,8 +122,14 @@ $wgTmpDirectory     = $conf['wgTmpDirectory'];
 // $wgTmpDirectory = "$IP/images/temp"; --- original value
 
 ///////////////////////
-$wgUseImageMagick               = $conf['wgUseImageMagick'];
-$wgImageMagickConvertCommand    = $conf['wgImageMagickConvertCommand'];
+// /* for archive
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+// */
+/* for mac mini
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/local/bin/convert";
+*/
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
 $wgUseInstantCommons = true;
