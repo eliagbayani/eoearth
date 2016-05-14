@@ -13,10 +13,10 @@ $conf['wgMemCachedServers'] = array();
 
 // images
 $conf['images_folder']      = "/var/www/html/eoearth_images";
-$conf['wgUploadDirectory']  = $images_folder;               //where MediaWiki uploades images
-$conf['wgUploadPath']       = "/eoearth_images";            //where MediaWiki views images
-$conf['wgDeletedDirectory'] = "$images_folder/deleted";
-$conf['wgTmpDirectory']     = "$images_folder/temp";
+$conf['wgUploadDirectory']  = $conf['images_folder'];               //where MediaWiki uploades images
+$conf['wgUploadPath']       = "/eoearth_images";                    //where MediaWiki views images
+$conf['wgDeletedDirectory'] = $conf['images_folder']."/deleted";
+$conf['wgTmpDirectory']     = $conf['images_folder']."/temp";
 
 // ImageMagick
 $conf['wgUseImageMagick']               = true;
