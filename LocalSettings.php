@@ -38,7 +38,8 @@ $wgArticlePath = "/eoearth/wiki/$1";
 $wgScriptExtension = ".php";
 
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = "http://editors.eol.org";
+$wgServer = "http://editors.eol.org";       //for archive
+// $wgServer = "http://editors.eol.localhost"; //for mac mini
 
 ## The relative URL path to the skins directory
 $wgStylePath = "$wgScriptPath/skins";
@@ -58,7 +59,8 @@ $wgDBtype       = "mysql";
 $wgDBserver     = "localhost";
 $wgDBname       = "wiki_eoearth";
 $wgDBuser       = "root";
-$wgDBpassword   = "m173!XAbc*";
+$wgDBpassword   = "m173!XAbc*";     //for archive
+// $wgDBpassword   = "m173";           //for mac mini
 
 # MySQL specific settings
 $wgDBprefix = "";
@@ -71,12 +73,15 @@ $wgDBmysql5 = false;
 
 ## Shared memory settings
 
-# used in eli macmini
-# $wgMainCacheType = CACHE_MEMCACHED;
-# $wgMemCachedServers = array( '127.0.0.1:11211' );
+/* for mac mini
+$wgMainCacheType = CACHE_MEMCACHED;
+$wgMemCachedServers = array( '127.0.0.1:11211' );
+*/
 
+// /* for archive
 $wgMainCacheType = CACHE_ACCEL;
 $wgMemCachedServers = array();
+// */
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
@@ -91,14 +96,22 @@ chmod 0777 /images/temp
 // change images folder:
 /// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
 // changed to  : /Library/WebServer/Documents/LiteratureEditor_images
-$images_folder      = $IP . "/eoearth_images";
-$images_folder = "/var/www/html/eoearth_images";
 
+/* for mac mini
+$images_folder      = $IP . "_images";
 $wgUploadDirectory  = $images_folder;               //where MediaWiki uploades images
-$wgUploadPath       = $wgScriptPath . "/eoearth_images";    //where MediaWiki views images
-$wgUploadPath = "/eoearth_images";
+$wgUploadPath       = $wgScriptPath . "_images";    //where MediaWiki views images
 $wgDeletedDirectory = "$images_folder/deleted";
 $wgTmpDirectory     = "$images_folder/temp";
+*/
+
+// /* for archive
+$images_folder      = "/var/www/html/eoearth_images";
+$wgUploadDirectory  = $images_folder;               //where MediaWiki uploades images
+$wgUploadPath       = "/eoearth_images";
+$wgDeletedDirectory = "$images_folder/deleted";
+$wgTmpDirectory     = "$images_folder/temp";
+// */
 
 //echo "<p>[$IP] $images_folder [$wgUploadPath]</p>";
 
@@ -109,13 +122,14 @@ $wgTmpDirectory     = "$images_folder/temp";
 // $wgTmpDirectory = "$IP/images/temp"; --- original value
 
 ///////////////////////
+// /* for archive
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = "/usr/bin/convert";
-
-///////////////////////
-//from mac mini
-//$wgUseImageMagick = true;
-//$wgImageMagickConvertCommand = "/usr/local/bin/convert";
+// */
+/* for mac mini
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = "/usr/local/bin/convert";
+*/
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
 $wgUseInstantCommons = true;
@@ -256,7 +270,7 @@ $wgFileExtensions = array_unique($wgFileExtensions);
 // print_r($wgFileExtensions);exit;
 
 //================================================= The Encyclopedia of Earth
-/*
+/* for mac mini
 $wgSMTP = array('host'      => 'ssl://smtp.gmail.com',
                 'IDHost'    => 'gmail.com',
                 'port'      => 465,
