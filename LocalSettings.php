@@ -38,7 +38,7 @@ $wgArticlePath = "/eoearth/wiki/$1";
 $wgScriptExtension = ".php";
 
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = "http://editors.eol.localhost";
+$wgServer = "http://editors.eol.org";
 
 ## The relative URL path to the skins directory
 $wgStylePath = "$wgScriptPath/skins";
@@ -48,7 +48,8 @@ $wgResourceBasePath = $wgScriptPath;
 ## or else you'll overwrite your logo when you upgrade!
 // $wgLogo = "$wgResourceBasePath/resources/assets/wiki.png";
 // $wgLogo = "$wgResourceBasePath/images/three_balls.png";
-$wgLogo = "$wgResourceBasePath/resources/assets/eol black bg.png";
+// $wgLogo = "$wgResourceBasePath/resources/assets/eol black bg.png";
+$wgLogo = "$wgResourceBasePath/resources/assets/EoE_logo_white_bg.png";
 
 ## UPO means: this is also a user preference option
 
@@ -57,7 +58,7 @@ $wgDBtype       = "mysql";
 $wgDBserver     = "localhost";
 $wgDBname       = "wiki_eoearth";
 $wgDBuser       = "root";
-$wgDBpassword   = "m173";
+$wgDBpassword   = "m173!XAbc*";
 
 # MySQL specific settings
 $wgDBprefix = "";
@@ -69,8 +70,13 @@ $wgDBTableOptions = "ENGINE=InnoDB, DEFAULT CHARSET=binary";
 $wgDBmysql5 = false;
 
 ## Shared memory settings
-$wgMainCacheType = CACHE_MEMCACHED;
-$wgMemCachedServers = array( '127.0.0.1:11211' );
+
+# used in eli macmini
+# $wgMainCacheType = CACHE_MEMCACHED;
+# $wgMemCachedServers = array( '127.0.0.1:11211' );
+
+$wgMainCacheType = CACHE_ACCEL;
+$wgMemCachedServers = array();
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
@@ -83,22 +89,33 @@ chmod 0777 /images/temp
 
 //1. Setup in LocalSettings.php
 // change images folder:
-// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
+/// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
 // changed to  : /Library/WebServer/Documents/LiteratureEditor_images
-$images_folder      = $IP . "_images";
+$images_folder      = $IP . "/eoearth_images";
+$images_folder = "/var/www/html/eoearth_images";
+
 $wgUploadDirectory  = $images_folder;               //where MediaWiki uploades images
-$wgUploadPath       = $wgScriptPath . "_images";    //where MediaWiki views images
+$wgUploadPath       = $wgScriptPath . "/eoearth_images";    //where MediaWiki views images
+$wgUploadPath = "/eoearth_images";
 $wgDeletedDirectory = "$images_folder/deleted";
 $wgTmpDirectory     = "$images_folder/temp";
+
+//echo "<p>[$IP] $images_folder [$wgUploadPath]</p>";
+
+
 // 2. Setup in Apache vhosts file, inside <VirtualHost *:80></VirtualHost>
 // Alias /LiteratureEditor/images/    "/Library/WebServer/Documents/LiteratureEditor_images/"
 
 // $wgTmpDirectory = "$IP/images/temp"; --- original value
 
-
-
+///////////////////////
 $wgUseImageMagick = true;
-$wgImageMagickConvertCommand = "/usr/local/bin/convert";
+$wgImageMagickConvertCommand = "/usr/bin/convert";
+
+///////////////////////
+//from mac mini
+//$wgUseImageMagick = true;
+//$wgImageMagickConvertCommand = "/usr/local/bin/convert";
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
 $wgUseInstantCommons = true;
@@ -239,12 +256,14 @@ $wgFileExtensions = array_unique($wgFileExtensions);
 // print_r($wgFileExtensions);exit;
 
 //================================================= The Encyclopedia of Earth
+/*
 $wgSMTP = array('host'      => 'ssl://smtp.gmail.com',
                 'IDHost'    => 'gmail.com',
                 'port'      => 465,
                 'username'  => 'eagbayanieol@gmail.com',
                 'password'  => 'erjaeol1309',
                 'auth'      => true);
+*/
 
 $wgEmailAuthentication  = true;
 $wgEnableEmail          = true;
@@ -407,3 +426,16 @@ $wgEmailUsersMaxRecipients  = 5;    //: Defines the max number of recipients
 $wgEmailUsersUseJobQueue = true;    //: Use Manual:Job queue when sending mails
 
 //================================================
+/* display debug info
+error_reporting( -1 );
+ini_set( 'display_errors', 1 );
+
+    $wgShowExceptionDetails = true;
+    $wgDebugToolbar = true;
+    $wgShowDebug = true;
+    $wgDevelopmentWarnings = true;
+*/
+
+$wgShowIPinHeader = false;
+
+
