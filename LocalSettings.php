@@ -428,4 +428,7 @@ ini_set( 'display_errors', 1 );
 
 $wgShowIPinHeader = false;
 
+//added 2016 May 14
+$wgActionLockdown['history'] = array('user'); //only logged-in users can view history
+//$wgActionLockdown['view-source'] = array('user'); //only logged-in users can view source
 
