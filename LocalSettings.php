@@ -309,6 +309,10 @@ $wgNamespacePermissionLockdown[NS_TALK]['createpage']   = array('EoE_Member', 'E
 $wgNamespacePermissionLockdown[NS_TALK]['delete']       = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_TALK]['undelete']     = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
+$wgNamespacePermissionLockdown[NS_USER]['edit']         = array('EoE_Member', 'EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_USER]['createpage']   = array('EoE_Member', 'EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_USER]['delete']       = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_USER]['undelete']     = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
 /*
 for($i=0; $i<16; $i++)
@@ -429,6 +433,7 @@ ini_set( 'display_errors', 1 );
 $wgShowIPinHeader = false;
 
 //added 2016 May 14
-$wgActionLockdown['history'] = array('user'); //only logged-in users can view history
-//$wgActionLockdown['view-source'] = array('user'); //only logged-in users can view source
+//$wgActionLockdown['history'] = array('user'); //only logged-in users can view history - working but used below instead
+$wgActionLockdown['history']              = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+//$wgNamespacePermissionLockdown[*]['move'] = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor'); - this caused probs.
 
