@@ -160,7 +160,7 @@ $wgDiff3 = "/usr/bin/diff3";
         foreach($rights as $right) $wgGroupPermissions[$eoe_user][$right] = true;
     }
     //initialize basic rights
-    $rights = array('createpage', 'edit', 'delete', 'undelete', 'upload', 'sendemail');
+    $rights = array('createpage', 'edit', 'delete', 'undelete', 'upload', 'sendemail', 'writeapi');
     foreach(array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor') as $eoe_user)
     {
         foreach($rights as $right) $wgGroupPermissions[$eoe_user][$right] = true;
@@ -237,6 +237,40 @@ require_once("$IP/extensions/TalkRight/TalkRight.php");             //ver 1.5.1 
 require_once "$IP/extensions/ConfirmAccount/ConfirmAccount.php";    //added by Eli Sep 9
 require_once("$IP/extensions/EmailUsers/EmailUsers.php");           //added by Eli Oct 20
 wfLoadExtension( 'EmbedVideo' );
+
+//=== VisualEditor start - added May 17 ===============================================
+require_once "$IP/extensions/VisualEditor/VisualEditor.php";
+
+// Enable by default for everybody
+$wgDefaultUserOptions['visualeditor-enable'] = 1;
+
+// Don't allow users to disable it
+$wgHiddenPrefs[] = 'visualeditor-enable';
+
+// OPTIONAL: Enable VisualEditor's experimental code features
+#$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
+
+// To get VisualEditor to talk to Parsoid, add the following code to your LocalSettings.php to specify your Parsoid instance:
+
+    $wgVirtualRestConfig['modules']['parsoid'] = array(
+      // URL to the Parsoid instance
+      // Use port 8142 if you use the Debian package
+      'url' => 'http://127.0.0.1:8000',
+      // Parsoid "domain", see below (optional)
+      'domain' => 'localhost',
+      // Parsoid "prefix", see below (optional)
+      'prefix' => 'eoearth'
+    );
+
+$wgEnableAPI = true;
+$wgEnableWriteAPI = true; //are required in order to use the write API.
+
+$wgVisualEditorParsoidURL = 'http://127.0.0.1:8000';
+$wgSessionsInObjectCache = true;
+$wgVisualEditorParsoidForwardCookies = true;
+
+
+//=== VisualEditor end ================================================================
 
 # End of automatically generated settings.
 # Add more configuration options below.
