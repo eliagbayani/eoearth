@@ -80,35 +80,27 @@ $wgMemCachedServers = $conf['wgMemCachedServers'];
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
 $wgEnableUploads = true;
+$wgUseImageMagick               = $conf['wgUseImageMagick'];
+$wgImageMagickConvertCommand    = $conf['wgImageMagickConvertCommand'];
 
-/*
-mkdir /images/temp
-chmod 0777 /images/temp
-*/
-
-//1. Setup in LocalSettings.php
-// change images folder:
-/// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
+// 1. change images folder:
+// orig is     : /Library/WebServer/Documents/LiteratureEditor/images
 // changed to  : /Library/WebServer/Documents/LiteratureEditor_images
 
 $images_folder      = $conf['images_folder'];
 $wgUploadDirectory  = $conf['wgUploadDirectory'];   //where MediaWiki uploades images
 $wgUploadPath       = $conf['wgUploadPath'];        //where MediaWiki views images
 $wgDeletedDirectory = $conf['wgDeletedDirectory'];
-$wgTmpDirectory     = $conf['wgTmpDirectory'];
-
+$wgTmpDirectory     = $conf['wgTmpDirectory'];      //"$IP/images/temp"; --- original value
 
 // 2. Setup in Apache vhosts file, inside <VirtualHost *:80></VirtualHost>
 // Alias /LiteratureEditor/images/    "/Library/WebServer/Documents/LiteratureEditor_images/"
 
-// $wgTmpDirectory = "$IP/images/temp"; --- original value
 
 ///////////////////////
-$wgUseImageMagick               = $conf['wgUseImageMagick'];
-$wgImageMagickConvertCommand    = $conf['wgImageMagickConvertCommand'];
 
 # InstantCommons allows wiki to use images from http://commons.wikimedia.org
-$wgUseInstantCommons = true;
+$wgUseInstantCommons = false;
 
 ## If you use ImageMagick (or any other shell command) on a
 ## Linux server, this will need to be set to the name of an
@@ -231,12 +223,13 @@ wfLoadExtension( 'SpamBlacklist' );
 wfLoadExtension( 'SyntaxHighlight_GeSHi' );
 wfLoadExtension( 'TitleBlacklist' );
 wfLoadExtension( 'WikiEditor' );
+//added later on
 require_once "$IP/extensions/CreatePage/CreatePage.php";            //added by Eli Sep 8
 require_once "$IP/extensions/Lockdown/Lockdown.php";                //added by Eli Sep 8
-require_once("$IP/extensions/TalkRight/TalkRight.php");             //ver 1.5.1 -> This makes EoE_Member write to Talk/Discussion pages but readonly to regular pages
+require_once("$IP/extensions/TalkRight/TalkRight.php");             //[***] ver 1.5.1 -> This makes EoE_Member write to Talk/Discussion pages but readonly to regular pages
 require_once "$IP/extensions/ConfirmAccount/ConfirmAccount.php";    //added by Eli Sep 9
-require_once("$IP/extensions/EmailUsers/EmailUsers.php");           //added by Eli Oct 20
-wfLoadExtension( 'EmbedVideo' );
+require_once("$IP/extensions/EmailUsers/EmailUsers.php");           //[***] added by Eli Oct 20
+wfLoadExtension( 'EmbedVideo' );                                    //[***]
 
 //=== VisualEditor start - added May 17 ===============================================
 require_once "$IP/extensions/VisualEditor/VisualEditor.php";
