@@ -242,7 +242,7 @@ wfLoadExtension( 'EmbedVideo' );
 require_once "$IP/extensions/VisualEditor/VisualEditor.php";
 
 // Enable by default for everybody
-$wgDefaultUserOptions['visualeditor-enable'] = 1;
+$wgDefaultUserOptions['visualeditor-enable'] = 0;
 
 // Don't allow users to disable it
 $wgHiddenPrefs[] = 'visualeditor-enable';
@@ -255,9 +255,9 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
     $wgVirtualRestConfig['modules']['parsoid'] = array(
       // URL to the Parsoid instance
       // Use port 8142 if you use the Debian package
-      'url' => 'http://127.0.0.1:8000',
+      'url' => 'http://10.252.248.39:8000',
       // Parsoid "domain", see below (optional)
-      'domain' => 'localhost',
+      'domain' => '',
       // Parsoid "prefix", see below (optional)
       'prefix' => 'eoearth'
     );
