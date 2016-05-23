@@ -467,6 +467,6 @@ $wgShowIPinHeader = false;
 //$wgActionLockdown['history'] = array('user'); //only logged-in users can view history - working but used below instead
 $wgActionLockdown['history']              = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 //$wgNamespacePermissionLockdown[*]['move'] = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor'); - this caused probs.
-==================================================
+//==================================================
 $wgReadOnly = 'Upgrading to MediaWiki 1.26.2';
 
