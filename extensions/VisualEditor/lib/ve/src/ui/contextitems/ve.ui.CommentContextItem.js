@@ -7,13 +7,14 @@
 /**
  * Context item for a comment.
  *
- * @extends ve.ui.ContextItem
+ * @class
+ * @extends ve.ui.LinearContextItem
  *
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.CommentContextItem = function VeCommentContextItem( context, model, config ) {
+ve.ui.CommentContextItem = function VeUiCommentContextItem( context, model, config ) {
 	// Parent constructor
 	ve.ui.CommentContextItem.super.call( this, context, model, config );
 
@@ -23,13 +24,13 @@ ve.ui.CommentContextItem = function VeCommentContextItem( context, model, config
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.CommentContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.CommentContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 
 ve.ui.CommentContextItem.static.name = 'comment';
 
-ve.ui.CommentContextItem.static.icon = 'comment';
+ve.ui.CommentContextItem.static.icon = 'notice';
 
 ve.ui.CommentContextItem.static.label = OO.ui.deferMsg( 'visualeditor-commentinspector-title' );
 

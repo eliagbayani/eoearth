@@ -5,8 +5,6 @@
  * @license The MIT License (MIT); see LICENSE.txt
  */
 
-/* global mw */
-
 /**
  * Dialog for inserting and editing MediaWiki transclusions.
  *
@@ -26,8 +24,9 @@ ve.ui.MWTemplateDialog = function VeUiMWTemplateDialog( config ) {
 	this.loaded = false;
 	this.altered = false;
 	this.preventReselection = false;
+	this.expandedParamList = {};
 
-	this.confirmOverlay = new ve.ui.Overlay( { classes: ['ve-ui-overlay-global'] } );
+	this.confirmOverlay = new ve.ui.Overlay( { classes: [ 've-ui-overlay-global' ] } );
 	this.confirmDialogs = new ve.ui.WindowManager( { factory: ve.ui.windowFactory, isolate: true } );
 	this.confirmOverlay.$element.append( this.confirmDialogs.$element );
 	$( 'body' ).append( this.confirmOverlay.$element );
@@ -58,7 +57,7 @@ ve.ui.MWTemplateDialog.static.actions = [
 	},
 	{
 		label: OO.ui.deferMsg( 'visualeditor-dialog-action-cancel' ),
-		flags: 'safe',
+		flags: [ 'safe', 'back' ],
 		modes: [ 'insert', 'edit' ]
 	}
 ];
@@ -84,6 +83,7 @@ ve.ui.MWTemplateDialog.prototype.onTransclusionReady = function () {
 	this.loaded = true;
 	this.$element.addClass( 've-ui-mwTemplateDialog-ready' );
 	this.popPending();
+	this.bookletLayout.focus( 1 );
 };
 
 /**
@@ -112,7 +112,8 @@ ve.ui.MWTemplateDialog.prototype.onReplacePart = function ( removed, added ) {
 		if ( removed instanceof ve.dm.MWTemplateModel ) {
 			params = removed.getParameters();
 			for ( name in params ) {
-				removePages.push( this.bookletLayout.getPage( params[name].getId() ) );
+				removePages.push( this.bookletLayout.getPage( params[ name ].getId() ) );
+				delete this.expandedParamList[ params[ name ].getId() ];
 			}
 			removed.disconnect( this );
 		}
@@ -138,12 +139,12 @@ ve.ui.MWTemplateDialog.prototype.onReplacePart = function ( removed, added ) {
 				// Prevent selection changes
 				this.preventReselection = true;
 				for ( i = 0, len = names.length; i < len; i++ ) {
-					this.onAddParameter( params[names[i]] );
+					this.onAddParameter( params[ names[ i ] ] );
 				}
 				this.preventReselection = false;
 				added.connect( this, { add: 'onAddParameter', remove: 'onRemoveParameter' } );
 				if ( names.length ) {
-					this.setPageByName( params[names[0]].getId() );
+					this.setPageByName( params[ names[ 0 ] ].getId() );
 				}
 			}
 
@@ -156,7 +157,7 @@ ve.ui.MWTemplateDialog.prototype.onReplacePart = function ( removed, added ) {
 				names = added.getParameterNames();
 				params = added.getParameters();
 				if ( names.length ) {
-					this.setPageByName( params[names[0]].getId() );
+					this.setPageByName( params[ names[ 0 ] ].getId() );
 				} else if ( addedCount === 0 ) {
 					page.onAddButtonFocus();
 				}
@@ -176,6 +177,16 @@ ve.ui.MWTemplateDialog.prototype.onReplacePart = function ( removed, added ) {
 };
 
 /**
+ * Respond to showAll event in the placeholder page.
+ * Cache this so we can make sure the parameter list is expanded
+ * when we next load this same pageId placeholder.
+ *
+ * @param {string} pageId Page Id
+ */
+ve.ui.MWTemplateDialog.prototype.onParameterPlaceholderShowAll = function ( pageId ) {
+	this.expandedParamList[ pageId ] = true;
+};
+/**
  * Handle add param events.
  *
  * @param {ve.dm.MWParameterModel} param Added param
@@ -184,9 +195,12 @@ ve.ui.MWTemplateDialog.prototype.onAddParameter = function ( param ) {
 	var page;
 
 	if ( param.getName() ) {
-		page = new ve.ui.MWParameterPage( param, param.getId(), { $: this.$ } );
+		page = new ve.ui.MWParameterPage( param, param.getId() );
 	} else {
-		page = new ve.ui.MWParameterPlaceholderPage( param, param.getId(), { $: this.$ } );
+		page = new ve.ui.MWParameterPlaceholderPage( param, param.getId(), {
+			expandedParamList: !!this.expandedParamList[ param.getId() ]
+		} )
+			.connect( this, { showAll: 'onParameterPlaceholderShowAll' } );
 	}
 	this.bookletLayout.addPages( [ page ], this.transclusionModel.getIndex( param ) );
 	if ( this.loaded ) {
@@ -206,13 +220,13 @@ ve.ui.MWTemplateDialog.prototype.onAddParameter = function ( param ) {
 			.find( '.ve-ui-mwParameterPage-field > .oo-ui-textInputWidget > textarea' )
 				.attr( 'tabindex', index * 3 + 1 )
 			.end()
-			.find( '.ve-ui-mwParameterPage-infoButton' )
+			.find( '.ve-ui-mwParameterPage-infoButton > a' )
 				.attr( 'tabindex', index * 3 + 2 )
 			.end()
-			.find( '.ve-ui-mwParameterPage-removeButton' )
+			.find( '.ve-ui-mwParameterPage-removeButton > a' )
 				.attr( 'tabindex', index * 3 + 3 )
 			.end()
-			.find( '.ve-ui-mwParameterPage-more' )
+			.find( '.ve-ui-mwParameterPage-more a' )
 				.attr( 'tabindex', index * 3 + 4 );
 	} );
 };
@@ -253,7 +267,7 @@ ve.ui.MWTemplateDialog.prototype.onRemoveParameter = function ( param ) {
 ve.ui.MWTemplateDialog.prototype.setApplicableStatus = function () {
 	var parts = this.transclusionModel && this.transclusionModel.getParts();
 
-	if ( parts.length && !( parts[0] instanceof ve.dm.MWTemplatePlaceholderModel ) ) {
+	if ( parts.length && !( parts[ 0 ] instanceof ve.dm.MWTemplatePlaceholderModel ) ) {
 		this.actions.setAbilities( { apply: this.altered, insert: true } );
 	} else {
 		// Loading is resolved. We have either: 1) no parts, or 2) the a placeholder as the first part
@@ -276,12 +290,12 @@ ve.ui.MWTemplateDialog.prototype.getBodyHeight = function () {
  */
 ve.ui.MWTemplateDialog.prototype.getPageFromPart = function ( part ) {
 	if ( part instanceof ve.dm.MWTemplateModel ) {
-		return new ve.ui.MWTemplatePage( part, part.getId(), { $: this.$ } );
+		return new ve.ui.MWTemplatePage( part, part.getId() );
 	} else if ( part instanceof ve.dm.MWTemplatePlaceholderModel ) {
 		return new ve.ui.MWTemplatePlaceholderPage(
 			part,
 			part.getId(),
-			{ $: this.$, $overlay: this.$overlay }
+			{ $overlay: this.$overlay }
 		);
 	}
 	return null;
@@ -291,7 +305,7 @@ ve.ui.MWTemplateDialog.prototype.getPageFromPart = function ( part ) {
  * Get the label of a template or template placeholder.
  *
  * @param {ve.dm.MWTemplateModel|ve.dm.MWTemplatePlaceholderModel} part Part to check
- * @returns {string} Label of template or template placeholder
+ * @return {string} Label of template or template placeholder
  */
 ve.ui.MWTemplateDialog.prototype.getTemplatePartLabel = function ( part ) {
 	return part instanceof ve.dm.MWTemplateModel ?
@@ -324,9 +338,7 @@ ve.ui.MWTemplateDialog.prototype.getSelectedNode = function ( data ) {
  */
 ve.ui.MWTemplateDialog.prototype.setPageByName = function ( name ) {
 	if ( this.bookletLayout.isOutlined() ) {
-		this.bookletLayout.getOutline().selectItem(
-			this.bookletLayout.getOutline().getItemFromData( name )
-		);
+		this.bookletLayout.getOutline().selectItemByData( name );
 	} else {
 		this.bookletLayout.setPage( name );
 	}
@@ -339,8 +351,8 @@ ve.ui.MWTemplateDialog.prototype.updateTitle = function () {
 	var parts = this.transclusionModel && this.transclusionModel.getParts();
 
 	this.title.setLabel(
-		parts && parts.length === 1 && parts[0] ?
-			this.getTemplatePartLabel( parts[0] ) :
+		parts && parts.length === 1 && parts[ 0 ] ?
+			this.getTemplatePartLabel( parts[ 0 ] ) :
 			ve.msg( 'visualeditor-dialog-transclusion-loading' )
 	);
 };
@@ -353,13 +365,8 @@ ve.ui.MWTemplateDialog.prototype.initialize = function () {
 	ve.ui.MWTemplateDialog.super.prototype.initialize.call( this );
 
 	// Properties
-	this.panels = new OO.ui.StackLayout( { $: this.$ } );
-	this.bookletLayout = new OO.ui.BookletLayout(
-		ve.extendObject(
-			{ $: this.$ },
-			this.constructor.static.bookletLayoutConfig
-		)
-	);
+	this.panels = new OO.ui.StackLayout();
+	this.bookletLayout = new OO.ui.BookletLayout( this.constructor.static.bookletLayoutConfig );
 
 	// Initialization
 	this.$content.addClass( 've-ui-mwTemplateDialog' );
@@ -372,7 +379,8 @@ ve.ui.MWTemplateDialog.prototype.initialize = function () {
  * If no required parameters were left blank, or if they were but the user decided to go ahead
  *  anyway, the returned deferred will be resolved.
  * Otherwise, the returned deferred will be rejected.
- * @returns {jQuery.Deferred}
+ *
+ * @return {jQuery.Deferred}
  */
 ve.ui.MWTemplateDialog.prototype.checkRequiredParameters = function () {
 	var blankRequired = [],
@@ -502,8 +510,8 @@ ve.ui.MWTemplateDialog.prototype.getSetupProcess = function ( data ) {
 ve.ui.MWTemplateDialog.prototype.initializeNewTemplateParameters = function () {
 	var i, parts = this.transclusionModel.getParts();
 	for ( i = 0; i < parts.length; i++ ) {
-		if ( parts[i] instanceof ve.dm.MWTemplateModel ) {
-			parts[i].addPromptedParameters();
+		if ( parts[ i ] instanceof ve.dm.MWTemplateModel ) {
+			parts[ i ].addPromptedParameters();
 		}
 	}
 };
@@ -512,17 +520,6 @@ ve.ui.MWTemplateDialog.prototype.initializeNewTemplateParameters = function () {
  * Intentionally empty. This is provided for Wikia extensibility.
  */
 ve.ui.MWTemplateDialog.prototype.initializeTemplateParameters = function () {};
-
-/**
- * @inheritdoc
- */
-ve.ui.MWTemplateDialog.prototype.getReadyProcess = function ( data ) {
-	var dialog = this;
-	return ve.ui.MWTemplateDialog.super.prototype.getReadyProcess.call( this, data )
-		.next( function () {
-			dialog.bookletLayout.focus();
-		} );
-};
 
 /**
  * @inheritdoc

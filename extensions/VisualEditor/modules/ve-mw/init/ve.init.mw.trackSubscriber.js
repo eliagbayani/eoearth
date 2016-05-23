@@ -8,14 +8,16 @@
  */
 
 ( function () {
+	var timing, editingSessionId;
+
 	if ( mw.loader.getState( 'schema.Edit' ) === null ) {
 		// Only route any events into the Edit schema if the module is actually available.
 		// It won't be if EventLogging is installed but WikimediaEvents is not.
 		return;
 	}
 
-	var timing = {},
-		editingSessionId = mw.user.generateRandomSessionId();
+	timing = {};
+	editingSessionId = mw.user.generateRandomSessionId();
 
 	function computeDuration( action, event, timeStamp ) {
 		if ( event.timing !== undefined ) {
@@ -50,6 +52,7 @@
 					case 'nochange':
 					case 'switchwith':
 					case 'switchwithout':
+					case 'switchnochange':
 					case 'abandon':
 						return timeStamp - timing.ready;
 					case 'abandonMidsave':
@@ -61,7 +64,7 @@
 	}
 
 	ve.trackSubscribe( 'mwedit.', function ( topic, data, timeStamp ) {
-		var action = topic.split( '.' )[1],
+		var action = topic.split( '.' )[ 1 ],
 			event;
 
 		timeStamp = timeStamp || this.timeStamp;  // I8e82acc12 back-compat
@@ -95,13 +98,12 @@
 			version: 1,
 			action: action,
 			editor: 'visualeditor',
-			platform: 'desktop', // FIXME
+			platform: ve.init && ve.init.target && ve.init.target.constructor.static.platformType || 'other',
 			integration: ve.init && ve.init.target && ve.init.target.constructor.static.integrationType || 'page',
 			'page.id': mw.config.get( 'wgArticleId' ),
 			'page.title': mw.config.get( 'wgPageName' ),
 			'page.ns': mw.config.get( 'wgNamespaceNumber' ),
 			'page.revid': mw.config.get( 'wgRevisionId' ),
-			'page.length': -1, // FIXME
 			editingSessionId: editingSessionId,
 			'user.id': mw.user.getId(),
 			'user.editCount': mw.config.get( 'wgUserEditCount', 0 ),
@@ -109,13 +111,13 @@
 		}, data );
 
 		if ( mw.user.isAnon() ) {
-			event['user.class'] = 'IP';
+			event[ 'user.class' ] = 'IP';
 		}
 
-		event['action.' + action + '.type'] = event.type;
-		event['action.' + action + '.mechanism'] = event.mechanism;
-		event['action.' + action + '.timing'] = Math.round( computeDuration( action, event, timeStamp ) );
-		event['action.' + action + '.message'] = event.message;
+		event[ 'action.' + action + '.type' ] = event.type;
+		event[ 'action.' + action + '.mechanism' ] = event.mechanism;
+		event[ 'action.' + action + '.timing' ] = Math.round( computeDuration( action, event, timeStamp ) );
+		event[ 'action.' + action + '.message' ] = event.message;
 
 		// Remove renamed properties
 		delete event.type;
@@ -126,22 +128,20 @@
 		if ( action === 'abort' ) {
 			timing = {};
 		} else {
-			timing[action] = timeStamp;
+			timing[ action ] = timeStamp;
 		}
 
 		mw.track( 'event.Edit', event );
 	} );
 
 	ve.trackSubscribe( 'mwtiming.', function ( topic, data ) {
-		var target;
 		// Add type for save errors; not in the topic for stupid historical reasons
 		if ( topic === 'mwtiming.performance.user.saveError' ) {
 			topic = topic + '.' + data.type;
 		}
 
-		target = data.targetName || 'mwTarget';
 		// Map mwtiming.foo --> timing.ve.foo.mobile
-		topic = topic.replace( /^mwtiming/, 'timing.ve.' + target );
+		topic = topic.replace( /^mwtiming/, 'timing.ve.' + data.targetName );
 		mw.track( topic, data.duration );
 	} );
 

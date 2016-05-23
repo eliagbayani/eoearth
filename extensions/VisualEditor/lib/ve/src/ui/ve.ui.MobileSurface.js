@@ -17,7 +17,7 @@
  */
 ve.ui.MobileSurface = function VeUiMobileSurface() {
 	// Parent constructor
-	ve.ui.Surface.apply( this, arguments );
+	ve.ui.MobileSurface.super.apply( this, arguments );
 
 	// Properties
 	this.scrollPosition = null;
@@ -36,6 +36,10 @@ ve.ui.MobileSurface = function VeUiMobileSurface() {
 /* Inheritance */
 
 OO.inheritClass( ve.ui.MobileSurface, ve.ui.Surface );
+
+/* Static Properties */
+
+ve.ui.MobileSurface.static.isMobile = true;
 
 /* Methods */
 
@@ -69,7 +73,7 @@ ve.ui.MobileSurface.prototype.onWindowOpening = function ( win, opening ) {
  * @inheritdoc
  */
 ve.ui.MobileSurface.prototype.createContext = function () {
-	return new ve.ui.MobileContext( this, { $: this.$ } );
+	return new ve.ui.MobileContext( this );
 };
 
 /**

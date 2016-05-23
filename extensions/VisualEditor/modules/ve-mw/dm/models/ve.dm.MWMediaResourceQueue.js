@@ -43,11 +43,11 @@ ve.dm.MWMediaResourceQueue.prototype.setup = function () {
 			// Set up the providers
 			for ( i = 0, len = sources.length; i < len; i++ ) {
 				queue.providers.push( new ve.dm.MWMediaResourceProvider(
-					sources[i].apiurl,
+					sources[ i ].apiurl,
 					{
-						name: sources[i].name,
-						local: sources[i].local,
-						scriptDirUrl: sources[i].scriptDirUrl,
+						name: sources[ i ].name,
+						local: sources[ i ].local,
+						scriptDirUrl: sources[ i ].scriptDirUrl,
 						userParams: {
 							gsrsearch: queue.getSearchQuery()
 						},
@@ -57,7 +57,7 @@ ve.dm.MWMediaResourceQueue.prototype.setup = function () {
 							generator: 'search',
 							gsrnamespace: 6,
 							continue: '',
-							iiprop: 'dimensions|url|mediatype|extmetadata|timestamp',
+							iiprop: 'dimensions|url|mediatype|extmetadata|timestamp|user',
 							prop: 'imageinfo'
 						}
 					} )
@@ -97,6 +97,7 @@ ve.dm.MWMediaResourceQueue.prototype.getFileRepos = function () {
 
 /**
  * Get the search query
+ *
  * @return {string} API search query
  */
 ve.dm.MWMediaResourceQueue.prototype.getSearchQuery = function () {
@@ -106,6 +107,7 @@ ve.dm.MWMediaResourceQueue.prototype.getSearchQuery = function () {
 
 /**
  * Get image maximum height
+ *
  * @return {string} Image max height
  */
 ve.dm.MWMediaResourceQueue.prototype.getMaxHeight = function () {

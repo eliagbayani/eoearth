@@ -57,41 +57,11 @@ ve.ce.RangeState = function VeCeRangeState( old, documentNode, selectionOnly ) {
 
 OO.initClass( ve.ce.RangeState );
 
-/* Static methods */
-
-/**
- * Create a plain selection object equivalent to no selection
- *
- * @return {Object} Plain selection object
- */
-ve.ce.RangeState.static.createNullSelection = function () {
-	return {
-		focusNode: null,
-		focusOffset: 0,
-		anchorNode: null,
-		anchorOffset: 0
-	};
-};
-
-/**
- * Compare two plain selection objects, checking that all values are equal
- * and all nodes are reference-equal.
- *
- * @param {Object} a First plain selection object
- * @param {Object} b First plain selection object
- * @return {boolean} Selections are identical
- */
-ve.ce.RangeState.static.compareSelections = function ( a, b ) {
-	return a.focusNode === b.focusNode &&
-		a.focusOffset === b.focusOffset &&
-		a.anchorNode === b.anchorNode &&
-		a.anchorOffset === b.anchorOffset;
-};
-
 /* Methods */
 
 /**
  * Saves a snapshot of the current range state
+ *
  * @method
  * @param {ve.ce.RangeState|null} old Previous range state
  * @param {ve.ce.DocumentNode} documentNode Document node
@@ -99,27 +69,22 @@ ve.ce.RangeState.static.compareSelections = function ( a, b ) {
  */
 ve.ce.RangeState.prototype.saveState = function ( old, documentNode, selectionOnly ) {
 	var $node, selection, anchorNodeChanged,
-		oldSelection = old ? old.misleadingSelection : this.constructor.static.createNullSelection(),
+		oldSelection = old ? old.misleadingSelection : ve.SelectionState.static.newNullSelection(),
 		nativeSelection = documentNode.getElementDocument().getSelection();
 
 	if (
 		nativeSelection.rangeCount &&
-		OO.ui.contains( documentNode.$element[0], nativeSelection.anchorNode, true )
+		OO.ui.contains( documentNode.$element[ 0 ], nativeSelection.anchorNode, true )
 	) {
 		// Freeze selection out of live object.
-		selection = {
-			focusNode: nativeSelection.focusNode,
-			focusOffset: nativeSelection.focusOffset,
-			anchorNode: nativeSelection.anchorNode,
-			anchorOffset: nativeSelection.anchorOffset
-		};
+		selection = new ve.SelectionState( nativeSelection );
 	} else {
 		// Use a blank selection if the selection is outside the document
-		selection = this.constructor.static.createNullSelection();
+		selection = ve.SelectionState.static.newNullSelection();
 	}
 
 	// Get new range information
-	if ( this.constructor.static.compareSelections( oldSelection, selection ) ) {
+	if ( selection.equalsSelection( oldSelection ) ) {
 		// No change; use old values for speed
 		this.selectionChanged = false;
 		this.veRange = old && old.veRange;
@@ -156,8 +121,8 @@ ve.ce.RangeState.prototype.saveState = function ( old, documentNode, selectionOn
 		this.text = null;
 		this.hash = null;
 	} else {
-		this.text = ve.ce.getDomText( this.node.$element[0] );
-		this.hash = ve.ce.getDomHash( this.node.$element[0] );
+		this.text = ve.ce.getDomText( this.node.$element[ 0 ] );
+		this.hash = ve.ce.getDomHash( this.node.$element[ 0 ] );
 	}
 
 	// Only set contentChanged if we're still in the same branch node

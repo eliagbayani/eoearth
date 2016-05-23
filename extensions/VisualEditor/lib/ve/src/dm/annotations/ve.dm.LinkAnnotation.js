@@ -27,15 +27,13 @@ OO.inheritClass( ve.dm.LinkAnnotation, ve.dm.Annotation );
 
 ve.dm.LinkAnnotation.static.name = 'link';
 
-ve.dm.LinkAnnotation.static.matchTagNames = ['a'];
-
-ve.dm.LinkAnnotation.static.splitOnWordbreak = true;
+ve.dm.LinkAnnotation.static.matchTagNames = [ 'a' ];
 
 ve.dm.LinkAnnotation.static.toDataElement = function ( domElements ) {
 	return {
 		type: this.name,
 		attributes: {
-			href: domElements[0].getAttribute( 'href' )
+			href: domElements[ 0 ].getAttribute( 'href' )
 		}
 	};
 };
@@ -55,7 +53,7 @@ ve.dm.LinkAnnotation.static.toDomElements = function ( dataElement, doc ) {
  * @method
  * @inheritable
  * @param {Object} dataElement Linear model element
- * @returns {string} Link href
+ * @return {string} Link href
  */
 ve.dm.LinkAnnotation.static.getHref = function ( dataElement ) {
 	return dataElement.attributes.href;
@@ -65,11 +63,23 @@ ve.dm.LinkAnnotation.static.getHref = function ( dataElement ) {
 
 /**
  * Convenience wrapper for .getHref() on the current element.
+ *
  * @see #static-getHref
- * @returns {string} Link href
+ * @return {string} Link href
  */
 ve.dm.LinkAnnotation.prototype.getHref = function () {
 	return this.constructor.static.getHref( this.element );
+};
+
+/**
+ * Get the display title for this link
+ *
+ * Can be overriden by special link types.
+ *
+ * @return {string} Display title
+ */
+ve.dm.LinkAnnotation.prototype.getDisplayTitle = function () {
+	return this.getHref();
 };
 
 /**

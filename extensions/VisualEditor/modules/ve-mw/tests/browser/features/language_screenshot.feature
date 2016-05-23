@@ -28,7 +28,7 @@ Feature: Language Screenshot
   @language_screenshot
   Scenario: VisualEditor_Toolbar_SpecialCharacters
     Given I am editing the language screenshots page
-    When I click on the Special character option in Insert menu
+    When I click on the Special character option in the toolbar
     Then I should see Special character Insertion window
 
   @language_screenshot
@@ -49,15 +49,34 @@ Feature: Language Screenshot
   Scenario: VisualEditor_Toolbar_Lists_and_indentation
     Given I go to the "Indent Outdent Screenshot" page with source content "Indent Outdent Screenshot"
       And I make the text "Indent Outdent" be selected
-    When I click Bullets
-      And I click on list and indentation dropdown
+    When I click on list and indentation button
     Then I should see list and indentation dropdown
 
-  Scenario: VisualEditor_External_link
-    Given I go to the "Links VisualEditor Screenshot" page with source content "Links VisualEditor Screenshot"
+  @language_screenshot
+  Scenario: VisualEditor_Internal_link
+    Given I go to the "Links VisualEditor Screenshot" page with source content "Hello World" for language screenshot
       And I click in the editable part
+      And I select "World" in editable part
       And I click the Link button
-    When I enter http://www.mediawiki.org into link Content box
+    Then I should see link Content box with dropdown options
+
+  @language_screenshot
+  Scenario: VisualEditor_External_link
+    Given I go to the "Links VisualEditor Screenshot" page with source content "Hello World" for language screenshot
+      And I click in the editable part
+      And I select "World" in editable part
+      And I click the Link button
+      And I click the External link button in the panel
+      When I enter external link "http://www.example.com" into external link Content box
+    Then I should see link Content box with dropdown options
+
+  @language_screenshot
+  Scenario: VisualEditor_Internal_selected_link
+    Given I go to the "Links VisualEditor Screenshot" page with source content "Hello World" for language screenshot
+      And I click in the editable part
+      And I select "World" in editable part
+      And I click the Link button
+      When I click on search pages in panel
     Then I should see link Content box with dropdown options
 
   Scenario: VisualEditor_Link_editing_inline
@@ -128,10 +147,18 @@ Feature: Language Screenshot
     Then I should see the VisualEditor tool-bar
 
   @language_screenshot
-  Scenario: VisualEditor_category_editing
-    Given I am editing the language screenshots page
+  Scenario: VisualEditor_category_addition
+    Given I am editing the language screenshots page with category "Earth"
+    And I click on category in hamburger menu
+    When I add Category "World" in category dialog box
+    Then I should see category recommendation drop down
+
+  @language_screenshot
+  Scenario: VisualEditor_category_deletion
+    Given I am editing the language screenshots page with category "Earth"
     When I click on category in hamburger menu
-    Then I should see category dialog box
+    When I click on first category
+    Then I should see delete button in category info box
 
   @language_screenshot
   Scenario: VisualEditor_formula

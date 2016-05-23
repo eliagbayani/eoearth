@@ -21,6 +21,7 @@ ve.ui.MWCitationDialog = function VeUiMWCitationDialog( config ) {
 	// Properties
 	this.referenceModel = null;
 	this.referenceNode = null;
+	this.inDialog = '';
 };
 
 /* Inheritance */
@@ -38,7 +39,7 @@ ve.ui.MWCitationDialog.static.icon = 'reference';
 /**
  * Get the reference node to be edited.
  *
- * @returns {ve.dm.MWReferenceNode|null} Reference node to be edited, null if none exists
+ * @return {ve.dm.MWReferenceNode|null} Reference node to be edited, null if none exists
  */
 ve.ui.MWCitationDialog.prototype.getReferenceNode = function () {
 	var selectedNode = this.getFragment().getSelectedNode();
@@ -61,12 +62,12 @@ ve.ui.MWCitationDialog.prototype.getSelectedNode = function () {
 		branches = referenceNode.getInternalItem().getChildren();
 		leaves = branches &&
 			branches.length === 1 &&
-			branches[0].canContainContent() &&
-			branches[0].getChildren();
+			branches[ 0 ].canContainContent() &&
+			branches[ 0 ].getChildren();
 		transclusionNode = leaves &&
 			leaves.length === 1 &&
-			leaves[0] instanceof ve.dm.MWTransclusionNode &&
-			leaves[0];
+			leaves[ 0 ] instanceof ve.dm.MWTransclusionNode &&
+			leaves[ 0 ];
 	}
 
 	return transclusionNode || null;
@@ -89,6 +90,9 @@ ve.ui.MWCitationDialog.prototype.initialize = function ( data ) {
 ve.ui.MWCitationDialog.prototype.getSetupProcess = function ( data ) {
 	return ve.ui.MWCitationDialog.super.prototype.getSetupProcess.call( this, data )
 		.next( function () {
+			data = data || {};
+			this.inDialog = data.inDialog;
+
 			// Initialization
 			if ( this.selectedNode ) {
 				this.referenceNode = this.getReferenceNode();
@@ -140,7 +144,8 @@ ve.ui.MWCitationDialog.prototype.onAddParameterBeforeLoad = function ( page ) {
 
 /**
  * Works out whether there are any set parameters that aren't just placeholders
- * @return boolean
+ *
+ * @return {boolean}
  */
 ve.ui.MWCitationDialog.prototype.hasUsefulParameter = function () {
 	var foundUseful = false;
@@ -161,7 +166,10 @@ ve.ui.MWCitationDialog.prototype.hasUsefulParameter = function () {
  */
 ve.ui.MWCitationDialog.prototype.getActionProcess = function ( action ) {
 	var dialog = this;
-	if ( action === 'apply' || action === 'insert' ) {
+	if (
+		this.inDialog !== 'reference' &&
+		( action === 'apply' || action === 'insert' )
+	) {
 		return new OO.ui.Process( function () {
 			var deferred = $.Deferred();
 			dialog.checkRequiredParameters().done( function () {
@@ -174,9 +182,7 @@ ve.ui.MWCitationDialog.prototype.getActionProcess = function ( action ) {
 				if ( !dialog.referenceModel ) {
 					// Collapse returns a new fragment, so update dialog.fragment
 					dialog.fragment = dialog.getFragment().collapseToEnd();
-					dialog.referenceModel = new ve.dm.MWReferenceModel();
-					dialog.referenceModel.setDir( doc.getDir() );
-					dialog.referenceModel.setLang( doc.getLang() );
+					dialog.referenceModel = new ve.dm.MWReferenceModel( doc );
 					dialog.referenceModel.insertInternalItem( surfaceModel );
 					dialog.referenceModel.insertReferenceNode( dialog.getFragment() );
 				}
@@ -197,7 +203,7 @@ ve.ui.MWCitationDialog.prototype.getActionProcess = function ( action ) {
 							// item covers the entire paragraph so we have to get the range of it's
 							// first (and empty) child
 							dialog.getFragment().clone(
-								new ve.dm.LinearSelection( doc, item.getChildren()[0].getRange() )
+								new ve.dm.LinearSelection( doc, item.getChildren()[ 0 ].getRange() )
 							)
 						);
 					}

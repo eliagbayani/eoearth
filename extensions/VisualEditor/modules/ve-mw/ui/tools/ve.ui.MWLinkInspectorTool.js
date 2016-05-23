@@ -13,22 +13,59 @@
  *
  * @class
  * @extends ve.ui.LinkInspectorTool
+ *
  * @constructor
  * @param {OO.ui.ToolGroup} toolGroup
  * @param {Object} [config] Configuration options
  */
-ve.ui.MWLinkInspectorTool = function VeUiMWLinkInspectorTool( toolGroup, config ) {
-	ve.ui.LinkInspectorTool.call( this, toolGroup, config );
+ve.ui.MWLinkInspectorTool = function VeUiMwLinkInspectorTool() {
+	ve.ui.MWLinkInspectorTool.super.apply( this, arguments );
 };
+
+/* Inheritance */
 
 OO.inheritClass( ve.ui.MWLinkInspectorTool, ve.ui.LinkInspectorTool );
 
-// FIXME should eventually vary title based on link type
-// Use message visualeditor-annotationbutton-linknode-tooltip
+/* Static Properties */
 
 ve.ui.MWLinkInspectorTool.static.modelClasses =
 	ve.ui.MWLinkInspectorTool.super.static.modelClasses.concat( [
-		ve.dm.MWNumberedExternalLinkNode
+		ve.dm.MWNumberedExternalLinkNode,
+		ve.dm.MWMagicLinkNode
 	] );
 
+ve.ui.MWLinkInspectorTool.static.associatedWindows = [ 'link', 'linkNode', 'linkMagicNode' ];
+
+/* Methods */
+
+/**
+ * @inheritdoc
+ */
+ve.ui.MWLinkInspectorTool.prototype.onUpdateState = function ( fragment ) {
+	var node, type, title;
+
+	// Parent method
+	ve.ui.MWLinkInspectorTool.super.prototype.onUpdateState.apply( this, arguments );
+
+	// Vary title based on link type.
+	node = fragment && fragment.getSelectedNode();
+	type = node instanceof ve.dm.MWMagicLinkNode ?
+		'magiclinknode-tooltip-' + node.getMagicType().toLowerCase() :
+		node instanceof ve.dm.MWNumberedExternalLinkNode ?
+		'linknode-tooltip' : null;
+	title = type ?
+		OO.ui.deferMsg( 'visualeditor-annotationbutton-' + type ) :
+		ve.ui.MWLinkInspectorTool.static.title;
+
+	this.setTitle( title  );
+};
+
+/* Registration */
+
 ve.ui.toolFactory.register( ve.ui.MWLinkInspectorTool );
+
+ve.ui.commandRegistry.register(
+	new ve.ui.Command(
+		'link', 'link', 'open', { supportedSelections: [ 'linear' ] }
+	)
+);

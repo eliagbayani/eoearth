@@ -39,7 +39,7 @@ ve.ui.MWTransclusionDialog.static.actions = ve.ui.MWTemplateDialog.static.action
 		modes: [ 'edit', 'insert' ],
 		// HACK: Will be set later, but we want measurements to be accurate in the mean time, this
 		// will not be needed when T93290 is resolved
-		label: $( document.createTextNode( '&nbsp;' ) )
+		label: $( document.createTextNode( '\u00a0' ) )
 	}
 ] );
 
@@ -155,8 +155,13 @@ ve.ui.MWTransclusionDialog.prototype.onBookletLayoutSet = function ( page ) {
 		!( page instanceof ve.ui.MWTemplatePage || page instanceof ve.ui.MWParameterPage )
 	);
 	this.bookletLayout.getOutlineControls().removeButton.toggle( !(
-		page instanceof ve.ui.MWParameterPage &&
-		page.parameter.isRequired()
+		(
+			page instanceof ve.ui.MWParameterPage &&
+			page.parameter.isRequired()
+		) || (
+			this.transclusionModel.getParts().length === 1 &&
+			page instanceof ve.ui.MWTemplatePlaceholderPage
+		)
 	) );
 };
 
@@ -186,14 +191,14 @@ ve.ui.MWTransclusionDialog.prototype.onReplacePart = function ( removed, added )
 /**
  * Checks if transclusion only contains a single template or template placeholder.
  *
- * @returns {boolean} Transclusion only contains a single template or template placeholder
+ * @return {boolean} Transclusion only contains a single template or template placeholder
  */
 ve.ui.MWTransclusionDialog.prototype.isSingleTemplateTransclusion = function () {
 	var parts = this.transclusionModel && this.transclusionModel.getParts();
 
 	return parts && parts.length === 1 && (
-		parts[0] instanceof ve.dm.MWTemplateModel ||
-		parts[0] instanceof ve.dm.MWTemplatePlaceholderModel
+		parts[ 0 ] instanceof ve.dm.MWTemplateModel ||
+		parts[ 0 ] instanceof ve.dm.MWTemplatePlaceholderModel
 	);
 };
 
@@ -203,7 +208,7 @@ ve.ui.MWTransclusionDialog.prototype.isSingleTemplateTransclusion = function () 
 ve.ui.MWTransclusionDialog.prototype.getPageFromPart = function ( part ) {
 	var page = ve.ui.MWTransclusionDialog.super.prototype.getPageFromPart.call( this, part );
 	if ( !page && part instanceof ve.dm.MWTransclusionContentModel ) {
-		return new ve.ui.MWTransclusionContentPage( part, part.getId(), { $: this.$ } );
+		return new ve.ui.MWTransclusionContentPage( part, part.getId() );
 	}
 	return page;
 };
@@ -221,12 +226,12 @@ ve.ui.MWTransclusionDialog.prototype.setMode = function ( mode ) {
 
 	if ( this.transclusionModel ) {
 		parts = this.transclusionModel.getParts();
-		part = parts.length && parts[0];
+		part = parts.length && parts[ 0 ];
 		if ( mode === 'auto' ) {
 			mode = this.isSingleTemplateTransclusion() ? 'single' : 'multiple';
 		}
 	}
-	if ( !modeCssClasses[mode] ) {
+	if ( !modeCssClasses[ mode ] ) {
 		mode = 'multiple';
 	}
 
@@ -235,7 +240,7 @@ ve.ui.MWTransclusionDialog.prototype.setMode = function ( mode ) {
 		single = mode === 'single';
 		if ( this.$content ) {
 			for ( name in modeCssClasses ) {
-				this.$content.toggleClass( modeCssClasses[name], name === mode );
+				this.$content.toggleClass( modeCssClasses[ name ], name === mode );
 			}
 		}
 		this.setSize( single ? 'medium' : 'large' );
@@ -320,19 +325,16 @@ ve.ui.MWTransclusionDialog.prototype.initialize = function () {
 
 	// Properties
 	this.addTemplateButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		framed: false,
 		icon: 'template',
 		title: ve.msg( 'visualeditor-dialog-transclusion-add-template' )
 	} );
 	this.addContentButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		framed: false,
 		icon: 'source',
 		title: ve.msg( 'visualeditor-dialog-transclusion-add-content' )
 	} );
 	this.addParameterButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		framed: false,
 		icon: 'parameter',
 		title: ve.msg( 'visualeditor-dialog-transclusion-add-param' )

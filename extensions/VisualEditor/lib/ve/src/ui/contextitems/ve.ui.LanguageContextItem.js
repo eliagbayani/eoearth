@@ -7,13 +7,14 @@
 /**
  * Context item for a language.
  *
- * @extends ve.ui.ContextItem
+ * @class
+ * @extends ve.ui.LinearContextItem
  *
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.LanguageContextItem = function VeLanguageContextItem( context, model, config ) {
+ve.ui.LanguageContextItem = function VeUiLanguageContextItem( context, model, config ) {
 	// Parent constructor
 	ve.ui.LanguageContextItem.super.call( this, context, model, config );
 
@@ -23,13 +24,13 @@ ve.ui.LanguageContextItem = function VeLanguageContextItem( context, model, conf
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.LanguageContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.LanguageContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 
 ve.ui.LanguageContextItem.static.name = 'language';
 
-ve.ui.LanguageContextItem.static.icon = 'language';
+ve.ui.LanguageContextItem.static.icon = 'textLanguage';
 
 ve.ui.LanguageContextItem.static.label = OO.ui.deferMsg( 'visualeditor-languageinspector-title' );
 

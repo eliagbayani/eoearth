@@ -1,12 +1,12 @@
 /*!
- * OOjs UI v0.9.7
+ * OOjs UI v0.12.8
  * https://www.mediawiki.org/wiki/OOjs_UI
  *
- * Copyright 2011–2015 OOjs Team and other contributors.
+ * Copyright 2011–2015 OOjs UI Team and other contributors.
  * Released under the MIT license
  * http://oojs.mit-license.org
  *
- * Date: 2015-04-03T21:01:28Z
+ * Date: 2015-09-08T20:55:55Z
  */
 /**
  * @class
@@ -16,7 +16,7 @@
  */
 OO.ui.ApexTheme = function OoUiApexTheme() {
 	// Parent constructor
-	OO.ui.ApexTheme.super.call( this );
+	OO.ui.ApexTheme.parent.call( this );
 };
 
 /* Setup */

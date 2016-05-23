@@ -45,22 +45,18 @@ ve.Node = function VeNode() {
  *
  * @method
  * @abstract
- * @returns {string[]|null} List of node types allowed as children or null if any type is allowed
+ * @return {string[]|null} List of node types allowed as children or null if any type is allowed
  */
-ve.Node.prototype.getChildNodeTypes = function () {
-	throw new Error( 've.Node.getChildNodeTypes must be overridden in subclass' );
-};
+ve.Node.prototype.getChildNodeTypes = null;
 
 /**
  * Get allowed parent node types.
  *
  * @method
  * @abstract
- * @returns {string[]|null} List of node types allowed as parents or null if any type is allowed
+ * @return {string[]|null} List of node types allowed as parents or null if any type is allowed
  */
-ve.Node.prototype.getParentNodeTypes = function () {
-	throw new Error( 've.Node.getParentNodeTypes must be overridden in subclass' );
-};
+ve.Node.prototype.getParentNodeTypes = null;
 
 /**
  * Check if the specified type is an allowed child node type
@@ -89,88 +85,90 @@ ve.Node.prototype.isAllowedParentNodeType = function ( type ) {
  *
  * @method
  * @abstract
- * @returns {string[]|null} List of node types suggested as parents or null if any type is suggested
+ * @return {string[]|null} List of node types suggested as parents or null if any type is suggested
  */
-ve.Node.prototype.getSuggestedParentNodeTypes = function () {
-	throw new Error( 've.Node.getSuggestedParentNodeTypes must be overridden in subclass' );
-};
+ve.Node.prototype.getSuggestedParentNodeTypes = null;
 
 /**
  * Check if the node can have children.
  *
  * @method
  * @abstract
- * @returns {boolean} Node can have children
+ * @return {boolean} Node can have children
  */
-ve.Node.prototype.canHaveChildren = function () {
-	throw new Error( 've.Node.canHaveChildren must be overridden in subclass' );
-};
+ve.Node.prototype.canHaveChildren = null;
 
 /**
  * Check if the node can have children but not content nor be content.
  *
  * @method
  * @abstract
- * @returns {boolean} Node can have children but not content nor be content
+ * @return {boolean} Node can have children but not content nor be content
  */
-ve.Node.prototype.canHaveChildrenNotContent = function () {
-	throw new Error( 've.Node.canHaveChildrenNotContent must be overridden in subclass' );
-};
+ve.Node.prototype.canHaveChildrenNotContent = null;
 
 /**
  * Check if the node can contain content.
  *
  * @method
  * @abstract
- * @returns {boolean} Node can contain content
+ * @return {boolean} Node can contain content
  */
-ve.Node.prototype.canContainContent = function () {
-	throw new Error( 've.Node.canContainContent must be overridden in subclass' );
-};
+ve.Node.prototype.canContainContent = null;
 
 /**
  * Check if the node is content.
  *
  * @method
  * @abstract
- * @returns {boolean} Node is content
+ * @return {boolean} Node is content
  */
-ve.Node.prototype.isContent = function () {
-	throw new Error( 've.Node.isContent must be overridden in subclass' );
-};
+ve.Node.prototype.isContent = null;
 
 /**
  * Check if the node has a wrapped element in the document data.
  *
  * @method
  * @abstract
- * @returns {boolean} Node represents a wrapped element
+ * @return {boolean} Node represents a wrapped element
  */
-ve.Node.prototype.isWrapped = function () {
-	throw new Error( 've.Node.isWrapped must be overridden in subclass' );
-};
+ve.Node.prototype.isWrapped = null;
 
 /**
  * Check if the node is focusable
  *
  * @method
  * @abstract
- * @returns {boolean} Node is focusable
+ * @return {boolean} Node is focusable
  */
-ve.Node.prototype.isFocusable = function () {
-	throw new Error( 've.Node.isFocusable must be overridden in subclass' );
-};
+ve.Node.prototype.isFocusable = null;
 
 /**
  * Check if the node is alignable
  *
  * @method
  * @abstract
- * @returns {boolean} Node is alignable
+ * @return {boolean} Node is alignable
  */
-ve.Node.prototype.isAlignable = function () {
-	throw new Error( 've.Node.isAlignable must be overridden in subclass' );
-};
+ve.Node.prototype.isAlignable = null;
+
+/**
+ * Check if the node can behave as a table cell
+ *
+ * @method
+ * @abstract
+ * @return {boolean} Node can behave as a table cell
+ */
+ve.Node.prototype.isCellable = null;
+
+/**
+ * Check the node, behaving as a table cell, can be edited in place
+ *
+ * @method
+ * @abstract
+ * @return {boolean} Node can be edited in place
+ */
+ve.Node.prototype.isCellEditable = null;
 
 /**
  * Check if the node has significant whitespace.
@@ -179,44 +177,36 @@ ve.Node.prototype.isAlignable = function () {
  *
  * @method
  * @abstract
- * @returns {boolean} Node has significant whitespace
+ * @return {boolean} Node has significant whitespace
  */
-ve.Node.prototype.hasSignificantWhitespace = function () {
-	throw new Error( 've.Node.hasSignificantWhitespace must be overridden in subclass' );
-};
+ve.Node.prototype.hasSignificantWhitespace = null;
 
 /**
  * Check if the node handles its own children
  *
  * @method
  * @abstract
- * @returns {boolean} Node handles its own children
+ * @return {boolean} Node handles its own children
  */
-ve.Node.prototype.handlesOwnChildren = function () {
-	throw new Error( 've.Node.handlesOwnChildren must be overridden in subclass' );
-};
+ve.Node.prototype.handlesOwnChildren = null;
 
 /**
  * Check if the node's children should be ignored.
  *
  * @method
  * @abstract
- * @returns {boolean} Node's children should be ignored
+ * @return {boolean} Node's children should be ignored
  */
-ve.Node.prototype.shouldIgnoreChildren = function () {
-	throw new Error( 've.Node.ignoreChildren must be overridden in subclass' );
-};
+ve.Node.prototype.shouldIgnoreChildren = null;
 
 /**
  * Get the length of the node.
  *
  * @method
  * @abstract
- * @returns {number} Node length
+ * @return {number} Node length
  */
-ve.Node.prototype.getLength = function () {
-	throw new Error( 've.Node.getLength must be overridden in subclass' );
-};
+ve.Node.prototype.getLength = null;
 
 /**
  * Get the offset of the node within the document.
@@ -225,19 +215,17 @@ ve.Node.prototype.getLength = function () {
  *
  * @method
  * @abstract
- * @returns {number} Offset of node
+ * @return {number} Offset of node
  * @throws {Error} Node not found in parent's children array
  */
-ve.Node.prototype.getOffset = function () {
-	throw new Error( 've.Node.getOffset must be overridden in subclass' );
-};
+ve.Node.prototype.getOffset = null;
 
 /**
  * Get the range inside the node.
  *
  * @method
  * @param {boolean} backwards Return a backwards range
- * @returns {ve.Range} Inner node range
+ * @return {ve.Range} Inner node range
  */
 ve.Node.prototype.getRange = function ( backwards ) {
 	var offset = this.getOffset() + ( this.isWrapped() ? 1 : 0 ),
@@ -250,7 +238,7 @@ ve.Node.prototype.getRange = function ( backwards ) {
  *
  * @method
  * @param {boolean} backwards Return a backwards range
- * @returns {ve.Range} Node outer range
+ * @return {ve.Range} Node outer range
  */
 ve.Node.prototype.getOuterRange = function ( backwards ) {
 	var range = new ve.Range( this.getOffset(), this.getOffset() + this.getOuterLength() );
@@ -261,7 +249,7 @@ ve.Node.prototype.getOuterRange = function ( backwards ) {
  * Get the outer length of the node, which includes wrappers if present.
  *
  * @method
- * @returns {number} Node outer length
+ * @return {number} Node outer length
  */
 ve.Node.prototype.getOuterLength = function () {
 	return this.getLength() + ( this.isWrapped() ? 2 : 0 );
@@ -273,7 +261,7 @@ ve.Node.prototype.getOuterLength = function () {
  * Get the symbolic node type name.
  *
  * @method
- * @returns {string} Symbolic name of element type
+ * @return {string} Symbolic name of element type
  */
 ve.Node.prototype.getType = function () {
 	return this.type;
@@ -283,7 +271,7 @@ ve.Node.prototype.getType = function () {
  * Get a reference to the node's parent.
  *
  * @method
- * @returns {ve.Node} Reference to the node's parent
+ * @return {ve.Node} Reference to the node's parent
  */
 ve.Node.prototype.getParent = function () {
 	return this.parent;
@@ -293,7 +281,7 @@ ve.Node.prototype.getParent = function () {
  * Get the root node of the tree the node is currently attached to.
  *
  * @method
- * @returns {ve.Node} Root node
+ * @return {ve.Node} Root node
  */
 ve.Node.prototype.getRoot = function () {
 	return this.root;
@@ -324,7 +312,7 @@ ve.Node.prototype.setRoot = function ( root ) {
  * Get the document the node is a part of.
  *
  * @method
- * @returns {ve.Document} Document the node is a part of
+ * @return {ve.Document} Document the node is a part of
  */
 ve.Node.prototype.getDocument = function () {
 	return this.doc;
@@ -377,13 +365,15 @@ ve.Node.prototype.detach = function () {
  *
  * @method
  * @param {Function} callback Callback method to be called for every traversed node. Returning false stops the traversal.
+ * @return {ve.Node|null} Node which caused the traversal to stop, or null if it didn't
  */
 ve.Node.prototype.traverseUpstream = function ( callback ) {
 	var node = this;
 	while ( node ) {
 		if ( callback( node ) === false ) {
-			break;
+			return node;
 		}
 		node = node.getParent();
 	}
+	return null;
 };

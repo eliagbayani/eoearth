@@ -60,11 +60,12 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 		}
 	}
 
-	protected function parseWikitext( $title ) {
+	protected function parseWikitext( $title, $newRevId ) {
 		$apiParams = array(
 			'action' => 'parse',
 			'page' => $title->getPrefixedDBkey(),
-			'prop' => 'text|revid|categorieshtml|displaytitle',
+			'oldid' => $newRevId,
+			'prop' => 'text|revid|categorieshtml|displaytitle|modules|jsconfigvars',
 		);
 		$api = new ApiMain(
 			new DerivativeRequest(
@@ -93,6 +94,9 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 		$timestamp = $revision ? $revision->getTimestamp() : wfTimestampNow();
 		$displaytitle = isset( $result['parse']['displaytitle'] ) ?
 			$result['parse']['displaytitle'] : false;
+		$modules = isset( $result['parse']['modules'] ) ? $result['parse']['modules'] : array();
+		$jsconfigvars = isset( $result['parse']['jsconfigvars'] ) ?
+			$result['parse']['jsconfigvars'] : array();
 
 		if ( $content === false || ( strlen( $content ) && $revision === null ) ) {
 			return false;
@@ -109,7 +113,9 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 			'categorieshtml' => $categorieshtml,
 			'basetimestamp' => $timestamp,
 			'starttimestamp' => wfTimestampNow(),
-			'displayTitleHtml' => $displaytitle
+			'displayTitleHtml' => $displaytitle,
+			'modules' => $modules,
+			'jsconfigvars' => $jsconfigvars
 		);
 	}
 
@@ -120,7 +126,9 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 		if ( !$page ) {
 			$this->dieUsageMsg( 'invalidtitle', $params['page'] );
 		}
-		if ( !in_array( $page->getNamespace(), $this->veConfig->get( 'VisualEditorNamespaces' ) ) ) {
+		$availableNamespaces = $this->veConfig->get( 'VisualEditorAvailableNamespaces' );
+		if ( !isset( $availableNamespaces[$page->getNamespace()] ) ||
+			!$availableNamespaces[$page->getNamespace()] ) {
 			$this->dieUsage( "VisualEditor is not enabled in namespace " .
 				$page->getNamespace(), 'novenamespace' );
 		}
@@ -157,20 +165,31 @@ class ApiVisualEditorEdit extends ApiVisualEditor {
 				'edit' => $saveresult['edit']
 			);
 
+			if ( isset( $saveresult['edit']['spamblacklist'] ) ) {
+				$matches = explode( '|', $saveresult['edit']['spamblacklist'] );
+				$matcheslist = $this->getLanguage()->listToText( $matches );
+				$result['edit']['sberrorparsed'] = $this->msg( 'spamprotectiontext' )->parse() . ' ' .
+					$this->msg( 'spamprotectionmatch', $matcheslist )->parse();
+			}
+
 		// Success
 		} else {
-			if ( isset( $saveresult['edit']['newrevid'] )
-				&& $this->veConfig->get( 'VisualEditorUseChangeTagging' )
-			) {
-				ChangeTags::addTags( 'visualeditor', null,
-					intval( $saveresult['edit']['newrevid'] ),
-					null
-				);
+			if ( isset( $saveresult['edit']['newrevid'] ) ) {
+				$newRevId = intval( $saveresult['edit']['newrevid'] );
+				if ( $this->veConfig->get( 'VisualEditorUseChangeTagging' ) ) {
+					// Defer till after the RC row is inserted
+					// @TODO: doEditContent should let callers specify desired tags
+					DeferredUpdates::addCallableUpdate( function() use ( $newRevId ) {
+						ChangeTags::addTags( 'visualeditor', null, $newRevId, null );
+					} );
+				}
+			} else {
+				$newRevId = $page->getLatestRevId();
 			}
 
 			// Return result of parseWikitext instead of saveWikitext so that the
 			// frontend can update the page rendering without a refresh.
-			$result = $this->parseWikitext( $page );
+			$result = $this->parseWikitext( $page, $newRevId );
 			if ( $result === false ) {
 				$this->dieUsage( 'Error contacting the Parsoid server', 'parsoidserver' );
 			}

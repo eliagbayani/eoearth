@@ -12,13 +12,14 @@
  * @mixins OO.EventEmitter
  *
  * @constructor
+ * @param {ve.dm.Document} parentDoc Document that contains or will contain the image
  * @param {Object} [config] Configuration options
  * @cfg {string} [resourceName] The resource name of the given media file
  * @cfg {Object} [currentDimensions] Current dimensions, width & height
  * @cfg {Object} [minDimensions] Minimum dimensions, width & height
  * @cfg {boolean} [isDefaultSize] Object is using its default size dimensions
  */
-ve.dm.MWImageModel = function VeDmMWImageModel( config ) {
+ve.dm.MWImageModel = function VeDmMWImageModel( parentDoc, config ) {
 	var scalable, currentDimensions, minDimensions;
 
 	config = config || {};
@@ -30,6 +31,7 @@ ve.dm.MWImageModel = function VeDmMWImageModel( config ) {
 	this.attributesCache = null;
 
 	// Image properties
+	this.parentDoc = parentDoc;
 	this.captionDoc = null;
 	this.caption = null;
 	this.mediaType = null;
@@ -40,9 +42,8 @@ ve.dm.MWImageModel = function VeDmMWImageModel( config ) {
 	this.sizeType = null;
 	this.border = false;
 	this.borderable = false;
-	this.dir = null;
-	this.lang = null;
 	this.defaultDimensions = null;
+	this.changedImageSource = false;
 
 	this.imageSrc = '';
 	this.imageResourceName = '';
@@ -114,6 +115,7 @@ ve.dm.MWImageModel.static.infoCache = {};
 
 /**
  * Create a new image node based on given parameters.
+ *
  * @param {Object} attributes Image attributes
  * @param {string} [imageType] Image node type 'mwInlineImage' or 'mwBlockImage'.
  *  Defaults to 'mwBlockImage'
@@ -155,21 +157,21 @@ ve.dm.MWImageModel.static.createImageNode = function ( attributes, imageType ) {
  * Load from image data with scalable information.
  *
  * @param {Object} attrs Image node attributes
- * @param {string} [dir] Document direction
- * @param {string} [lang] Document language
- * @param {string} [caption] Existing image caption HTML
+ * @param {ve.dm.Document} parentDoc Document that contains or will contain the image
  * @return {ve.dm.MWImageModel} Image model
  */
-ve.dm.MWImageModel.static.newFromImageAttributes = function ( attrs, dir, lang, caption ) {
-	var captionDomTree,
-		imgModel = new ve.dm.MWImageModel( {
-			resourceName: attrs.resource,
-			currentDimensions: {
-				width: attrs.width,
-				height: attrs.height
-			},
-			defaultSize: !!attrs.defaultSize
-		} );
+ve.dm.MWImageModel.static.newFromImageAttributes = function ( attrs, parentDoc ) {
+	var imgModel = new ve.dm.MWImageModel(
+			parentDoc,
+			{
+				resourceName: attrs.resource,
+				currentDimensions: {
+					width: attrs.width,
+					height: attrs.height
+				},
+				defaultSize: !!attrs.defaultSize
+			}
+		);
 
 	// Cache the attributes so we can create a new image without
 	// losing any existing information
@@ -188,9 +190,6 @@ ve.dm.MWImageModel.static.newFromImageAttributes = function ( attrs, dir, lang, 
 	// Collect all the information
 	imgModel.toggleBorder( !!attrs.borderImage );
 	imgModel.setAltText( attrs.alt || '' );
-
-	imgModel.setDir( dir );
-	imgModel.setLang( lang );
 
 	imgModel.setType( attrs.type );
 
@@ -211,18 +210,24 @@ ve.dm.MWImageModel.static.newFromImageAttributes = function ( attrs, dir, lang, 
 		'custom'
 	);
 
-	// If a caption is given, use it in the document
-	if ( caption ) {
-		captionDomTree = ve.createDocumentFromHtml( caption );
-		imgModel.setCaptionDocument( ve.dm.converter.getModelFromDom( captionDomTree ) );
-	}
 	return imgModel;
+};
+
+/**
+ * Load from existing image node.
+ *
+ * @param {ve.dm.MWImageNode} node Image node
+ * @return {ve.dm.MWImageModel} Image model
+ */
+ve.dm.MWImageModel.static.newFromImageNode = function ( node ) {
+	return ve.dm.MWImageModel.static.newFromImageAttributes( node.getAttributes(), node.getDocument() );
 };
 
 /* Methods */
 
 /**
  * Get the hash object of the current image model state.
+ *
  * @return {Object} Hash object
  */
 ve.dm.MWImageModel.prototype.getHashObject = function () {
@@ -263,12 +268,15 @@ ve.dm.MWImageModel.prototype.getNormalizedImageSource = function () {
 
 /**
  * Adjust the model parameters based on a new image
+ *
  * @param {Object} attrs New image source attributes
  * @param {Object} [APIinfo] The image's API info
  * @throws {Error} Image has insufficient details to compute the imageModel details.
  */
 ve.dm.MWImageModel.prototype.changeImageSource = function ( attrs, APIinfo ) {
 	var imageModel = this;
+
+	this.changedImageSource = true;
 
 	if ( attrs.mediaType ) {
 		this.setMediaType( attrs.mediaType );
@@ -362,6 +370,7 @@ ve.dm.MWImageModel.prototype.getImageNodeType = function ( imageType, align ) {
 
 /**
  * Get the original bounding box
+ *
  * @return {Object} Bounding box with width and height
  */
 ve.dm.MWImageModel.prototype.getBoundingBox = function () {
@@ -432,30 +441,15 @@ ve.dm.MWImageModel.prototype.updateImageNode = function ( node, surfaceModel ) {
  * @throws {Error} Unknown image node type
  */
 ve.dm.MWImageModel.prototype.insertImageNode = function ( fragment ) {
-	var editAttributes, captionDoc,
-		offset,
-		contentToInsert = [],
+	var captionDoc, offset, contentToInsert,
 		nodeType = this.getImageNodeType(),
-		originalAttrs = ve.copy( this.getOriginalImageAttributes() ),
 		surfaceModel = fragment.getSurface();
 
 	if ( !( fragment.getSelection() instanceof ve.dm.LinearSelection ) ) {
 		return fragment;
 	}
 
-	editAttributes = $.extend( originalAttrs, this.getUpdatedAttributes() );
-
-	// Remove old classes
-	delete editAttributes.originalClasses;
-	delete editAttributes.unrecognizedClasses;
-
-	contentToInsert = [
-		{
-			type: nodeType,
-			attributes: editAttributes
-		},
-		{ type: '/' + nodeType }
-	];
+	contentToInsert = this.getData();
 
 	switch ( nodeType ) {
 		case 'mwInlineImage':
@@ -468,7 +462,6 @@ ve.dm.MWImageModel.prototype.insertImageNode = function ( fragment ) {
 			return fragment;
 
 		case 'mwBlockImage':
-			contentToInsert.splice( 1, 0, { type: 'mwImageCaption' }, { type: '/mwImageCaption' } );
 			// Try to put the image in front of the structural node
 			offset = fragment.getDocument().data.getNearestStructuralOffset( fragment.getSelection().getRange().start, -1 );
 			if ( offset > -1 ) {
@@ -477,7 +470,7 @@ ve.dm.MWImageModel.prototype.insertImageNode = function ( fragment ) {
 			fragment.insertContent( contentToInsert );
 			// Check if there is caption document and insert it
 			captionDoc = this.getCaptionDocument();
-			if ( captionDoc.data.countNonInternalElements() > 2 ) {
+			if ( captionDoc.data.hasContent() ) {
 				// Add contents of new caption
 				surfaceModel.change(
 					ve.dm.Transaction.newFromDocumentInsertion(
@@ -495,7 +488,41 @@ ve.dm.MWImageModel.prototype.insertImageNode = function ( fragment ) {
 };
 
 /**
+ * Get linear data representation of the image
+ *
+ * @return {Array} Linear data
+ */
+ve.dm.MWImageModel.prototype.getData = function () {
+	var data,
+		originalAttrs = ve.copy( this.getOriginalImageAttributes() ),
+		editAttributes = $.extend( originalAttrs, this.getUpdatedAttributes() ),
+		nodeType = this.getImageNodeType();
+
+	// Remove old classes
+	delete editAttributes.originalClasses;
+	delete editAttributes.unrecognizedClasses;
+	// Newly created images must have valid URLs, so remove the error attribute
+	if ( this.isChangedImageSource() ) {
+		delete editAttributes.isError;
+	}
+
+	data = [
+		{
+			type: nodeType,
+			attributes: editAttributes
+		},
+		{ type: '/' + nodeType }
+	];
+
+	if ( nodeType === 'mwBlockImage' ) {
+		data.splice( 1, 0, { type: 'mwImageCaption' }, { type: '/mwImageCaption' } );
+	}
+	return data;
+};
+
+/**
  * Return all updated attributes that belong to the node.
+ *
  * @return {Object} Updated attributes
  */
 ve.dm.MWImageModel.prototype.getUpdatedAttributes = function () {
@@ -552,6 +579,7 @@ ve.dm.MWImageModel.prototype.onScalableDefaultSizeChange = function ( isDefault 
 
 /**
  * Set the image file source
+ *
  * @param {string} src The source of the given media file
  */
 ve.dm.MWImageModel.prototype.setImageSource = function ( src ) {
@@ -560,6 +588,7 @@ ve.dm.MWImageModel.prototype.setImageSource = function ( src ) {
 
 /**
  * Set the image file resource name
+ *
  * @param {string} resourceName The resource name of the given image file
  */
 ve.dm.MWImageModel.prototype.setImageResourceName = function ( resourceName ) {
@@ -568,6 +597,7 @@ ve.dm.MWImageModel.prototype.setImageResourceName = function ( resourceName ) {
 
 /**
  * Set the image href value
+ *
  * @param {string} href The destination href of the given media file
  */
 ve.dm.MWImageModel.prototype.setImageHref = function ( href ) {
@@ -576,6 +606,7 @@ ve.dm.MWImageModel.prototype.setImageHref = function ( href ) {
 
 /**
  * Set the original bounding box
+ *
  * @param {Object} box Bounding box with width and height
  */
 ve.dm.MWImageModel.prototype.setBoundingBox = function ( box ) {
@@ -597,7 +628,7 @@ ve.dm.MWImageModel.prototype.storeInitialHash = function ( hash ) {
  *
  * Example values: "BITMAP" for JPEG or PNG images; "DRAWING" for SVG graphics
  *
- * @param {string|undefined} Symbolic media type name, or undefined if empty
+ * @param {string|undefined} type Symbolic media type name, or undefined if empty
  */
 ve.dm.MWImageModel.prototype.setMediaType = function ( type ) {
 	this.mediaType = type;
@@ -605,6 +636,7 @@ ve.dm.MWImageModel.prototype.setMediaType = function ( type ) {
 
 /**
  * Check whether the image is set to default size
+ *
  * @return {boolean} Default size flag on or off
  */
 ve.dm.MWImageModel.prototype.isDefaultSize = function () {
@@ -613,6 +645,7 @@ ve.dm.MWImageModel.prototype.isDefaultSize = function () {
 
 /**
  * Check whether the image has the border flag set
+ *
  * @return {boolean} Border flag on or off
  */
 ve.dm.MWImageModel.prototype.hasBorder = function () {
@@ -620,7 +653,17 @@ ve.dm.MWImageModel.prototype.hasBorder = function () {
 };
 
 /**
+ * Check whether the image source is changed
+ *
+ * @return {boolean} changedImageSource flag on or off
+ */
+ve.dm.MWImageModel.prototype.isChangedImageSource = function () {
+	return this.changedImageSource;
+};
+
+/**
  * Check whether the image has floating alignment set
+ *
  * @param {string} [align] Optional. Alignment value to test against.
  * @return {boolean} hasAlignment flag on or off
  */
@@ -636,6 +679,8 @@ ve.dm.MWImageModel.prototype.isAligned = function ( align ) {
  * Check whether the image is set to default alignment
  * We explicitly repeat tests so to avoid recursively calling
  * the other methods.
+ *
+ * @param {string} [imageType] Type of the image.
  * @param {string} [align] Optional alignment value to test against.
  * Supplying this parameter would test whether this align parameter
  * would mean the image is aligned to its default position.
@@ -643,7 +688,7 @@ ve.dm.MWImageModel.prototype.isAligned = function ( align ) {
  */
 ve.dm.MWImageModel.prototype.isDefaultAligned = function ( imageType, align ) {
 	var alignment = align || this.getAlignment(),
-		defaultAlignment = ( this.getDir() === 'rtl' ) ? 'left' : 'right';
+		defaultAlignment = ( this.parentDoc.getDir() === 'rtl' ) ? 'left' : 'right';
 
 	imageType = imageType || this.getType();
 	// No alignment specified means defeault alignment always
@@ -674,6 +719,7 @@ ve.dm.MWImageModel.prototype.isDefaultAligned = function ( imageType, align ) {
 
 /**
  * Check whether the image can have a border set on it
+ *
  * @return {boolean} Border possible or not
  */
 ve.dm.MWImageModel.prototype.isBorderable = function () {
@@ -682,6 +728,7 @@ ve.dm.MWImageModel.prototype.isBorderable = function () {
 
 /**
  * Get the image file resource name
+ *
  * @return {string} resourceName The resource name of the given media file
  */
 ve.dm.MWImageModel.prototype.getResourceName = function () {
@@ -690,6 +737,7 @@ ve.dm.MWImageModel.prototype.getResourceName = function () {
 
 /**
  * Get the image alternate text
+ *
  * @return {string} Alternate text
  */
 ve.dm.MWImageModel.prototype.getAltText = function () {
@@ -698,6 +746,7 @@ ve.dm.MWImageModel.prototype.getAltText = function () {
 
 /**
  * Get image wikitext type; 'thumb', 'frame', 'frameless' or 'none/inline'
+ *
  * @return {string} Image type
  */
 ve.dm.MWImageModel.prototype.getType = function () {
@@ -724,6 +773,7 @@ ve.dm.MWImageModel.prototype.getMediaType = function () {
 
 /**
  * Get image alignment 'left', 'right', 'center', 'none' or 'default'
+ *
  * @return {string|null} Image alignment. Inline images have initial alignment
  * value of null.
  */
@@ -734,6 +784,7 @@ ve.dm.MWImageModel.prototype.getAlignment = function () {
 /**
  * Get image vertical alignment
  * 'middle', 'baseline', 'sub', 'super', 'top', 'text-top', 'bottom', 'text-bottom' or 'default'
+ *
  * @return {string} Image alignment
  */
 ve.dm.MWImageModel.prototype.getVerticalAlignment = function () {
@@ -743,6 +794,7 @@ ve.dm.MWImageModel.prototype.getVerticalAlignment = function () {
 /**
  * Get the scalable object responsible for size manipulations
  * for the given image
+ *
  * @return {ve.dm.Scalable} Scalable object
  */
 ve.dm.MWImageModel.prototype.getScalable = function () {
@@ -751,6 +803,7 @@ ve.dm.MWImageModel.prototype.getScalable = function () {
 
 /**
  * Get the image current dimensions
+ *
  * @return {Object} Current dimensions width/height
  * @return {number} dimensions.width The width of the image
  * @return {number} dimensions.height The height of the image
@@ -776,7 +829,7 @@ ve.dm.MWImageModel.prototype.getCaptionDocument = function () {
 				{ type: '/internalList' }
 			],
 			// htmlDocument
-			null,
+			this.parentDoc.getHtmlDocument(),
 			// parentDocument
 			null,
 			// internalList
@@ -784,9 +837,9 @@ ve.dm.MWImageModel.prototype.getCaptionDocument = function () {
 			// innerWhitespace
 			null,
 			// lang
-			this.getLang(),
+			this.parentDoc.getLang(),
 			// dir
-			this.getDir()
+			this.parentDoc.getDir()
 		);
 	}
 	return this.captionDoc;
@@ -818,6 +871,7 @@ ve.dm.MWImageModel.prototype.toggleBorder = function ( hasBorder ) {
 
 /**
  * Toggle the default size flag of the image
+ *
  * @param {boolean} [isDefault] Default size flag. Omit to toggle current value.
  * @fires sizeDefaultChange
  */
@@ -833,6 +887,7 @@ ve.dm.MWImageModel.prototype.toggleDefaultSize = function ( isDefault ) {
 
 /**
  * Cache all image attributes
+ *
  * @param {Object} attrs Image attributes
  */
 ve.dm.MWImageModel.prototype.cacheOriginalImageAttributes = function ( attrs ) {
@@ -841,6 +896,7 @@ ve.dm.MWImageModel.prototype.cacheOriginalImageAttributes = function ( attrs ) {
 
 /**
  * Get the cache of all image attributes
+ *
  * @return {Object} attrs Image attributes
  */
 ve.dm.MWImageModel.prototype.getOriginalImageAttributes = function () {
@@ -850,6 +906,7 @@ ve.dm.MWImageModel.prototype.getOriginalImageAttributes = function () {
 /**
  * Set the current dimensions of the image.
  * Normalize in case only one dimension is available.
+ *
  * @param {Object} dimensions Dimensions width and height
  * @param {number} dimensions.width The width of the image
  * @param {number} dimensions.height The height of the image
@@ -861,6 +918,7 @@ ve.dm.MWImageModel.prototype.setCurrentDimensions = function ( dimensions ) {
 
 /**
  * Set alternate text
+ *
  * @param {string} text Alternate text
  */
 ve.dm.MWImageModel.prototype.setAltText = function ( text ) {
@@ -869,6 +927,7 @@ ve.dm.MWImageModel.prototype.setAltText = function ( text ) {
 
 /**
  * Set image type
+ *
  * @see #getType
  *
  * @param {string} type Image type
@@ -1007,7 +1066,7 @@ ve.dm.MWImageModel.prototype.setVerticalAlignment = function ( valign ) {
 ve.dm.MWImageModel.prototype.getDefaultDir = function ( imageNodeType ) {
 	imageNodeType = imageNodeType || this.getImageNodeType();
 
-	if ( this.getDir() === 'rtl' ) {
+	if ( this.parentDoc.getDir() === 'rtl' ) {
 		// Assume position is 'left'
 		return ( imageNodeType === 'mwBlockImage' ) ? 'left' : 'none';
 	} else {
@@ -1017,47 +1076,11 @@ ve.dm.MWImageModel.prototype.getDefaultDir = function ( imageNodeType ) {
 };
 
 /**
- * Get the directionality of the image, especially important for
- * default alignment.
- *
- * @return {string} Current document direction 'rtl' or 'ltr'
- */
-ve.dm.MWImageModel.prototype.getDir = function () {
-	return this.dir;
-};
-
-/**
- * Set the directionality of the image, especially important for
- * default alignment.
- * @param {string} dir 'rtl' or 'ltr'
- */
-ve.dm.MWImageModel.prototype.setDir = function ( dir ) {
-	this.dir = dir;
-};
-
-/**
- * Get the language of the image document. Specifically relevant
- * for the caption document.
- * @return {string} Document language
- */
-ve.dm.MWImageModel.prototype.getLang = function () {
-	return this.lang;
-};
-
-/**
- * Set the language of the image document. Specifically relevant
- * for the caption document.
- * @param {string} lang Document language
- */
-ve.dm.MWImageModel.prototype.setLang = function ( lang ) {
-	this.lang = lang;
-};
-
-/**
  * Get the image file source
  * The image file source that points to the location of the
- * file on the web.
+ * file on the Web.
  * For instance, '//upload.wikimedia.org/wikipedia/commons/0/0f/Foo.jpg'
+ *
  * @return {string} The source of the given media file
  */
 ve.dm.MWImageModel.prototype.getImageSource = function () {
@@ -1069,6 +1092,7 @@ ve.dm.MWImageModel.prototype.getImageSource = function () {
  * The resource name represents the filename without the full
  * source url.
  * For example, './File:Foo.jpg'
+ *
  * @return {string} The resource name of the given media file
  */
 ve.dm.MWImageModel.prototype.getImageResourceName = function () {
@@ -1081,6 +1105,7 @@ ve.dm.MWImageModel.prototype.getImageResourceName = function () {
  * the link to the source of the image in commons or locally, but
  * may hold an alternative link if link= is supplied in the wikitext.
  * For example, './File:Foo.jpg' or 'http://www.wikipedia.org'
+ *
  * @return {string} The destination href of the given media file
  */
 ve.dm.MWImageModel.prototype.getImageHref = function () {
@@ -1091,7 +1116,7 @@ ve.dm.MWImageModel.prototype.getImageHref = function () {
  * Attach a new scalable object to the model and request the
  * information from the API.
  *
- * @param {ve.dm.Scalable} Scalable object
+ * @param {ve.dm.Scalable} scalable Scalable object
  */
 ve.dm.MWImageModel.prototype.attachScalable = function ( scalable ) {
 	var imageName = this.getResourceName().replace( /^(\.+\/)*/, '' ),
@@ -1134,6 +1159,7 @@ ve.dm.MWImageModel.prototype.attachScalable = function ( scalable ) {
 
 /**
  * Set the filename of the current image
+ *
  * @param {string} filename Image filename
  */
 ve.dm.MWImageModel.prototype.setFilename = function ( filename ) {
@@ -1142,6 +1168,7 @@ ve.dm.MWImageModel.prototype.setFilename = function ( filename ) {
 
 /**
  * Get the filename of the current image
+ *
  * @return {string} filename Image filename
  */
 ve.dm.MWImageModel.prototype.getFilename = function () {
@@ -1150,6 +1177,7 @@ ve.dm.MWImageModel.prototype.getFilename = function () {
 
 /**
  * If the image changed, update scalable definitions.
+ *
  * @param {Object} originalDimensions Image original dimensions
  */
 ve.dm.MWImageModel.prototype.updateScalableDetails = function ( originalDimensions ) {
@@ -1182,7 +1210,7 @@ ve.dm.MWImageModel.prototype.updateScalableDetails = function ( originalDimensio
 /**
  * Set image caption document.
  *
- * @param {ve.dm.Document} Image caption document
+ * @param {ve.dm.Document} doc Image caption document
  */
 ve.dm.MWImageModel.prototype.setCaptionDocument = function ( doc ) {
 	this.captionDoc = doc;
@@ -1191,6 +1219,7 @@ ve.dm.MWImageModel.prototype.setCaptionDocument = function ( doc ) {
 /**
  * Check if the model attributes and parameters have been modified by
  * comparing the current hash to the new hash object.
+ *
  * @return {boolean} Model has been modified
  */
 ve.dm.MWImageModel.prototype.hasBeenModified = function () {

@@ -107,13 +107,13 @@ ve.dm.Selection.prototype.translateByTransaction = function ( tx, excludeInserti
  * @inheritdoc
  */
 ve.dm.LinearSelection.prototype.getRanges = function () {
-	return [this.range];
+	return [ this.range ];
 };
 
 /**
  * Get the range for this selection
  *
- * @returns {ve.Range} Range
+ * @return {ve.Range} Range
  */
 ve.dm.LinearSelection.prototype.getRange = function () {
 	return this.range;

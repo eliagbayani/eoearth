@@ -12,7 +12,6 @@
  * @extends OO.ui.Dialog
  *
  * @constructor
- * @param {ve.ui.Surface} surface
  * @param {Object} [config] Configuration options
  */
 ve.ui.ToolbarDialog = function VeUiToolbarDialog( config ) {
@@ -21,7 +20,7 @@ ve.ui.ToolbarDialog = function VeUiToolbarDialog( config ) {
 
 	// Properties
 	this.disabled = false;
-	this.$shield = this.$( '<div>' ).addClass( 've-ui-toolbarDialog-shield' );
+	this.$shield = $( '<div>' ).addClass( 've-ui-toolbarDialog-shield' );
 
 	// Pre-initialization
 	// This class needs to exist before setup to constrain the height

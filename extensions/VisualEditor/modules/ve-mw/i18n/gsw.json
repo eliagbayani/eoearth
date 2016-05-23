@@ -2,16 +2,18 @@
 	"@metadata": {
 		"authors": [
 			"Als-Holder",
-			80686
+			80686,
+			"J. 'mach' wust"
 		]
 	},
 	"tooltip-ca-createsource": "Dr Quälltäxt zue däre Syten aalege",
 	"tooltip-ca-editsource": "Am Quälltäxt vu däre Syte schaffe",
-	"tooltip-ca-ve-edit": "An däre Syte mit em VisualEditor schaffe",
+	"tooltip-ca-ve-edit": "Die Syte bearbeite",
 	"visualeditor-beta-appendix": "Beta",
 	"visualeditor-beta-label": "Beta",
 	"visualeditor-beta-warning": "VisualEditor isch in dr Beta-Version. S cha syy, ass Dir Softwarefähler uffallen un ass Du an Teil vu dr Syte nit chasch schaffe. Druck uf „{{int:visualeditor-ca-editsource}}“ go in dr Wikitäxtmodus chuu. Doderby gehn nit gspychereti Änderige verlore.",
 	"visualeditor-browserwarning": "Du bruchsch e Browser, wu vum VisualEditor nit offiziäll unterstitzt wird.",
+	"visualeditor-ca-createlocaldescriptionsource": "Lokale Bschrybigsquälltäxt zuefiege",
 	"visualeditor-ca-createsource": "Quälltäxt aalege",
 	"visualeditor-ca-editsource": "Quälltäxt bearbeite",
 	"visualeditor-ca-editsource-section": "Quälltäxt bearbeite",
@@ -21,9 +23,6 @@
 	"visualeditor-categories-tool": "Kategorie",
 	"visualeditor-desc": "Visuälli Täxtbearbeitig fir MediaWiki",
 	"visualeditor-descriptionpagelink": "Project:VisualEditor",
-	"visualeditor-dialog-beta-welcome-action-continue": "Wytermache",
-	"visualeditor-dialog-beta-welcome-content": "Des isch unsere neie, eifachere Wäg zum Bearbeite. Är isch no in dr Beta-Phas. S cha syy, ass Du Teil vu dr Syte findsch, wu Du nonig dra chasch schaffe oder ass Du uf Fähler stohsch, wu mien repariert wäre. Mir empfähle Dir, d Änderige z priefen un bitte Di um Fählerbricht. Druck uf d Schaltflechi „{{int:visualeditor-help-tool}}“ go Ruggmäldige hinterloo. Du chasch statt däm au wyter dr Wikitäxt-Editor bruche, indäm Du dr Ryter „$1“ drucksch. Uugspychereti Änderige geh doderby verlore.",
-	"visualeditor-dialog-beta-welcome-title": "{{GENDER:$1|Willchumme}} bim VisualEditor",
 	"visualeditor-dialog-media-content-section": "Bschrybig",
 	"visualeditor-dialog-media-title": "Medieyystellige",
 	"visualeditor-dialog-meta-categories-category": "Kategorii",
@@ -55,5 +54,6 @@
 	"visualeditor-dialog-transclusion-content": "Inhalt",
 	"visualeditor-dialog-transclusion-options": "Optione",
 	"visualeditor-dialog-transclusion-placeholder": "Neui Vorlag",
-	"visualeditor-languages-tool": "Sproche"
+	"visualeditor-languages-tool": "Sproche",
+	"visualeditor-version-label": "Version"
 }

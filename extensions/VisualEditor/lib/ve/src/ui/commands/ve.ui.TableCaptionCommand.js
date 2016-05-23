@@ -16,7 +16,7 @@ ve.ui.TableCaptionCommand = function VeUiTableCaptionCommand() {
 	// Parent constructor
 	ve.ui.TableCaptionCommand.super.call(
 		this, 'tableCaption', 'table', 'caption',
-		{ supportedSelections: ['linear', 'table'] }
+		{ supportedSelections: [ 'linear', 'table' ] }
 	);
 };
 
@@ -30,13 +30,14 @@ OO.inheritClass( ve.ui.TableCaptionCommand, ve.ui.Command );
  * @inheritdoc
  */
 ve.ui.TableCaptionCommand.prototype.isExecutable = function ( fragment ) {
+	var i, len, nodes, hasCaptionNode, selection;
+
 	// Parent method
 	if ( !ve.ui.TableCaptionCommand.super.prototype.isExecutable.apply( this, arguments ) ) {
 		return false;
 	}
 
-	var i, len, nodes, hasCaptionNode,
-		selection = fragment.getSelection();
+	selection = fragment.getSelection();
 
 	if ( selection instanceof ve.dm.TableSelection ) {
 		return true;
@@ -45,7 +46,7 @@ ve.ui.TableCaptionCommand.prototype.isExecutable = function ( fragment ) {
 		hasCaptionNode = !!nodes.length;
 
 		for ( i = 0, len = nodes.length; i < len; i++ ) {
-			if ( !nodes[i].hasMatchingAncestor( 'tableCaption' ) ) {
+			if ( !nodes[ i ].hasMatchingAncestor( 'tableCaption' ) ) {
 				hasCaptionNode = false;
 				break;
 			}

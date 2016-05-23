@@ -10,12 +10,16 @@
  *
  * @class
  * @abstract
+ * @extends ve.dm.LeafNode
  * @mixins ve.dm.FocusableNode
  * @mixins ve.dm.GeneratedContentNode
  *
  * @constructor
  */
 ve.dm.MWExtensionNode = function VeDmMWExtensionNode() {
+	// Parent constructor
+	ve.dm.MWExtensionNode.super.apply( this, arguments );
+
 	// Mixin constructors
 	ve.dm.GeneratedContentNode.call( this );
 	ve.dm.FocusableNode.call( this );
@@ -23,8 +27,8 @@ ve.dm.MWExtensionNode = function VeDmMWExtensionNode() {
 
 /* Inheritance */
 
+OO.inheritClass( ve.dm.MWExtensionNode, ve.dm.LeafNode );
 OO.mixinClass( ve.dm.MWExtensionNode, ve.dm.FocusableNode );
-
 OO.mixinClass( ve.dm.MWExtensionNode, ve.dm.GeneratedContentNode );
 
 /* Static members */
@@ -57,7 +61,7 @@ ve.dm.MWExtensionNode.static.getMatchRdfaTypes = function () {
 
 ve.dm.MWExtensionNode.static.toDataElement = function ( domElements, converter ) {
 	var dataElement, index,
-		mwDataJSON = domElements[0].getAttribute( 'data-mw' ),
+		mwDataJSON = domElements[ 0 ].getAttribute( 'data-mw' ),
 		mwData = mwDataJSON ? JSON.parse( mwDataJSON ) : {};
 
 	dataElement = {
@@ -75,7 +79,7 @@ ve.dm.MWExtensionNode.static.toDataElement = function ( domElements, converter )
 };
 
 ve.dm.MWExtensionNode.static.toDomElements = function ( dataElement, doc, converter ) {
-	var el,
+	var el, els,
 		index = converter.getStore().indexOfHash( OO.getHash( [ this.getHashObject( dataElement ), undefined ] ) ),
 		originalMw = dataElement.attributes.originalMw;
 
@@ -86,13 +90,24 @@ ve.dm.MWExtensionNode.static.toDomElements = function ( dataElement, doc, conver
 		( originalMw && ve.compare( dataElement.attributes.mw, JSON.parse( originalMw ) ) )
 	) {
 		// The object in the store is also used for CE rendering so return a copy
-		return ve.copyDomElements( dataElement.originalDomElements, doc );
+		els = ve.copyDomElements( dataElement.originalDomElements, doc );
 	} else {
-		el = doc.createElement( this.tagName );
-		el.setAttribute( 'typeof', 'mw:Extension/' + this.getExtensionName( dataElement ) );
-		el.setAttribute( 'data-mw', JSON.stringify( dataElement.attributes.mw ) );
-		return [ el ];
+		if ( converter.isForClipboard() && index !== null ) {
+			// For the clipboard use the current DOM contents so the user has something
+			// meaningful to paste into external applications
+			els = ve.copyDomElements( converter.getStore().value( index ), doc );
+		} else {
+			el = doc.createElement( this.tagName );
+			el.setAttribute( 'typeof', 'mw:Extension/' + this.getExtensionName( dataElement ) );
+			el.setAttribute( 'data-mw', JSON.stringify( dataElement.attributes.mw ) );
+			els = [ el ];
+		}
 	}
+	if ( converter.isForClipboard() ) {
+		// Resolve attributes
+		ve.resolveAttributes( $( els ), doc, ve.dm.Converter.static.computedAttributes );
+	}
+	return els;
 };
 
 ve.dm.MWExtensionNode.static.getHashObject = function ( dataElement ) {
@@ -109,7 +124,7 @@ ve.dm.MWExtensionNode.static.getHashObject = function ( dataElement ) {
  *
  * @static
  * @param {Object} dataElement Data element
- * @returns {string} Extension name
+ * @return {string} Extension name
  */
 ve.dm.MWExtensionNode.static.getExtensionName = function () {
 	return this.extensionName;
@@ -119,8 +134,9 @@ ve.dm.MWExtensionNode.static.getExtensionName = function () {
 
 /**
  * Get the extension's name
+ *
  * @method
- * @returns {string} Extension name
+ * @return {string} Extension name
  */
 ve.dm.MWExtensionNode.prototype.getExtensionName = function () {
 	return this.constructor.static.getExtensionName( this.element );
@@ -131,25 +147,19 @@ ve.dm.MWExtensionNode.prototype.getExtensionName = function () {
  *
  * @class
  * @abstract
- * @extends ve.dm.LeafNode
- * @mixins ve.dm.MWExtensionNode
+ * @extends ve.dm.MWExtensionNode
  *
  * @constructor
  * @param {Object} [element] Reference to element in linear model
  */
 ve.dm.MWInlineExtensionNode = function VeDmMWInlineExtensionNode() {
 	// Parent constructor
-	ve.dm.LeafNode.apply( this, arguments );
-
-	// Mixin constructors
-	ve.dm.MWExtensionNode.call( this );
+	ve.dm.MWInlineExtensionNode.super.apply( this, arguments );
 };
 
 /* Inheritance */
 
-OO.inheritClass( ve.dm.MWInlineExtensionNode, ve.dm.LeafNode );
-
-OO.mixinClass( ve.dm.MWInlineExtensionNode, ve.dm.MWExtensionNode );
+OO.inheritClass( ve.dm.MWInlineExtensionNode, ve.dm.MWExtensionNode );
 
 /* Static members */
 
@@ -160,23 +170,17 @@ ve.dm.MWInlineExtensionNode.static.isContent = true;
  *
  * @class
  * @abstract
- * @extends ve.dm.BranchNode
- * @mixins ve.dm.MWExtensionNode
+ * @extends ve.dm.MWExtensionNode
  *
  * @constructor
  * @param {Object} [element] Reference to element in linear model
  * @param {ve.dm.Node[]} [children]
  */
-ve.dm.MWBlockExtensionNode = function VeDmMWInlineExtensionNode() {
+ve.dm.MWBlockExtensionNode = function VeDmMWBlockExtensionNode() {
 	// Parent constructor
-	ve.dm.BranchNode.apply( this, arguments );
-
-	// Mixin constructors
-	ve.dm.MWExtensionNode.call( this );
+	ve.dm.MWBlockExtensionNode.super.apply( this, arguments );
 };
 
 /* Inheritance */
 
-OO.inheritClass( ve.dm.MWBlockExtensionNode, ve.dm.BranchNode );
-
-OO.mixinClass( ve.dm.MWBlockExtensionNode, ve.dm.MWExtensionNode );
+OO.inheritClass( ve.dm.MWBlockExtensionNode, ve.dm.MWExtensionNode );

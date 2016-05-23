@@ -34,13 +34,13 @@ $conf['wgDBuser']       = "root";
 $conf['wgDBpassword']   = "m173";
 
 // cache
-$conf['wgMainCacheType']    = CACHE_MEMCACHED;
-$conf['wgMemCachedServers'] = array( '127.0.0.1:11211' );
+$conf['wgMainCacheType']    = CACHE_MEMCACHED;//CACHE_ACCEL; //CACHE_MEMCACHED;                used in MW 1.25.2
+$conf['wgMemCachedServers'] = array( '127.0.0.1:11211' );//array();     //array( '127.0.0.1:11211' );     used in MW 1.25.2
 
 // images
-$conf['images_folder']      = $IP . "_images";
-$conf['wgUploadDirectory']  = $conf['images_folder'];               //where MediaWiki uploades images
-$conf['wgUploadPath']       = $wgScriptPath . "_images";            //where MediaWiki views images
+$conf['images_folder']      = "/Library/WebServer/Documents/eoearth_images";
+$conf['wgUploadDirectory']  = $conf['images_folder'];                           //where MediaWiki uploades images
+$conf['wgUploadPath']       = "/eoearth_images";    //where MediaWiki views images
 $conf['wgDeletedDirectory'] = $conf['images_folder']."/deleted";
 $conf['wgTmpDirectory']     = $conf['images_folder']."/temp";
 

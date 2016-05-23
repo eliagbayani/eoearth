@@ -11,7 +11,7 @@
  * @extends ve.ui.WindowManager
  *
  * @constructor
- * @param {ve.ui.Surface} Surface this belongs to
+ * @param {ve.ui.Surface} surface Surface this belongs to
  * @param {Object} [config] Configuration options
  * @cfg {ve.ui.Overlay} [overlay] Overlay to use for menus
  */
@@ -35,6 +35,7 @@ OO.inheritClass( ve.ui.SurfaceWindowManager, ve.ui.WindowManager );
  * Override the window manager's directionality method to get the
  * directionality from the surface. The surface sometimes does not
  * have a directionality set; fallback to direction from the document.
+ *
  * @return {string} UI directionality
  */
 ve.ui.SurfaceWindowManager.prototype.getDir = function () {

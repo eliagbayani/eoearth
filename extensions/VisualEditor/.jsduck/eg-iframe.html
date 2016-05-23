@@ -7,6 +7,9 @@
 				<!-- oojs-ui-apex -->
 		<link rel=stylesheet href="lib/ve/lib/oojs-ui/oojs-ui-apex.vector.css">
 		<link rel=stylesheet href="lib/ve/lib/oojs-ui/oojs-ui-apex-icons-editing-core.vector.css">
+		<link rel=stylesheet href="lib/ve/lib/oojs-ui/oojs-ui-apex-icons-editing-advanced.vector.css">
+		<link rel=stylesheet href="lib/ve/lib/oojs-ui/oojs-ui-apex-icons-editing-styling.vector.css">
+		<link rel=stylesheet href="lib/ve/lib/oojs-ui/oojs-ui-apex-icons-editing-list.vector.css">
 
 		<!-- visualEditor.core.build -->
 		<link rel=stylesheet href="lib/ve/src/ce/styles/nodes/ve.ce.FocusableNode.css" class="stylesheet-ve">
@@ -16,11 +19,13 @@
 		<link rel=stylesheet href="lib/ve/src/ce/styles/nodes/ve.ce.DocumentNode.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/nodes/ve.ce.GeneratedContentNode.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/annotations/ve.ce.LanguageAnnotation.css" class="stylesheet-ve">
+		<link rel=stylesheet href="lib/ve/src/ce/styles/annotations/ve.ce.LinkAnnotation.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/nodes/ve.ce.ResizableNode.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/nodes/ve.ce.TableCellNode.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/nodes/ve.ce.TableNode.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/ve.ce.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ce/styles/ve.ce.Surface.css" class="stylesheet-ve">
+		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/dialogs/ve.ui.ToolbarDialog.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/dialogs/ve.ui.CommandHelpDialog.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/dialogs/ve.ui.FindAndReplaceDialog.css" class="stylesheet-ve">
@@ -35,8 +40,9 @@
 		<link rel=stylesheet href="lib/ve/src/ui/styles/widgets/ve.ui.MediaSizeWidget.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/inspectors/ve.ui.CommentInspector.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/inspectors/ve.ui.FragmentInspector.css" class="stylesheet-ve">
-		<link rel=stylesheet href="lib/ve/src/ui/styles/inspectors/ve.ui.LinkInspector.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.ContextItem.css" class="stylesheet-ve">
+		<link rel=stylesheet href="lib/ve/src/ui/styles/contextitems/ve.ui.LinearContextItem.css" class="stylesheet-ve">
+		<link rel=stylesheet href="lib/ve/src/ui/styles/contextitems/ve.ui.TableContextItem.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/contextitems/ve.ui.AlignableContextItem.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/contextitems/ve.ui.CommentContextItem.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/contextitems/ve.ui.LanguageContextItem.css" class="stylesheet-ve">
@@ -44,10 +50,9 @@
 		<link rel=stylesheet href="lib/ve/src/ui/styles/contextitems/ve.ui.ToolContextItem.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.Overlay.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.Surface.css" class="stylesheet-ve">
-		<link rel=stylesheet href="lib/ve/src/ui/styles/widgets/ve.ui.SurfaceWidget.css" class="stylesheet-ve">
+		<link rel=stylesheet href="lib/ve/src/ui/styles/widgets/ve.ui.TargetWidget.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.TableContext.css" class="stylesheet-ve">
 		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.Toolbar.css" class="stylesheet-ve">
-		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.Icons.css" class="stylesheet-ve">
 
 		<!-- visualEditor.desktop.build -->
 		<link rel=stylesheet href="lib/ve/src/ui/styles/ve.ui.DesktopContext.css">
@@ -77,11 +82,15 @@
 		<!-- oojs-ui -->
 		<script src="lib/ve/lib/oojs-ui/oojs-ui.js"></script>
 
+		<!-- CLDRPluralRuleParser -->
+		<script src="lib/ve/lib/jquery.i18n/libs/CLDRPluralRuleParser/src/CLDRPluralRuleParser.js"></script>
+
 		<!-- jquery.i18n -->
 		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.js"></script>
 		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.messagestore.js"></script>
 		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.parser.js"></script>
 		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.emitter.js"></script>
+		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.emitter.bidi.js"></script>
 		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.language.js"></script>
 		<script src="lib/ve/lib/jquery.i18n/src/jquery.i18n.fallbacks.js"></script>
 		<script src="lib/ve/lib/jquery.i18n/src/languages/bs.js"></script>
@@ -134,6 +143,7 @@
 
 		<!-- visualEditor.core.build -->
 		<script src="lib/ve/src/ve.Range.js"></script>
+		<script src="lib/ve/src/ve.SelectionState.js"></script>
 		<script src="lib/ve/src/ve.Node.js"></script>
 		<script src="lib/ve/src/ve.BranchNode.js"></script>
 		<script src="lib/ve/src/ve.LeafNode.js"></script>
@@ -150,10 +160,11 @@
 		<script src="lib/ve/src/dm/ve.dm.ClassAttributeNode.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.AlignableNode.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.FocusableNode.js"></script>
+		<script src="lib/ve/src/dm/ve.dm.ResizableNode.js"></script>
+		<script src="lib/ve/src/dm/ve.dm.TableCellableNode.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.Scalable.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.APIResultsProvider.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.APIResultsQueue.js"></script>
-		<script src="lib/ve/src/dm/ve.dm.ResizableNode.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.Node.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.BranchNode.js"></script>
 		<script src="lib/ve/src/dm/ve.dm.ContentBranchNode.js"></script>
@@ -247,6 +258,7 @@
 		<script src="lib/ve/src/ce/ve.ce.AlignableNode.js"></script>
 		<script src="lib/ve/src/ce/ve.ce.FocusableNode.js"></script>
 		<script src="lib/ve/src/ce/ve.ce.ResizableNode.js"></script>
+		<script src="lib/ve/src/ce/ve.ce.TableCellableNode.js"></script>
 		<script src="lib/ve/src/ce/ve.ce.Surface.js"></script>
 		<script src="lib/ve/src/ce/ve.ce.SurfaceObserver.js"></script>
 		<script src="lib/ve/src/ce/nodes/ve.ce.GeneratedContentNode.js"></script>
@@ -302,15 +314,19 @@
 		<script src="lib/ve/src/ui/ve.ui.Overlay.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.Surface.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.Context.js"></script>
+		<script src="lib/ve/src/ui/contexts/ve.ui.LinearContext.js"></script>
+		<script src="lib/ve/src/ui/contexts/ve.ui.TableContext.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.ModeledFactory.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.ContextItem.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.ContextItemFactory.js"></script>
+		<script src="lib/ve/src/ui/contextitems/ve.ui.LinearContextItem.js"></script>
+		<script src="lib/ve/src/ui/contextitems/ve.ui.TableContextItem.js"></script>
+		<script src="lib/ve/src/ui/contextitems/ve.ui.AlienContextItem.js"></script>
 		<script src="lib/ve/src/ui/contextitems/ve.ui.AlignableContextItem.js"></script>
 		<script src="lib/ve/src/ui/contextitems/ve.ui.CommentContextItem.js"></script>
 		<script src="lib/ve/src/ui/contextitems/ve.ui.LanguageContextItem.js"></script>
 		<script src="lib/ve/src/ui/contextitems/ve.ui.LinkContextItem.js"></script>
 		<script src="lib/ve/src/ui/contextitems/ve.ui.ToolContextItem.js"></script>
-		<script src="lib/ve/src/ui/ve.ui.TableContext.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.Tool.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.Toolbar.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.TargetToolbar.js"></script>
@@ -328,12 +344,14 @@
 		<script src="lib/ve/src/ui/ve.ui.DataTransferHandlerFactory.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.DataTransferItem.js"></script>
 		<script src="lib/ve/src/ui/ve.ui.WindowManager.js"></script>
+		<script src="lib/ve/src/ui/ve.ui.NodeWindow.js"></script>
 		<script src="lib/ve/src/ui/windowmanagers/ve.ui.SurfaceWindowManager.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.AnnotationAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.ContentAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.FormatAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.HistoryAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.IndentationAction.js"></script>
+		<script src="lib/ve/src/ui/actions/ve.ui.LinkAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.ListAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.TableAction.js"></script>
 		<script src="lib/ve/src/ui/actions/ve.ui.WindowAction.js"></script>
@@ -354,18 +372,20 @@
 		<script src="lib/ve/src/ui/datatransferhandlers/ve.ui.DSVFileTransferHandler.js"></script>
 		<script src="lib/ve/src/ui/datatransferhandlers/ve.ui.PlainTextFileTransferHandler.js"></script>
 		<script src="lib/ve/src/ui/datatransferhandlers/ve.ui.HTMLFileTransferHandler.js"></script>
+		<script src="lib/ve/src/ui/datatransferhandlers/ve.ui.UrlStringTransferHandler.js"></script>
 		<script src="lib/ve/src/ui/windowmanagers/ve.ui.ToolbarDialogWindowManager.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.AlignWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.LanguageSearchWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.LanguageResultWidget.js"></script>
 		<script src="lib/ve/src/ui/dialogs/ve.ui.LanguageSearchDialog.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.LanguageInputWidget.js"></script>
-		<script src="lib/ve/src/ui/widgets/ve.ui.SurfaceWidget.js"></script>
-		<script src="lib/ve/src/ui/widgets/ve.ui.LinkTargetInputWidget.js"></script>
+		<script src="lib/ve/src/ui/widgets/ve.ui.TargetWidget.js"></script>
+		<script src="lib/ve/src/ui/widgets/ve.ui.LinkAnnotationWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.ContextSelectWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.ContextOptionWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.DimensionsWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.MediaSizeWidget.js"></script>
+		<script src="lib/ve/src/ui/widgets/ve.ui.PreviewWidget.js"></script>
 		<script src="lib/ve/src/ui/widgets/ve.ui.WhitespacePreservingTextInputWidget.js"></script>
 		<script src="lib/ve/src/ui/tools/ve.ui.AnnotationTool.js"></script>
 		<script src="lib/ve/src/ui/tools/ve.ui.ClearAnnotationTool.js"></script>
@@ -381,15 +401,18 @@
 		<script src="lib/ve/src/ui/inspectors/ve.ui.FragmentInspector.js"></script>
 		<script src="lib/ve/src/ui/inspectors/ve.ui.AnnotationInspector.js"></script>
 		<script src="lib/ve/src/ui/inspectors/ve.ui.NodeInspector.js"></script>
-		<script src="lib/ve/src/ui/inspectors/ve.ui.LinkInspector.js"></script>
+		<script src="lib/ve/src/ui/inspectors/ve.ui.LinkAnnotationInspector.js"></script>
 		<script src="lib/ve/src/ui/inspectors/ve.ui.CommentInspector.js"></script>
 		<script src="lib/ve/src/ui/inspectors/ve.ui.LanguageInspector.js"></script>
 		<script src="lib/ve/src/ui/pages/ve.ui.SpecialCharacterPage.js"></script>
 
 		<!-- visualEditor.desktop.build -->
 		<script src="lib/ve/src/ui/ve.ui.DesktopSurface.js"></script>
-		<script src="lib/ve/src/ui/ve.ui.DesktopContext.js"></script>
+		<script src="lib/ve/src/ui/contexts/ve.ui.DesktopContext.js"></script>
 		<script src="lib/ve/src/ui/windowmanagers/ve.ui.DesktopInspectorWindowManager.js"></script>
+
+		<!-- visualEditor.desktop.standalone -->
+		<script src="lib/ve/src/init/sa/ve.init.sa.DesktopTarget.js"></script>
 
 		<!-- example scripts -->
 		<script>

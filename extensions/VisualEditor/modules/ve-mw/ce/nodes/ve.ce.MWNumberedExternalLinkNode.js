@@ -24,12 +24,21 @@ ve.ce.MWNumberedExternalLinkNode = function VeCeMWNumberedExternalLinkNode( mode
 
 	// DOM changes
 	this.$element
+		// TODO: Test to see whether we can get away with adding unicode-bidi
+		// embed/isolate style on $element. unicode-bidi isolate is more conceptually
+		// correct, but not well supported (e.g. it seems to result in unexpected jumping
+		// on Chromium).
 		.addClass( 've-ce-mwNumberedExternalLinkNode' )
-		// Need CE=false to prevent selection issues
-		.prop( 'contentEditable', 'false' );
+		// Need some content to make span take up a cursor position, but it must be text
+		// with no directionality, else it can break Chromium cursoring (see
+		// https://code.google.com/p/chromium/issues/detail?id=441056 ). Either a
+		// unicorn-like img tag or the actual apparent link text ("[1]", hitherto shown
+		// with CSS generated content) would fall foul of this bug. Use a zero-width
+		// space so it doesn't change the appearance.
+		.text( '\u200B' );
 
 	// Add link
-	this.$link = this.$( '<a>' )
+	this.$link = $( '<a>' )
 		// CSS for numbering needs rel=mw:ExtLink
 		.attr( 'rel', 'mw:ExtLink' )
 		.addClass( 'external' )
@@ -69,8 +78,6 @@ ve.ce.MWNumberedExternalLinkNode.static.getDescription = function ( model ) {
 
 /**
  * Handle model update events.
- *
- * If the source changed since last update the image's src attribute will be updated accordingly.
  *
  * @method
  */

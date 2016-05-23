@@ -13,7 +13,8 @@
 			{
 				"name": "User Interface",
 				"classes": [
-					"ve.ui.MW*Page"
+					"ve.ui.MW*Page",
+					"ve.ui.MW*Window"
 				]
 			},
 			{
@@ -30,7 +31,8 @@
 			{
 				"name": "MediaWiki",
 				"classes": [
-					"mw.Title"
+					"mw.Title",
+					"mw.widgets.TitleInputWidget"
 				]
 			}
 		]
@@ -43,6 +45,7 @@
 				"classes": [
 					"ve",
 					"ve.Range",
+					"ve.SelectionState",
 					"ve.EventSequencer",
 					"ve.Filibuster",
 					"ve.TriggerListener",
@@ -136,6 +139,7 @@
 					"ve.ui.*Tool",
 					"ve.ui.*Widget",
 					"ve.ui.*WindowManager",
+					"ve.ui.NodeWindow",
 					"ve.ui.*Dialog",
 					"ve.ui.*Inspector"
 				]
@@ -167,48 +171,40 @@
 		]
 	},
 	{
-		"name": "OOJS UI",
+		"name": "OOjs UI",
 		"groups": [
 			{
 				"name": "General",
 				"classes": [
 					"OO.ui",
-					"OO.ui.ActionSet",
 					"OO.ui.Element",
-					"OO.ui.Layout",
-					"OO.ui.Widget",
+					"OO.ui.HtmlSnippet",
+					"OO.ui.Toolbar",
 					"OO.ui.Window",
 					"OO.ui.Dialog",
 					"OO.ui.WindowManager",
-					"OO.ui.Error",
 					"OO.ui.Process",
-					"OO.ui.HtmlSnippet"
+					"OO.ui.Error",
+					"OO.ui.ActionSet"
 				]
 			},
 			{
-				"name": "Elements",
+				"name": "Factories",
 				"classes": [
-					"OO.ui.*Element"
+					"OO.ui.*Factory"
 				]
 			},
 			{
 				"name": "Tools",
 				"classes": [
-					"OO.ui.*Tool",
-					"OO.ui.Tool*Factory"
+					"OO.ui.*Tool"
 				]
 			},
 			{
-				"name": "Toolbar and tool groups",
+				"name": "Mixins",
 				"classes": [
-					"OO.ui.Toolbar",
-					"OO.ui.*ToolGroup"
-				]
-			},
-			{
-				"name": "Dialogs",
-				"classes": [
-					"OO.ui.*Dialog"
+					"OO.ui.mixin",
+					"OO.ui.mixin.*"
 				]
 			},
 			{
@@ -218,9 +214,21 @@
 				]
 			},
 			{
+				"name": "Tool groups",
+				"classes": [
+					"OO.ui.*ToolGroup"
+				]
+			},
+			{
 				"name": "Widgets",
 				"classes": [
 					"OO.ui.*Widget"
+				]
+			},
+			{
+				"name": "Dialogs",
+				"classes": [
+					"OO.ui.*Dialog"
 				]
 			},
 			{
@@ -235,7 +243,7 @@
 		"name": "Upstream",
 		"groups": [
 			{
-				"name": "OOJS",
+				"name": "OOjs",
 				"classes": [
 					"OO",
 					"OO.EventEmitter",

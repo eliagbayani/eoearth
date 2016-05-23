@@ -8,14 +8,14 @@
  * Context item for a MWTransclusion.
  *
  * @class
- * @extends ve.ui.ContextItem
+ * @extends ve.ui.LinearContextItem
  *
  * @constructor
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.MWTransclusionContextItem = function VeMWTransclusionContextItem() {
+ve.ui.MWTransclusionContextItem = function VeUiMWTransclusionContextItem() {
 	// Parent constructor
 	ve.ui.MWTransclusionContextItem.super.apply( this, arguments );
 
@@ -28,7 +28,7 @@ ve.ui.MWTransclusionContextItem = function VeMWTransclusionContextItem() {
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.MWTransclusionContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.MWTransclusionContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 
@@ -69,8 +69,24 @@ ve.ui.MWTransclusionContextItem.static.isCompatibleWith =
 ve.ui.MWTransclusionContextItem.prototype.getDescription = function () {
 	return ve.msg(
 		'visualeditor-dialog-transclusion-contextitem-description',
-		ve.ce.MWTransclusionNode.static.getDescription( this.model )
+		ve.ce.MWTransclusionNode.static.getDescription( this.model ),
+		ve.ce.MWTransclusionNode.static.getTemplatePartDescriptions( this.model ).length
 	);
+};
+
+/**
+ * @inheritdoc
+ */
+ve.ui.MWTransclusionContextItem.prototype.onEditButtonClick = function () {
+	var surfaceModel = this.context.getSurface().getModel(),
+		selection = surfaceModel.getSelection();
+
+	if ( selection instanceof ve.dm.TableSelection ) {
+		surfaceModel.setLinearSelection( selection.getOuterRanges()[ 0 ] );
+	}
+
+	// Parent method
+	ve.ui.MWTransclusionContextItem.super.prototype.onEditButtonClick.apply( this, arguments );
 };
 
 /* Registration */

@@ -6,13 +6,38 @@
  */
 
 /**
+ * MediaWiki UserInterface popup tool.
+ *
+ * @class
+ * @abstract
+ * @extends OO.ui.PopupTool
+ * @constructor
+ * @param {string} title Title
+ * @param {OO.ui.ToolGroup} toolGroup
+ * @param {Object} [config]
+ */
+ve.ui.MWPopupTool = function VeUiMWPopupTool( title, toolGroup, config ) {
+	// Configuration initialization
+	config = ve.extendObject( { popup: { head: true, label: title } }, config );
+
+	// Parent constructor
+	ve.ui.MWPopupTool.super.call( this, toolGroup, config );
+
+	this.$element.addClass( 've-ui-mwPopupTool' );
+};
+
+/* Inheritance */
+
+OO.inheritClass( ve.ui.MWPopupTool, OO.ui.PopupTool );
+
+/**
  * MediaWiki UserInterface notices popup tool.
  *
  * @class
- * @extends OO.ui.PopupTool
+ * @extends ve.ui.MWPopupTool
  * @constructor
- * @param {OO.ui.ToolGroup} toolGroup Tool group. Must belong to a ve.ui.TargetToolbar
- * @param {Object} [config] Configuration options
+ * @param {OO.ui.ToolGroup} toolGroup
+ * @param {Object} [config]
  */
 ve.ui.MWNoticesPopupTool = function VeUiMWNoticesPopupTool( toolGroup, config ) {
 	var tool = this,
@@ -20,24 +45,21 @@ ve.ui.MWNoticesPopupTool = function VeUiMWNoticesPopupTool( toolGroup, config ) 
 		count = items.length,
 		title = ve.msg( 'visualeditor-editnotices-tool', count );
 
-	// Configuration initialization
-	config = ve.extendObject( true, { popup: { head: true, label: title } }, config );
-
 	// Parent constructor
-	OO.ui.PopupTool.call( this, toolGroup, config );
+	ve.ui.MWNoticesPopupTool.super.call( this, title, toolGroup, config );
 
 	// Properties
-	this.$items = this.$( '<div>' ).addClass( 've-ui-mwNoticesPopupTool-items' );
+	this.$items = $( '<div>' ).addClass( 've-ui-mwNoticesPopupTool-items' );
 
 	// Initialization
-	items.forEach( function ( item ) {
-		var node = $.parseHTML( item )[0];
-		$( node )
+	items.forEach( function ( itemHtml ) {
+		var $node = $( '<div>' )
 			.addClass( 've-ui-mwNoticesPopupTool-item' )
-			.find( 'a' )
-				.attr( 'target', '_blank' );
+			.append( $.parseHTML( itemHtml ) );
 
-		tool.$items.append( node );
+		$node.find( 'a' ).attr( 'target', '_blank' );
+
+		tool.$items.append( $node );
 	} );
 
 	this.popup.$body.append( this.$items );
@@ -49,7 +71,7 @@ ve.ui.MWNoticesPopupTool = function VeUiMWNoticesPopupTool( toolGroup, config ) 
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.MWNoticesPopupTool, OO.ui.PopupTool );
+OO.inheritClass( ve.ui.MWNoticesPopupTool, ve.ui.MWPopupTool );
 
 /* Static Properties */
 
@@ -81,25 +103,19 @@ ve.ui.toolFactory.register( ve.ui.MWNoticesPopupTool );
  * MediaWiki UserInterface help popup tool.
  *
  * @class
- * @extends OO.ui.PopupTool
+ * @extends ve.ui.MWPopupTool
  * @constructor
  * @param {OO.ui.ToolGroup} toolGroup
  * @param {Object} [config] Configuration options
  */
 ve.ui.MWHelpPopupTool = function VeUiMWHelpPopupTool( toolGroup, config ) {
-	var title = ve.msg( 'visualeditor-help-tool' );
-
-	// Configuration initialization
-	config = ve.extendObject( true, { popup: { head: true, label: title } }, config );
-
 	// Parent constructor
-	OO.ui.PopupTool.call( this, toolGroup, config );
+	ve.ui.MWHelpPopupTool.super.call( this, ve.msg( 'visualeditor-help-tool' ), toolGroup, config );
 
 	// Properties
-	this.$items = this.$( '<div>' );
+	this.$items = $( '<div>' );
 	this.feedbackPromise = null;
 	this.helpButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		framed: false,
 		icon: 'help',
 		title: ve.msg( 'visualeditor-help-title' ),
@@ -108,13 +124,11 @@ ve.ui.MWHelpPopupTool = function VeUiMWHelpPopupTool( toolGroup, config ) {
 		label: ve.msg( 'visualeditor-help-label' )
 	} );
 	this.keyboardShortcutsButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		framed: false,
 		icon: 'help',
 		label: ve.msg( 'visualeditor-dialog-command-help-title' )
 	} );
 	this.feedbackButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		framed: false,
 		icon: 'comment',
 		label: ve.msg( 'visualeditor-feedback-tool' )
@@ -128,12 +142,12 @@ ve.ui.MWHelpPopupTool = function VeUiMWHelpPopupTool( toolGroup, config ) {
 	this.$items
 		.addClass( 've-ui-mwHelpPopupTool-items' )
 		.append(
-			this.$( '<div>' )
+			$( '<div>' )
 				.addClass( 've-ui-mwHelpPopupTool-item' )
-				.text( ve.msg( 'visualeditor-beta-warning' ) )
+				.text( ve.msg( 'visualeditor-beta-warning', $( '#ca-edit' ).text() ) )
 		)
 		.append(
-			this.$( '<div>' )
+			$( '<div>' )
 				.addClass( 've-ui-mwHelpPopupTool-item' )
 				.append( this.helpButton.$element )
 				.append( this.keyboardShortcutsButton.$element )
@@ -141,21 +155,21 @@ ve.ui.MWHelpPopupTool = function VeUiMWHelpPopupTool( toolGroup, config ) {
 		);
 	if ( ve.version.id !== false ) {
 		this.$items
-			.append( this.$( '<div>' )
+			.append( $( '<div>' )
 				.addClass( 've-ui-mwHelpPopupTool-item' )
-				.append( this.$( '<span>' )
+				.append( $( '<span>' )
 					.addClass( 've-ui-mwHelpPopupTool-version-label' )
 					.text( ve.msg( 'visualeditor-version-label' ) )
 				)
 				.append( ' ' )
-				.append( this.$( '<a>' )
+				.append( $( '<a>' )
 					.addClass( 've-ui-mwHelpPopupTool-version-link' )
 					.attr( 'target', '_blank' )
 					.attr( 'href', ve.version.url )
 					.text( ve.version.id )
 				)
 				.append( ' ' )
-				.append( this.$( '<span>' )
+				.append( $( '<span>' )
 					.addClass( 've-ui-mwHelpPopupTool-version-date' )
 					.text( ve.version.dateString )
 				)
@@ -167,7 +181,7 @@ ve.ui.MWHelpPopupTool = function VeUiMWHelpPopupTool( toolGroup, config ) {
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.MWHelpPopupTool, OO.ui.PopupTool );
+OO.inheritClass( ve.ui.MWHelpPopupTool, ve.ui.MWPopupTool );
 
 /* Static Properties */
 
@@ -198,7 +212,9 @@ ve.ui.MWHelpPopupTool.prototype.onFeedbackClick = function () {
 		} );
 	}
 	this.feedbackPromise.done( function ( feedback ) {
-		feedback.launch();
+		feedback.launch( {
+			message: ve.msg( 'visualeditor-feedback-defaultmessage', location.toString() )
+		} );
 	} );
 };
 
@@ -207,7 +223,7 @@ ve.ui.MWHelpPopupTool.prototype.onFeedbackClick = function () {
  */
 ve.ui.MWHelpPopupTool.prototype.onKeyboardShortcutsClick = function () {
 	this.popup.toggle( false );
-	ve.ui.commandRegistry.lookup( 'commandHelp' ).execute( this.toolbar.getSurface() );
+	ve.init.target.commandRegistry.lookup( 'commandHelp' ).execute( this.toolbar.getSurface() );
 };
 
 /* Registration */

@@ -274,7 +274,7 @@ ve.dm.mwExample.MWBlockImage = {
 				height: 2,
 				resource: 'FooBar',
 				originalClasses: 'mw-halign-right foobar',
-				unrecognizedClasses: ['foobar']
+				unrecognizedClasses: [ 'foobar' ]
 			}
 		},
 		{ type: 'mwImageCaption' },
@@ -311,7 +311,7 @@ ve.dm.mwExample.MWInlineImage = {
 			resource: './File:Wiki.png',
 			type: 'none',
 			originalClasses: 'foo mw-valign-text-top',
-			unrecognizedClasses: ['foo']
+			unrecognizedClasses: [ 'foo' ]
 		}
 	},
 	storeItems: [
@@ -687,7 +687,7 @@ ve.dm.mwExample.complexInternalData = [
 	{ type: 'alienMeta', originalDomElements: $( '<!-- before -->' ).toArray() },
 	{ type: '/alienMeta' },
 	{ type: 'paragraph' },
-	'F', ['o', [ve.dm.example.bold]], ['o', [ve.dm.example.italic]],
+	'F', [ 'o', [ ve.dm.example.bold ] ], [ 'o', [ ve.dm.example.italic ] ],
 	// 4
 	{ type: 'mwReference', attributes: {
 		mw: {},
@@ -710,11 +710,11 @@ ve.dm.mwExample.complexInternalData = [
 	{ type: 'internalItem' },
 	// 9
 	{ type: 'paragraph', internal: { generated: 'wrapper' } },
-	'R', ['e', [ve.dm.example.bold]], 'f',
+	'R', [ 'e', [ ve.dm.example.bold ] ], 'f',
 	// 13
 	{ type: 'alienMeta', originalDomElements: $( '<!-- reference -->' ).toArray() },
 	{ type: '/alienMeta' },
-	'e', ['r', [ve.dm.example.italic]], ['e', [ve.dm.example.italic]],
+	'e', [ 'r', [ ve.dm.example.italic ] ], [ 'e', [ ve.dm.example.italic ] ],
 	// 16
 	{ type: 'mwReference', attributes: {
 		mw: {},
@@ -905,7 +905,7 @@ ve.dm.mwExample.domToDataCases = {
 			ve.dm.mwExample.MWTransclusion.blockStoreItems
 		],
 		modify: function ( model ) {
-			model.data.data[0].attributes.mw.parts[0].template.params['1'].wt = 'Hello, globe!';
+			model.data.data[ 0 ].attributes.mw.parts[ 0 ].template.params[ '1' ].wt = 'Hello, globe!';
 		},
 		normalizedBody: ve.dm.mwExample.MWTransclusion.blockOpenModified,
 		fromDataBody: ve.dm.mwExample.MWTransclusion.blockOpenFromDataModified,
@@ -942,7 +942,7 @@ ve.dm.mwExample.domToDataCases = {
 			ve.dm.mwExample.MWTransclusion.inlineStoreItems
 		],
 		modify: function ( model ) {
-			model.data.data[1].attributes.mw.parts[0].template.params['1'].wt = '5,678';
+			model.data.data[ 1 ].attributes.mw.parts[ 0 ].template.params[ '1' ].wt = '5,678';
 		},
 		normalizedBody: ve.dm.mwExample.MWTransclusion.inlineOpenModified + ve.dm.mwExample.MWTransclusion.inlineClose,
 		fromDataBody: ve.dm.mwExample.MWTransclusion.inlineOpenFromDataModified + ve.dm.mwExample.MWTransclusion.inlineClose,
@@ -1051,7 +1051,27 @@ ve.dm.mwExample.domToDataCases = {
 			{ type: '/internalList' }
 		]
 	},
-	'mw:AlienExtension': {
+	'mw:Transclusion which is also a language annotation': {
+		body: '<span dir="ltr" about="#mwt1" typeof="mw:Transclusion" data-mw="{}">content</span>',
+		data: [
+			{ type: 'paragraph', internal: { generated: 'wrapper' } },
+			{
+				type: 'mwTransclusionInline',
+				attributes: {
+					mw: {},
+					originalIndex: 0,
+					originalMw: '{}'
+				},
+				originalDomElements: $( '<span dir="ltr" about="#mwt1" typeof="mw:Transclusion" data-mw="{}">content</span>' ).toArray()
+			},
+			{ type: '/mwTransclusionInline' },
+			{ type: '/paragraph' },
+			{ type: 'internalList' },
+			{ type: '/internalList' }
+		],
+		clipboardBody: '<span dir="ltr" about="#mwt1" typeof="mw:Transclusion" data-mw="{}" data-ve-no-generated-contents="true">content</span>'
+	},
+	'mw:AlienBlockExtension': {
 		body:
 			'<div about="#mwt1" typeof="mw:Extension/syntaxhighlight"' +
 				' data-mw="{&quot;name&quot;:&quot;syntaxhighlight&quot;,&quot;attrs&quot;:{&quot;lang&quot;:&quot;php&quot;},&quot;body&quot;:{&quot;extsrc&quot;:&quot;\\n$foo = bar;\\n&quot;}}"' +
@@ -1067,7 +1087,7 @@ ve.dm.mwExample.domToDataCases = {
 			'</div>',
 		data: [
 			{
-				type: 'mwAlienExtension',
+				type: 'mwAlienBlockExtension',
 				attributes: {
 					mw: {
 						name: 'syntaxhighlight',
@@ -1083,12 +1103,51 @@ ve.dm.mwExample.domToDataCases = {
 				},
 				originalDomElements: $( '<div about="#mwt1" data-parsoid="1"></div>' ).toArray()
 			},
-			{ type: '/mwAlienExtension' },
+			{ type: '/mwAlienBlockExtension' },
 			{ type: 'internalList' },
 			{ type: '/internalList' }
 		],
 		modify: function ( model ) {
-			model.data.data[0].attributes.mw.attrs.lang = 'php5';
+			model.data.data[ 0 ].attributes.mw.attrs.lang = 'php5';
+		}
+	},
+	'mw:AlienInlineExtension': {
+		body:
+			'<p>' +
+				'<img src="Foo" width="100" height="20" alt="Bar" typeof="mw:Extension/score"' +
+					' data-mw="{&quot;name&quot;:&quot;score&quot;,&quot;attrs&quot;:{},&quot;body&quot;:{&quot;extsrc&quot;:&quot;\\\\relative c&#39; { e d c d e e e }&quot;}}" ' +
+					' data-parsoid="1" about="#mwt1" />' +
+			'</p>',
+		normalizedBody:
+			'<p>' +
+				'<span typeof="mw:Extension/score"' +
+					' data-mw="{&quot;name&quot;:&quot;score&quot;,&quot;attrs&quot;:{},&quot;body&quot;:{&quot;extsrc&quot;:&quot;\\\\relative c&#39; { d d d e e e }&quot;}}" ' +
+					' src="Foo" width="100" height="20" alt="Bar" data-parsoid="1" about="#mwt1" />' +
+			'</p>',
+		data: [
+			{ type: 'paragraph' },
+			{
+				type: 'mwAlienInlineExtension',
+				attributes: {
+					mw: {
+						name: 'score',
+						attrs: {},
+						body: {
+							extsrc: '\\relative c\' { e d c d e e e }'
+						}
+					},
+					originalIndex: 0,
+					originalMw: '{"name":"score","attrs":{},"body":{"extsrc":"\\\\relative c\' { e d c d e e e }"}}'
+				},
+				originalDomElements: $( '<img src="Foo" width="100" height="20" alt="Bar" about="#mwt1" data-parsoid="1"></img>' ).toArray()
+			},
+			{ type: '/mwAlienInlineExtension' },
+			{ type: '/paragraph' },
+			{ type: 'internalList' },
+			{ type: '/internalList' }
+		],
+		modify: function ( model ) {
+			model.data.data[ 1 ].attributes.mw.body.extsrc = '\\relative c\' { d d d e e e }';
 		}
 	},
 	'mw:Reference': {
@@ -1167,6 +1226,43 @@ ve.dm.mwExample.domToDataCases = {
 				'data-mw=\\&quot;{&amp;quot;name&amp;quot;:&amp;quot;ref&amp;quot;,&amp;quot;body&amp;quot;:{&amp;quot;html&amp;quot;:&amp;quot;Ref in refs&amp;quot;},' +
 				'&amp;quot;attrs&amp;quot;:{&amp;quot;group&amp;quot;:&amp;quot;g1&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;foo&amp;quot;}}\\&quot;>' +
 				'</span>&quot;}}">' +
+			'</div>',
+		clipboardBody:
+			'<p>Foo' +
+				'<span typeof="mw:Extension/ref" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;attrs&quot;:{&quot;name&quot;:&quot;bar&quot;}}">' +
+					'<sup>[1]</sup>' +
+				'</span>' +
+				' Baz' +
+				'<span typeof="mw:Extension/ref" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;body&quot;:{&quot;html&quot;:&quot;Quux&quot;},&quot;attrs&quot;:{&quot;group&quot;:&quot;g1&quot;,&quot;name&quot;:&quot;:0&quot;}}">' +
+					'<sup>[g1 1]</sup>' +
+				'</span>' +
+				' Whee' +
+				'<span typeof="mw:Extension/ref" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;body&quot;:{&quot;html&quot;:&quot;' +
+				'<a href=\\&quot;./Bar\\&quot; rel=\\&quot;mw:WikiLink\\&quot;>Bar' +
+				'</a>&quot;},&quot;attrs&quot;:{&quot;name&quot;:&quot;bar&quot;}}">' +
+					'<sup>[1]</sup>' +
+				'</span>' +
+				' Yay' +
+				// This reference has .body.id instead of .body.html
+				'<span typeof="mw:Extension/ref" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;body&quot;:{&quot;id&quot;:&quot;mw-cite-3&quot;,&quot;html&quot;:&quot;No name&quot;},&quot;attrs&quot;:{&quot;group&quot;:&quot;g1&quot;}}">' +
+					'<sup>[g1 2]</sup>' +
+				'</span>' +
+				' Quux' +
+				'<span typeof="mw:Extension/ref" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;body&quot;:{&quot;html&quot;:&quot;Different content&quot;},&quot;attrs&quot;:{&quot;name&quot;:&quot;bar&quot;}}">' +
+					'<sup>[1]</sup>' +
+				'</span>' +
+				' Foo' +
+				'<span typeof="mw:Extension/ref" data-mw="{&quot;name&quot;:&quot;ref&quot;,&quot;attrs&quot;:{&quot;group&quot;:&quot;g1&quot;,&quot;name&quot;:&quot;foo&quot;}}">' +
+					'<sup>[g1 3]</sup>' +
+				'</span>' +
+			'</p>' +
+			// The HTML below is enriched to wrap reference contents in <span id="mw-cite-[...]">
+			// which Parsoid doesn't do yet, but T88290 asks for
+			'<div typeof="mw:Extension/references"' +
+				'data-mw="{&quot;name&quot;:&quot;references&quot;,&quot;attrs&quot;:{&quot;group&quot;:&quot;g1&quot;},&quot;body&quot;:{' +
+				'&quot;html&quot;:&quot;<span typeof=\\&quot;mw:Extension/ref\\&quot; ' +
+				'data-mw=\\&quot;{&amp;quot;name&amp;quot;:&amp;quot;ref&amp;quot;,&amp;quot;attrs&amp;quot;:{&amp;quot;group&amp;quot;:&amp;quot;g1&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;foo&amp;quot;},&amp;quot;body&amp;quot;:{&amp;quot;html&amp;quot;:&amp;quot;Ref in refs&amp;quot;}}' +
+				'\\&quot;><sup>[g1 3]</sup></span>&quot;}}">' +
 			'</div>',
 		head: '<base href="http://example.com" />',
 		data: [
@@ -1362,7 +1458,7 @@ ve.dm.mwExample.domToDataCases = {
 			'typeof="mw:Extension/ref"></span></p>',
 		clipboardBody: '<p><span typeof="mw:Extension/ref" ' +
 			'data-mw="{&quot;attrs&quot;:{},&quot;body&quot;:' +
-			'{&quot;html&quot;:&quot;Foo<span rel=\\&quot;ve:Comment\\&quot; data-ve-comment=\\&quot; bar \\&quot;></span>&quot;},&quot;name&quot;:&quot;ref&quot;}" ' +
+			'{&quot;html&quot;:&quot;Foo<span rel=\\&quot;ve:Comment\\&quot; data-ve-comment=\\&quot; bar \\&quot;>&amp;nbsp;</span>&quot;},&quot;name&quot;:&quot;ref&quot;}" ' +
 			'>' +
 			'<sup>[1]</sup></span></p>',
 		head: '<base href="http://example.com" />',
@@ -1509,12 +1605,12 @@ ve.dm.mwExample.domToDataCases = {
 		}
 	},
 	'internal link with href set to ./': {
-		body: '<p><a rel="mw:WikiLink" href="./"> </a></p>',
+		body: '<p><a rel="mw:WikiLink" href="./">x</a></p>',
 		head: '<base href="http://example.com" />',
 		data: [
 			{ type: 'paragraph' },
 			[
-				' ',
+				'x',
 				[ {
 					type: 'link/mwInternal',
 					attributes: {
@@ -1621,10 +1717,10 @@ ve.dm.mwExample.domToDataCases = {
 			'<meta property="mw:bar" content="baz" /><!--barbaz-->' +
 			'<link rel="mw:PageProp/Category" href="./Category:Foo_foo#Bar baz%23quux" />' +
 			'<meta typeof="mw:Placeholder" data-parsoid="foobar" />',
-		clipboardBody: '<span rel="ve:Comment" data-ve-comment=" No content conversion "></span><meta property="mw:ThisIsAnAlien" /><p>Foo' +
+		clipboardBody: '<span rel="ve:Comment" data-ve-comment=" No content conversion ">&nbsp;</span><meta property="mw:ThisIsAnAlien" /><p>Foo' +
 			'<link rel="mw:PageProp/Category" href="./Category:Bar" />Bar' +
-			'<meta property="mw:foo" content="bar" />Ba<span rel="ve:Comment" data-ve-comment=" inline "></span>z</p>' +
-			'<meta property="mw:bar" content="baz" /><span rel="ve:Comment" data-ve-comment="barbaz"></span>' +
+			'<meta property="mw:foo" content="bar" />Ba<span rel="ve:Comment" data-ve-comment=" inline ">&nbsp;</span>z</p>' +
+			'<meta property="mw:bar" content="baz" /><span rel="ve:Comment" data-ve-comment="barbaz">&nbsp;</span>' +
 			'<link rel="mw:PageProp/Category" href="./Category:Foo_foo#Bar baz%23quux" />' +
 			'<meta typeof="mw:Placeholder" data-parsoid="foobar" />',
 		head: '<base href="http://example.com" />',
@@ -1848,14 +1944,14 @@ ve.dm.mwExample.domToDataCases = {
 	'mw:Nowiki unwraps when text modified': {
 		data: ve.dm.mwExample.mwNowiki,
 		modify: function ( model ) {
-			model.data.data[7][0] = 'z';
+			model.data.data[ 7 ][ 0 ] = 'z';
 		},
 		normalizedBody: '<p>Foo[[Bzr]]Baz</p>'
 	},
 	'mw:Nowiki unwraps when annotations modified': {
 		data: ve.dm.mwExample.mwNowiki,
 		modify: function ( model ) {
-			model.data.data[7][1].push( model.getStore().index( ve.dm.example.createAnnotation( ve.dm.example.bold ) ) );
+			model.data.data[ 7 ][ 1 ].push( model.getStore().index( ve.dm.example.createAnnotation( ve.dm.example.bold ) ) );
 		},
 		normalizedBody: '<p>Foo[[B<b>a</b>r]]Baz</p>'
 	},
@@ -1953,7 +2049,7 @@ ve.dm.mwExample.domToDataCases = {
 			{ type: '/internalList' }
 		],
 		modify: function ( doc ) {
-			doc.metadata.data[1].splice( 0, 1 );
+			doc.metadata.data[ 1 ].splice( 0, 1 );
 		},
 		normalizedBody: '<h1></h1>'
 	}

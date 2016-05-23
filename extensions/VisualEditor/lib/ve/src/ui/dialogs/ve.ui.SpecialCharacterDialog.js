@@ -1,7 +1,7 @@
 /*!
  * VisualEditor UserInterface SpecialCharacterDialog class.
  *
- * @copyright 2011-2014 VisualEditor Team and others; see http://ve.mit-license.org
+ * @copyright 2011-2015 VisualEditor Team and others; see http://ve.mit-license.org
  */
 
 /**
@@ -48,7 +48,7 @@ ve.ui.SpecialCharacterDialog.prototype.initialize = function () {
 	// Parent method
 	ve.ui.SpecialCharacterDialog.super.prototype.initialize.call( this );
 
-	this.$spinner = this.$( '<div>' ).addClass( 've-ui-specialCharacterDialog-spinner' );
+	this.$spinner = $( '<div>' ).addClass( 've-ui-specialCharacterDialog-spinner' );
 	this.$content.append( this.$spinner );
 };
 
@@ -58,11 +58,12 @@ ve.ui.SpecialCharacterDialog.prototype.initialize = function () {
 ve.ui.SpecialCharacterDialog.prototype.getSetupProcess = function ( data ) {
 	return ve.ui.SpecialCharacterDialog.super.prototype.getSetupProcess.call( this, data )
 		.next( function () {
+			var inspector = this;
+
 			this.surface = data.surface;
 			this.surface.getView().focus();
 			this.surface.getModel().connect( this, { contextChange: 'onContextChange' } );
 
-			var inspector = this;
 			if ( !this.characters ) {
 				this.$spinner.show();
 				ve.init.platform.fetchSpecialCharList()
@@ -122,23 +123,18 @@ ve.ui.SpecialCharacterDialog.prototype.onContextChange = function () {
  * Builds the button DOM list based on the character list
  */
 ve.ui.SpecialCharacterDialog.prototype.buildButtonList = function () {
-	var category,
-		// HACK: When displaying this inside a dialog, menu would tend to be wider than content
-		isInsideDialog = !!this.manager.$element.closest( '.oo-ui-dialog' ).length;
+	var category;
 
 	this.bookletLayout = new OO.ui.BookletLayout( {
-		$: this.$,
 		outlined: true,
-		menuSize: isInsideDialog ? '10em' : '18em',
 		continuous: true
 	} );
 	this.pages = [];
 	for ( category in this.characters ) {
 		this.pages.push(
 			new ve.ui.SpecialCharacterPage( category, {
-				$: this.$,
 				label: category,
-				characters: this.characters[category]
+				characters: this.characters[ category ]
 			} )
 		);
 	}
@@ -156,9 +152,19 @@ ve.ui.SpecialCharacterDialog.prototype.buildButtonList = function () {
  * Handle the click event on the list
  */
 ve.ui.SpecialCharacterDialog.prototype.onListClick = function ( e ) {
-	var character = $( e.target ).data( 'character' );
+	var
+		character = $( e.target ).data( 'character' ),
+		fragment = this.surface.getModel().getFragment();
+
 	if ( character ) {
-		this.surface.getModel().getFragment().insertContent( character, true ).collapseToEnd().select();
+		if ( typeof character === 'string' ) {
+			fragment.insertContent( character, true ).collapseToEnd().select();
+		} else if ( character.action.type === 'replace' ) {
+			fragment.insertContent( character.action.options.peri, true ).collapseToEnd().select();
+		} else if ( character.action.type === 'encapsulate' ) {
+			fragment.collapseToStart().insertContent( character.action.options.pre, true );
+			fragment.collapseToEnd().insertContent( character.action.options.post, true ).collapseToEnd().select();
+		}
 	}
 };
 

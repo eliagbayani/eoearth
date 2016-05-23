@@ -67,6 +67,8 @@ ve.dm.MWBlockImageNode.static.getMatchRdfaTypes = function () {
 	return Object.keys( this.rdfaToType );
 };
 
+ve.dm.MWBlockImageNode.static.allowedRdfaTypes = [ 'mw:Error' ];
+
 ve.dm.MWBlockImageNode.static.classAttributes = {
 	'mw-image-border': { borderImage: true },
 	'mw-halign-left': { align: 'left' },
@@ -77,6 +79,10 @@ ve.dm.MWBlockImageNode.static.classAttributes = {
 };
 
 ve.dm.MWBlockImageNode.static.toDataElement = function ( domElements, converter ) {
+	var dataElement, newDimensions, attributes,
+		figure, imgWrapper, img, caption,
+		classAttr, typeofAttrs, errorIndex, width, height, altText;
+
 	// Workaround for jQuery's .children() being expensive due to
 	// https://github.com/jquery/sizzle/issues/311
 	function findChildren( parent, nodeNames ) {
@@ -85,25 +91,32 @@ ve.dm.MWBlockImageNode.static.toDataElement = function ( domElements, converter 
 		} );
 	}
 
-	var dataElement, newDimensions,
-		figure = domElements[0],
-		imgWrapper = findChildren( figure, [ 'a', 'span' ] )[0] || null,
-		img = imgWrapper && findChildren( imgWrapper, [ 'img' ] )[0] || null,
-		caption = findChildren( figure, [ 'figcaption' ] )[0] || null,
-		classAttr = figure.getAttribute( 'class' ),
-		typeofAttr = figure.getAttribute( 'typeof' ),
-		attributes = {
-			type: this.rdfaToType[typeofAttr],
-			href: imgWrapper && imgWrapper.getAttribute( 'href' ) || '',
-			src: img && img.getAttribute( 'src' ),
-			resource: img && img.getAttribute( 'resource' )
-		},
-		width = img && img.getAttribute( 'width' ),
-		height = img && img.getAttribute( 'height' ),
-		altText = img && img.getAttribute( 'alt' );
+	figure = domElements[ 0 ];
+	imgWrapper = findChildren( figure, [ 'a', 'span' ] )[ 0 ] || null;
+	img = imgWrapper && findChildren( imgWrapper, [ 'img' ] )[ 0 ] || null;
+	caption = findChildren( figure, [ 'figcaption' ] )[ 0 ] || null;
+	classAttr = figure.getAttribute( 'class' );
+	typeofAttrs = figure.getAttribute( 'typeof' ).split( ' ' );
+	errorIndex = typeofAttrs.indexOf( 'mw:Error' );
+	width = img && img.getAttribute( 'width' );
+	height = img && img.getAttribute( 'height' );
+	altText = img && img.getAttribute( 'alt' );
+
+	if ( errorIndex !== -1 ) {
+		typeofAttrs.splice( errorIndex, 1 );
+	}
+	attributes = {
+		type: this.rdfaToType[ typeofAttrs[ 0 ] ],
+		href: imgWrapper && imgWrapper.getAttribute( 'href' ) || '',
+		src: img && img.getAttribute( 'src' ),
+		resource: img && img.getAttribute( 'resource' )
+	};
 
 	if ( altText !== null ) {
 		attributes.alt = altText;
+	}
+	if ( errorIndex !== -1 ) {
+		attributes.isError = true;
 	}
 
 	this.setClassAttributes( attributes, classAttr );
@@ -159,7 +172,7 @@ ve.dm.MWBlockImageNode.static.toDataElement = function ( domElements, converter 
 // should be more conditional.
 ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) {
 	var rdfa, width, height,
-		dataElement = data[0],
+		dataElement = data[ 0 ],
 		figure = doc.createElement( 'figure' ),
 		imgWrapper = doc.createElement( dataElement.attributes.href !== '' ? 'a' : 'span' ),
 		img = doc.createElement( 'img' ),
@@ -170,12 +183,12 @@ ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) 
 	if ( !this.typeToRdfa ) {
 		this.typeToRdfa = {};
 		for ( rdfa in this.rdfaToType ) {
-			this.typeToRdfa[this.rdfaToType[rdfa]] = rdfa;
+			this.typeToRdfa[ this.rdfaToType[ rdfa ] ] = rdfa;
 		}
 	}
 
 	// Type
-	figure.setAttribute( 'typeof', this.typeToRdfa[dataElement.attributes.type] );
+	figure.setAttribute( 'typeof', this.typeToRdfa[ dataElement.attributes.type ] );
 
 	if ( classAttr ) {
 		figure.className = classAttr;
@@ -225,13 +238,14 @@ ve.dm.MWBlockImageNode.static.toDomElements = function ( data, doc, converter ) 
  * Get the caption node of the image.
  *
  * @method
- * @returns {ve.dm.MWImageCaptionNode|null} Caption node, if present
+ * @return {ve.dm.MWImageCaptionNode|null} Caption node, if present
  */
 ve.dm.MWBlockImageNode.prototype.getCaptionNode = function () {
-	var node = this.children[0];
+	var node = this.children[ 0 ];
 	return node instanceof ve.dm.MWImageCaptionNode ? node : null;
 };
 
 /* Registration */
 
+ve.dm.modelRegistry.unregister( ve.dm.BlockImageNode );
 ve.dm.modelRegistry.register( ve.dm.MWBlockImageNode );

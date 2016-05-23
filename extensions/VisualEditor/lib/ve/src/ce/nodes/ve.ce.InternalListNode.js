@@ -18,7 +18,7 @@ ve.ce.InternalListNode = function VeCeInternalListNode() {
 	ve.ce.InternalListNode.super.apply( this, arguments );
 
 	// An internal list has no rendering
-	this.$element = this.$( [] );
+	this.$element = $( [] );
 };
 
 /* Inheritance */
@@ -33,6 +33,7 @@ ve.ce.InternalListNode.static.name = 'internalList';
 
 /**
  * Deliberately empty: don't build an entire CE tree with DOM elements for things that won't render
+ *
  * @inheritdoc
  */
 ve.ce.InternalListNode.prototype.onSplice = function () {

@@ -1,19 +1,20 @@
 /*!
  * VisualEditor user interface MWMediaDialog class.
  *
- * @copyright 2011-2014 VisualEditor Team and others; see AUTHORS.txt
+ * @copyright 2011-2015 VisualEditor Team and others; see AUTHORS.txt
  * @license The MIT License (MIT); see LICENSE.txt
  */
-/* global moment */
+
 /**
  * MWMediaInfoFieldWidget widget for displaying media information from the API.
  *
  * @class
  * @extends OO.ui.Widget
- * @mixins OO.ui.IconElement
- * @mixins OO.ui.TitledElement
+ * @mixins OO.ui.mixin.IconElement
+ * @mixins OO.ui.mixin.TitledElement
  *
  * @constructor
+ * @param {Object} content API response data from which to build the display
  * @param {Object} [config] Configuration options
  * @cfg {string} [href] A url encapsulating the field text. If a label is attached it will include the label.
  * @cfg {string} [label] A ve.msg() label string for the field.
@@ -31,10 +32,10 @@ ve.ui.MWMediaInfoFieldWidget = function VeUiMWMediaInfoFieldWidget( content, con
 	ve.ui.MWMediaInfoFieldWidget.super.call( this, config );
 
 	// Mixin constructors
-	OO.ui.IconElement.call( this, config );
-	OO.ui.LabelElement.call( this, $.extend( { $label: this.$( '<div>' ) }, config ) );
+	OO.ui.mixin.IconElement.call( this, config );
+	OO.ui.mixin.LabelElement.call( this, $.extend( { $label: $( '<div>' ) }, config ) );
 
-	this.$text = this.$( '<div>' )
+	this.$text = $( '<div>' )
 		.addClass( 've-ui-mwMediaInfoFieldWidget-text' );
 	this.$overlay = null;
 	this.type = config.type || 'attribute';
@@ -51,7 +52,7 @@ ve.ui.MWMediaInfoFieldWidget = function VeUiMWMediaInfoFieldWidget( content, con
 	if ( config.href ) {
 		this.$text
 			.append(
-				this.$( '<a>' )
+				$( '<a>' )
 					.attr( 'target', '_blank' )
 					.attr( 'rel', 'mw:ExtLink' )
 					.attr( 'href',
@@ -77,7 +78,6 @@ ve.ui.MWMediaInfoFieldWidget = function VeUiMWMediaInfoFieldWidget( content, con
 	if ( this.type === 'description' ) {
 		// Limit height
 		this.readMoreButton = new OO.ui.ButtonWidget( {
-			$: this.$,
 			framed: false,
 			icon: 'expand',
 			label: ve.msg( 'visualeditor-dialog-media-info-readmore' ),
@@ -99,8 +99,8 @@ ve.ui.MWMediaInfoFieldWidget = function VeUiMWMediaInfoFieldWidget( content, con
 /* Setup */
 
 OO.inheritClass( ve.ui.MWMediaInfoFieldWidget, OO.ui.Widget );
-OO.mixinClass( ve.ui.MWMediaInfoFieldWidget, OO.ui.IconElement );
-OO.mixinClass( ve.ui.MWMediaInfoFieldWidget, OO.ui.LabelElement );
+OO.mixinClass( ve.ui.MWMediaInfoFieldWidget, OO.ui.mixin.IconElement );
+OO.mixinClass( ve.ui.MWMediaInfoFieldWidget, OO.ui.mixin.LabelElement );
 
 /* Static Properties */
 
@@ -150,6 +150,7 @@ ve.ui.MWMediaInfoFieldWidget.prototype.onReadMoreClick = function () {
 
 /**
  * Get field type; 'attribute' or 'description'
+ *
  * @return {string} Field type
  */
 ve.ui.MWMediaInfoFieldWidget.prototype.getType = function () {

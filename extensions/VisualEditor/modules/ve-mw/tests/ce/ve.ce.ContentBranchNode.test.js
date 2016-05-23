@@ -5,7 +5,7 @@
  * @license The MIT License (MIT); see LICENSE.txt
  */
 
-QUnit.module( 've.ce.ContentBranchNode (MW)' );
+QUnit.module( 've.ce.ContentBranchNode (MW)', ve.test.utils.mwEnvironment );
 
 /* Tests */
 
@@ -17,14 +17,14 @@ QUnit.test( 'getRenderedContents', function ( assert ) {
 			data: [
 				{ type: 'paragraph' },
 				'a',
-				['b', [ { type: 'textStyle/bold' } ]],
+				[ 'b', [ { type: 'textStyle/bold' } ] ],
 				{
 					type: 'mwEntity',
 					attributes: { character: 'c' },
 					annotations: [ { type: 'textStyle/bold' } ]
 				},
 				{ type: '/mwEntity' },
-				['d', [ { type: 'textStyle/bold' } ]],
+				[ 'd', [ { type: 'textStyle/bold' } ] ],
 				{
 					type: 'alienInline',
 					originalDomElements: $( '<span rel="ve:Alien">e</span>' ).toArray(),
@@ -41,10 +41,10 @@ QUnit.test( 'getRenderedContents', function ( assert ) {
 		} ];
 	QUnit.expect( cases.length );
 	for ( i = 0, len = cases.length; i < len; i++ ) {
-		doc = new ve.dm.Document( ve.dm.example.preprocessAnnotations( cases[i].data ) );
-		$wrapper = $( new ve.ce.ParagraphNode( doc.getDocumentNode().getChildren()[0] ).getRenderedContents() );
+		doc = new ve.dm.Document( ve.dm.example.preprocessAnnotations( cases[ i ].data ) );
+		$wrapper = $( new ve.ce.ParagraphNode( doc.getDocumentNode().getChildren()[ 0 ] ).getRenderedContents() );
 		// HACK strip out all the class="ve-ce-textStyleAnnotation ve-ce-textStyleBoldAnnotation" crap
 		$wrapper.find( '.ve-ce-textStyleAnnotation' ).removeAttr( 'class' );
-		assert.equalDomElement( $wrapper[0], $( '<div>' ).html( cases[i].html )[0], cases[i].msg );
+		assert.equalDomElement( $wrapper[ 0 ], $( '<div>' ).html( cases[ i ].html )[ 0 ], cases[ i ].msg );
 	}
 } );

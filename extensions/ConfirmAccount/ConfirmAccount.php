@@ -26,7 +26,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 $wgExtensionCredits['specialpage'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'Confirm User Accounts',
-	'descriptionmsg' => 'confirmedit-desc',
+	'descriptionmsg' => 'confirmaccount-desc',
 	'author'         => 'Aaron Schulz',
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:ConfirmAccount',
 );
@@ -36,7 +36,7 @@ require( dirname( __FILE__ ) . '/ConfirmAccount.config.php' );
 
 # Define were PHP files and i18n files are located
 require( dirname( __FILE__ ) . '/ConfirmAccount.setup.php' );
-ConfirmAccountSetup::defineSourcePaths( $wgAutoloadClasses, $wgMessagesDirs, $wgExtensionMessagesFiles );
+ConfirmAccountSetup::defineSourcePaths( $wgAutoloadClasses, $wgMessagesDirs, $wgExtensionMessagesFiles  );
 
 # Define JS/CSS modules and file locations
 ConfirmAccountUISetup::defineResourceModules( $wgResourceModules );
@@ -47,7 +47,7 @@ $wgAvailableRights[] = 'requestips'; // user can see IPs in request queue
 $wgAvailableRights[] = 'lookupcredentials'; // user can lookup info on confirmed users
 
 # Actually register special pages
-ConfirmAccountUISetup::defineSpecialPages( $wgSpecialPages, $wgSpecialPageGroups );
+ConfirmAccountUISetup::defineSpecialPages( $wgSpecialPages );
 
 # ####### HOOK CALLBACK FUNCTIONS #########
 

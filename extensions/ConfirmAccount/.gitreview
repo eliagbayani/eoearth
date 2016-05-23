@@ -1,6 +1,6 @@
 [gerrit]
 host=gerrit.wikimedia.org
 port=29418
-project=mediawiki/extensions/ConfirmAccount
-defaultbranch=REL1_24
+project=mediawiki/extensions/ConfirmAccount.git
+defaultbranch=REL1_26
 defaultrebase=0

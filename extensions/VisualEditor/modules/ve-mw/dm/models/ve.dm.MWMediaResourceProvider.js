@@ -24,7 +24,7 @@ ve.dm.MWMediaResourceProvider = function VeDmMWMediaResourceProvider( apiurl, co
 
 	// Fetching configuration
 	this.scriptDirUrl = config.scriptDirUrl;
-	this.isLocal = ( 'local' in config );
+	this.isLocal = config.local !== undefined;
 
 	if ( this.isLocal ) {
 		this.setAjaxSettings( {
@@ -89,7 +89,7 @@ ve.dm.MWMediaResourceProvider.prototype.loadSiteInfo = function () {
  * Override parent method and get results from the source
  *
  * @param {number} [howMany] The number of items to pull from the API
- * @returns {jQuery.Promise} Promise that is resolved into an array
+ * @return {jQuery.Promise} Promise that is resolved into an array
  * of available results, or is rejected if no results are available.
  */
 ve.dm.MWMediaResourceProvider.prototype.getResults = function ( howMany ) {
@@ -166,9 +166,9 @@ ve.dm.MWMediaResourceProvider.prototype.fetchAPIresults = function ( howMany ) {
 				return [];
 			}
 
-			if ( data[ 'continue' ] ) {
+			if ( data.continue ) {
 				// Update the offset for next time
-				provider.setOffset( data[ 'continue' ].gsroffset );
+				provider.setOffset( data.continue.gsroffset );
 			} else {
 				// This is the last available set of results. Mark as depleted!
 				provider.toggleDepleted( true );
@@ -181,7 +181,7 @@ ve.dm.MWMediaResourceProvider.prototype.fetchAPIresults = function ( howMany ) {
 				if ( raw ) {
 					// Strip away the page ids
 					for ( page in raw ) {
-						if ( !raw[page].imageinfo ) {
+						if ( !raw[ page ].imageinfo ) {
 							// The search may give us pages that belong to the File:
 							// namespace but have no files in them, either because
 							// they were deleted or imported wrongly, or just started
@@ -189,8 +189,8 @@ ve.dm.MWMediaResourceProvider.prototype.fetchAPIresults = function ( howMany ) {
 							// imageinfo. Skip those files.
 							continue;
 						}
-						newObj = raw[page].imageinfo[0];
-						newObj.title = raw[page].title;
+						newObj = raw[ page ].imageinfo[ 0 ];
+						newObj.title = raw[ page ].title;
 						results.push( newObj );
 					}
 				}
@@ -212,7 +212,7 @@ ve.dm.MWMediaResourceProvider.prototype.setName = function ( name ) {
 /**
  * Get name
  *
- * @returns {string} name
+ * @return {string} name
  */
 ve.dm.MWMediaResourceProvider.prototype.getName = function () {
 	return this.name;
@@ -269,7 +269,7 @@ ve.dm.MWMediaResourceProvider.prototype.setImageSizes = function ( sizes ) {
 /**
  * Get thumb sizes
  *
- * @returns {number[]} sizes Available thumbnail sizes
+ * @return {number[]} sizes Available thumbnail sizes
  */
 ve.dm.MWMediaResourceProvider.prototype.getThumbSizes = function () {
 	return this.thumbSizes;
@@ -278,7 +278,7 @@ ve.dm.MWMediaResourceProvider.prototype.getThumbSizes = function () {
 /**
  * Get image sizes
  *
- * @returns {number[]} sizes Available image sizes
+ * @return {number[]} sizes Available image sizes
  */
 ve.dm.MWMediaResourceProvider.prototype.getImageSizes = function () {
 	return this.imageSizes;
@@ -286,6 +286,7 @@ ve.dm.MWMediaResourceProvider.prototype.getImageSizes = function () {
 
 /**
  * Check if this source is valid and ready for search.
+ *
  * @return {boolean} Source is valid
  */
 ve.dm.MWMediaResourceProvider.prototype.isValid = function () {

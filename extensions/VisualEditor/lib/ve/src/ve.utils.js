@@ -13,13 +13,13 @@
  *
  * @param {Object} subject Object to check
  * @param {Function[]} classes Classes to compare with
- * @returns {boolean} Object inherits from one or more of the classes
+ * @return {boolean} Object inherits from one or more of the classes
  */
 ve.isInstanceOfAny = function ( subject, classes ) {
 	var i = classes.length;
 
-	while ( classes[--i] ) {
-		if ( subject instanceof classes[i] ) {
+	while ( classes[ --i ] ) {
+		if ( subject instanceof classes[ i ] ) {
 			return true;
 		}
 	}
@@ -46,7 +46,7 @@ ve.cloneObject = OO.cloneObject;
 
 /**
  * @method
- * @inheritdoc OO#cloneObject
+ * @inheritdoc OO#getObjectValues
  */
 ve.getObjectValues = OO.getObjectValues;
 
@@ -63,11 +63,23 @@ ve.compare = OO.compare;
 ve.copy = OO.copy;
 
 /**
+ * @method
+ * @inheritdoc OO.ui#debounce
+ */
+ve.debounce = OO.ui.debounce;
+
+/**
+ * @method
+ * @inheritdoc OO.ui.Element#scrollIntoView
+ */
+ve.scrollIntoView = OO.ui.Element.static.scrollIntoView.bind( OO.ui.Element.static );
+
+/**
  * Copy an array of DOM elements, optionally into a different document.
  *
  * @param {HTMLElement[]} domElements DOM elements to copy
  * @param {HTMLDocument} [doc] Document to create the copies in; if unset, simply clone each element
- * @returns {HTMLElement[]} Copy of domElements with copies of each element
+ * @return {HTMLElement[]} Copy of domElements with copies of each element
  */
 ve.copyDomElements = function ( domElements, doc ) {
 	return domElements.map( function ( domElement ) {
@@ -77,6 +89,7 @@ ve.copyDomElements = function ( domElements, doc ) {
 
 /**
  * Check if two arrays of DOM elements are equal (according to .isEqualNode())
+ *
  * @param {HTMLElement[]} domElements1 First array of DOM elements
  * @param {HTMLElement[]} domElements2 Second array of DOM elements
  * @return {boolean} All elements are pairwise equal
@@ -88,7 +101,7 @@ ve.isEqualDomElements = function ( domElements1, domElements2 ) {
 		return false;
 	}
 	for ( ; i < len; i++ ) {
-		if ( !domElements1[i].isEqualNode( domElements2[i] ) ) {
+		if ( !domElements1[ i ].isEqualNode( domElements2[ i ] ) ) {
 			return false;
 		}
 	}
@@ -125,7 +138,7 @@ ve.compareClassLists = function ( classList1, classList2 ) {
  * @method
  * @source <http://api.jquery.com/jQuery.isPlainObject/>
  * @param {Object} obj The object that will be checked to see if it's a plain object
- * @returns {boolean}
+ * @return {boolean}
  */
 ve.isPlainObject = $.isPlainObject;
 
@@ -135,24 +148,9 @@ ve.isPlainObject = $.isPlainObject;
  * @method
  * @source <http://api.jquery.com/jQuery.isEmptyObject/>
  * @param {Object} obj The object that will be checked to see if it's empty
- * @returns {boolean}
+ * @return {boolean}
  */
 ve.isEmptyObject = $.isEmptyObject;
-
-/**
- * Wrapper for Array#indexOf.
- *
- * Values are compared without type coercion.
- *
- * @method
- * @source <http://api.jquery.com/jQuery.inArray/>
- * @until ES5: Array#indexOf
- * @param {Mixed} value Element to search for
- * @param {Array} array Array to search in
- * @param {number} [fromIndex=0] Index to being searching from
- * @returns {number} Index of value in array, or -1 if not found
- */
-ve.indexOf = $.inArray;
 
 /**
  * Merge properties of one or more objects into another.
@@ -167,11 +165,39 @@ ve.indexOf = $.inArray;
  * @source <http://api.jquery.com/jQuery.extend/>
  * @param {boolean} [recursive=false]
  * @param {Mixed} [target] Object that will receive the new properties
- * @param {Mixed...} [sources] Variadic list of objects containing properties
+ * @param {...Mixed} [sources] Variadic list of objects containing properties
  * to be merged into the target.
- * @returns {Mixed} Modified version of first or second argument
+ * @return {Mixed} Modified version of first or second argument
  */
 ve.extendObject = $.extend;
+
+/**
+ * @private
+ * @property {boolean}
+ */
+ve.supportsSplice = ( function () {
+	var a, n;
+
+	// This returns false in Safari 8
+	a = new Array( 100000 );
+	a.splice( 30, 0, 'x' );
+	a.splice( 20, 1 );
+	if ( a.indexOf( 'x' ) !== 29 ) {
+		return false;
+	}
+
+	// This returns false in Opera 12.15
+	a = [];
+	n = 256;
+	a[ n ] = 'a';
+	a.splice( n + 1, 0, 'b' );
+	if ( a[ n ] !== 'a' ) {
+		return false;
+	}
+
+	// Splice is supported
+	return true;
+} )();
 
 /**
  * Splice one array into another.
@@ -183,7 +209,7 @@ ve.extendObject = $.extend;
  * performance tests should be conducted on each use of this method to verify this is true for the
  * particular use. Also, browsers change fast, never assume anything, always test everything.
  *
- * Includes a replacement for broken implementation of Array.prototype.splice() found in Opera 12.
+ * Includes a replacement for broken implementations of Array.prototype.splice().
  *
  * @param {Array|ve.dm.BranchNode} arr Target object (must have `splice` method, object will be modified)
  * @param {number} offset Offset in arr to splice at. This may NOT be negative, unlike the
@@ -192,93 +218,74 @@ ve.extendObject = $.extend;
  * @param {Array} data Array of items to insert at the offset. Must be non-empty if remove=0
  * @return {Array} Array of items removed
  */
-ve.batchSplice = ( function () {
-	var arraySplice;
+ve.batchSplice = function ( arr, offset, remove, data ) {
+	// We need to splice insertion in in batches, because of parameter list length limits which vary
+	// cross-browser - 1024 seems to be a safe batch size on all browsers
+	var splice, spliced,
+		index = 0,
+		batchSize = 1024,
+		toRemove = remove,
+		removed = [];
 
-	// This returns true in Opera 12.15
-	function spliceBrokenOpera() {
-		var n = 256,
-			a = [];
-		a[n] = 'a';
-		a.splice( n + 1, 0, 'b' );
-		return a[n] !== 'a';
-	}
-
-	// This returns true in Safari 8
-	function spliceBrokenSafari() {
-		var a = new Array( 100000 );
-		a.splice( 30, 0, 'x' );
-		a.splice( 20, 1 );
-		return a.indexOf( 'x' ) !== 29;
-	}
-
-	if ( !spliceBrokenOpera() && !spliceBrokenSafari() ) {
-		arraySplice = Array.prototype.splice;
+	if ( !Array.isArray( arr ) ) {
+		splice = arr.splice;
 	} else {
-		// Standard Array.prototype.splice() function implemented using .slice() and .push().
-		arraySplice = function ( offset, remove/*, data... */ ) {
-			var data, begin, removed, end;
+		if ( ve.supportsSplice ) {
+			splice = Array.prototype.splice;
+		} else {
+			// Standard Array.prototype.splice() function implemented using .slice() and .push().
+			splice = function ( offset, remove/*, data... */ ) {
+				var data, begin, removed, end;
 
-			data = Array.prototype.slice.call( arguments, 2 );
+				data = Array.prototype.slice.call( arguments, 2 );
 
-			begin = this.slice( 0, offset );
-			removed = this.slice( offset, remove );
-			end = this.slice( offset + remove );
+				begin = this.slice( 0, offset );
+				removed = this.slice( offset, offset + remove );
+				end = this.slice( offset + remove );
 
-			this.length = 0;
-			ve.batchPush( this, begin );
-			ve.batchPush( this, data );
-			ve.batchPush( this, end );
+				this.length = 0;
+				ve.batchPush( this, begin );
+				ve.batchPush( this, data );
+				ve.batchPush( this, end );
 
-			return removed;
-		};
+				return removed;
+			};
+		}
 	}
 
-	return function ( arr, offset, remove, data ) {
-		// We need to splice insertion in in batches, because of parameter list length limits which vary
-		// cross-browser - 1024 seems to be a safe batch size on all browsers
-		var splice, spliced,
-			index = 0,
-			batchSize = 1024,
-			toRemove = remove,
-			removed = [];
+	if ( data.length === 0 ) {
+		// Special case: data is empty, so we're just doing a removal
+		// The code below won't handle that properly, so we do it here
+		return splice.call( arr, offset, remove );
+	}
 
-		splice = Array.isArray( arr ) ? arraySplice : arr.splice;
-
-		if ( data.length === 0 ) {
-			// Special case: data is empty, so we're just doing a removal
-			// The code below won't handle that properly, so we do it here
-			return splice.call( arr, offset, remove );
+	while ( index < data.length ) {
+		// Call arr.splice( offset, remove, i0, i1, i2, ..., i1023 );
+		// Only set remove on the first call, and set it to zero on subsequent calls
+		spliced = splice.apply(
+			arr, [ index + offset, toRemove ].concat( data.slice( index, index + batchSize ) )
+		);
+		if ( toRemove > 0 ) {
+			removed = spliced;
 		}
-
-		while ( index < data.length ) {
-			// Call arr.splice( offset, remove, i0, i1, i2, ..., i1023 );
-			// Only set remove on the first call, and set it to zero on subsequent calls
-			spliced = splice.apply(
-				arr, [index + offset, toRemove].concat( data.slice( index, index + batchSize ) )
-			);
-			if ( toRemove > 0 ) {
-				removed = spliced;
-			}
-			index += batchSize;
-			toRemove = 0;
-		}
-		return removed;
-	};
-}() );
+		index += batchSize;
+		toRemove = 0;
+	}
+	return removed;
+};
 
 /**
  * Insert one array into another.
  *
- * Shortcut for `ve.batchSplice( dst, offset, 0, src )`.
+ * Shortcut for `ve.batchSplice( arr, offset, 0, src )`.
  *
  * @see #batchSplice
  * @param {Array|ve.dm.BranchNode} arr Target object (must have `splice` method)
  * @param {number} offset Offset in arr where items will be inserted
- * @param {Array} data Items to insert at offset
+ * @param {Array} src Items to insert at offset
  */
-ve.insertIntoArray = function ( dst, offset, src ) {
-	ve.batchSplice( dst, offset, 0, src );
+ve.insertIntoArray = function ( arr, offset, src ) {
+	ve.batchSplice( arr, offset, 0, src );
 };
 
 /**
@@ -289,7 +296,7 @@ ve.insertIntoArray = function ( dst, offset, src ) {
  *
  * @param {Array|ve.dm.BranchNode} arr Object supporting .push() to insert at the end of the array. Will be modified
  * @param {Array} data Array of items to insert.
- * @returns {number} length of the new array
+ * @return {number} length of the new array
  */
 ve.batchPush = function ( arr, data ) {
 	// We need to push insertion in batches, because of parameter list length limits which vary
@@ -308,11 +315,47 @@ ve.batchPush = function ( arr, data ) {
 };
 
 /**
+ * Use binary search to locate an element in a sorted array.
+ *
+ * searchFunc is given an element from the array. `searchFunc(elem)` must return a number
+ * above 0 if the element we're searching for is to the right of (has a higher index than) elem,
+ * below 0 if it is to the left of elem, or zero if it's equal to elem.
+ *
+ * To search for a specific value with a comparator function (a `function cmp(a,b)` that returns
+ * above 0 if `a > b`, below 0 if `a < b`, and 0 if `a == b`), you can use
+ * `searchFunc = cmp.bind( null, value )`.
+ *
+ * @param {Array} arr Array to search in
+ * @param {Function} searchFunc Search function
+ * @param {boolean} [forInsertion] If not found, return index where val could be inserted
+ * @return {number|null} Index where val was found, or null if not found
+ */
+ve.binarySearch = function ( arr, searchFunc, forInsertion ) {
+	var mid, cmpResult,
+		left = 0,
+		right = arr.length;
+	while ( left < right ) {
+		// Equivalent to Math.floor( ( left + right ) / 2 ) but much faster
+		/*jshint bitwise:false */
+		mid = ( left + right ) >> 1;
+		cmpResult = searchFunc( arr[ mid ] );
+		if ( cmpResult < 0 ) {
+			right = mid;
+		} else if ( cmpResult > 0 ) {
+			left = mid + 1;
+		} else {
+			return mid;
+		}
+	}
+	return forInsertion ? right : null;
+};
+
+/**
  * Log data to the console.
  *
  * This implementation does nothing, to add a real implementation ve.debug needs to be loaded.
  *
- * @param {Mixed...} [args] Data to log
+ * @param {...Mixed} [args] Data to log
  */
 ve.log = ve.log || function () {
 	// don't do anything, this is just a stub
@@ -323,7 +366,7 @@ ve.log = ve.log || function () {
  *
  * This implementation does nothing, to add a real implementation ve.debug needs to be loaded.
  *
- * @param {Mixed...} [args] Data to log
+ * @param {...Mixed} [args] Data to log
  */
 ve.error = ve.error || function () {
 	// don't do anything, this is just a stub
@@ -341,45 +384,14 @@ ve.dir = ve.dir || function () {
 };
 
 /**
- * Return a function, that, as long as it continues to be invoked, will not
- * be triggered. The function will be called after it stops being called for
- * N milliseconds. If `immediate` is passed, trigger the function on the
- * leading edge, instead of the trailing.
- *
- * Ported from: http://underscorejs.org/underscore.js
- *
- * @param {Function} func
- * @param {number} wait
- * @param {boolean} immediate
- * @returns {Function}
- */
-ve.debounce = function ( func, wait, immediate ) {
-	var timeout;
-	return function () {
-		var context = this,
-			args = arguments,
-			later = function () {
-				timeout = null;
-				if ( !immediate ) {
-					func.apply( context, args );
-				}
-			};
-		if ( immediate && !timeout ) {
-			func.apply( context, args );
-		}
-		clearTimeout( timeout );
-		timeout = setTimeout( later, wait );
-	};
-};
-
-/**
  * Select the contents of an element
  *
  * @param {HTMLElement} element Element
  */
 ve.selectElement = function ( element ) {
-	var nativeRange = document.createRange(),
-		nativeSelection = window.getSelection();
+	var win = OO.ui.Element.static.getWindow( element ),
+		nativeRange = win.document.createRange(),
+		nativeSelection = win.getSelection();
 	nativeRange.setStart( element, 0 );
 	nativeRange.setEnd( element, element.childNodes.length );
 	nativeSelection.removeAllRanges();
@@ -387,27 +399,11 @@ ve.selectElement = function ( element ) {
 };
 
 /**
- * Move the selection to the end of an input.
- *
- * @param {HTMLElement} element Input element
- */
-ve.selectEnd = function ( element ) {
-	element.focus();
-	if ( element.selectionStart !== undefined ) {
-		element.selectionStart = element.selectionEnd = element.value.length;
-	} else if ( element.createTextRange ) {
-		var textRange = element.createTextRange();
-		textRange.collapse( false );
-		textRange.select();
-	}
-};
-
-/**
  * Get a localized message.
  *
  * @param {string} key Message key
- * @param {Mixed...} [params] Message parameters
- * @returns {string} Localized message
+ * @param {...Mixed} [params] Message parameters
+ * @return {string} Localized message
  */
 ve.msg = function () {
 	// Avoid using bind because ve.init.platform doesn't exist yet.
@@ -416,22 +412,40 @@ ve.msg = function () {
 };
 
 /**
- * Get a config value.
+ * Get platform config value(s)
  *
  * @param {string|string[]} key Config key, or list of keys
- * @returns {Mixed|Object} Config value, or keyed object of config values if list of keys provided
+ * @return {Mixed|Object} Config value, or keyed object of config values if list of keys provided
  */
 ve.config = function () {
-	// Avoid using bind because ve.init.platform doesn't exist yet.
-	// TODO: Fix dependency issues between ve.js and ve.init.platform
 	return ve.init.platform.getConfig.apply( ve.init.platform, arguments );
+};
+
+/**
+ * Get or set a user config value.
+ *
+ * @param {string|string[]|Object} key Config key, list of keys or object mapping keys to values
+ * @param {Mixed} [value] Value to set, if setting and key is a string
+ * @return {Mixed|Object|boolean} Config value, keyed object of config values if list of keys provided,
+ *  or success boolean if setting.
+ */
+ve.userConfig = function ( key ) {
+	if ( arguments.length <= 1 && ( typeof key === 'string' || Array.isArray( key ) ) ) {
+		// get( string key )
+		// get( Array keys )
+		return ve.init.platform.getUserConfig.apply( ve.init.platform, arguments );
+	} else {
+		// set( Object values )
+		// set( key, value )
+		return ve.init.platform.setUserConfig.apply( ve.init.platform, arguments );
+	}
 };
 
 /**
  * Determine if the text consists of only unattached combining marks.
  *
  * @param {string} text Text to test
- * @returns {boolean} The text is unattached combining marks
+ * @return {boolean} The text is unattached combining marks
  */
 ve.isUnattachedCombiningMark = function ( text ) {
 	return ( /^[\u0300-\u036F]+$/ ).test( text );
@@ -442,7 +456,7 @@ ve.isUnattachedCombiningMark = function ( text ) {
  *
  * @param {string} text Text in which to calculate offset
  * @param {number} clusterOffset Grapheme cluster offset
- * @returns {number} Byte offset
+ * @return {number} Byte offset
  */
 ve.getByteOffset = function ( text, clusterOffset ) {
 	return unicodeJS.graphemebreak.splitClusters( text )
@@ -456,7 +470,7 @@ ve.getByteOffset = function ( text, clusterOffset ) {
  *
  * @param {string} text Text in which to calculate offset
  * @param {number} byteOffset Byte offset
- * @returns {number} Grapheme cluster offset
+ * @return {number} Grapheme cluster offset
  */
 ve.getClusterOffset = function ( text, byteOffset ) {
 	return unicodeJS.graphemebreak.splitClusters( text.slice( 0, byteOffset ) ).length;
@@ -469,7 +483,7 @@ ve.getClusterOffset = function ( text, byteOffset ) {
  * @param {number} start Start offset
  * @param {number} end End offset
  * @param {boolean} [outer=false] Include graphemes if the offset splits them
- * @returns {string} Substring of text
+ * @return {string} Substring of text
  */
 ve.graphemeSafeSubstring = function ( text, start, end, outer ) {
 	// TODO: improve performance by incrementally inspecting characters around the offsets
@@ -497,7 +511,7 @@ ve.graphemeSafeSubstring = function ( text, start, end, outer ) {
  * Escape non-word characters so they can be safely used as HTML attribute values.
  *
  * @param {string} value Attribute value to escape
- * @returns {string} Escaped attribute value
+ * @return {string} Escaped attribute value
  */
 ve.escapeHtml = ( function () {
 	function escape( value ) {
@@ -529,7 +543,7 @@ ve.escapeHtml = ( function () {
  * (e.g. from the user or from the web).
  *
  * @param {Object} [attributes] Key-value map of attributes for the tag
- * @returns {string} HTML attributes
+ * @return {string} HTML attributes
  */
 ve.getHtmlAttributes = function ( attributes ) {
 	var attrName, attrValue,
@@ -540,7 +554,7 @@ ve.getHtmlAttributes = function ( attributes ) {
 	}
 
 	for ( attrName in attributes ) {
-		attrValue = attributes[attrName];
+		attrValue = attributes[ attrName ];
 		if ( attrValue === true ) {
 			// Convert name=true to name=name
 			attrValue = attrName;
@@ -562,9 +576,9 @@ ve.getHtmlAttributes = function ( attributes ) {
  * responsible for making sure these are sane tag/attribute names and do not contain
  * unsanitized content from an external source (e.g. from the user or from the web).
  *
- * @param {string} tag HTML tag name
+ * @param {string} tagName HTML tag name
  * @param {Object} [attributes] Key-value map of attributes for the tag
- * @returns {string} Opening HTML tag
+ * @return {string} Opening HTML tag
  */
 ve.getOpeningHtmlTag = function ( tagName, attributes ) {
 	var attr = ve.getHtmlAttributes( attributes );
@@ -575,13 +589,13 @@ ve.getOpeningHtmlTag = function ( tagName, attributes ) {
  * Get the attributes of a DOM element as an object with key/value pairs.
  *
  * @param {HTMLElement} element
- * @returns {Object}
+ * @return {Object}
  */
 ve.getDomAttributes = function ( element ) {
 	var i,
 		result = {};
 	for ( i = 0; i < element.attributes.length; i++ ) {
-		result[element.attributes[i].name] = element.attributes[i].value;
+		result[ element.attributes[ i ].name ] = element.attributes[ i ].value;
 	}
 	return result;
 };
@@ -605,10 +619,10 @@ ve.setDomAttributes = function ( element, attributes, whitelist ) {
 		if ( whitelist && whitelist.indexOf( key.toLowerCase() ) === -1 ) {
 			continue;
 		}
-		if ( attributes[key] === undefined || attributes[key] === null ) {
+		if ( attributes[ key ] === undefined || attributes[ key ] === null ) {
 			element.removeAttribute( key );
 		} else {
-			element.setAttribute( key, attributes[key] );
+			element.setAttribute( key, attributes[ key ] );
 		}
 	}
 };
@@ -622,7 +636,7 @@ ve.setDomAttributes = function ( element, attributes, whitelist ) {
  * @private
  * @param {HTMLElement} element Element to summarize
  * @param {boolean} [includeHtml=false] Include an HTML summary for element nodes
- * @returns {Object} Summary of element.
+ * @return {Object} Summary of element.
  */
 ve.getDomElementSummary = function ( element, includeHtml ) {
 	var i,
@@ -640,13 +654,13 @@ ve.getDomElementSummary = function ( element, includeHtml ) {
 	// Gather attributes
 	if ( element.attributes ) {
 		for ( i = 0; i < element.attributes.length; i++ ) {
-			summary.attributes[element.attributes[i].name] = element.attributes[i].value;
+			summary.attributes[ element.attributes[ i ].name ] = element.attributes[ i ].value;
 		}
 	}
 	// Summarize children
 	if ( element.childNodes ) {
 		for ( i = 0; i < element.childNodes.length; i++ ) {
-			summary.children.push( ve.getDomElementSummary( element.childNodes[i], includeHtml ) );
+			summary.children.push( ve.getDomElementSummary( element.childNodes[ i ], includeHtml ) );
 		}
 	}
 	return summary;
@@ -657,7 +671,7 @@ ve.getDomElementSummary = function ( element, includeHtml ) {
  *
  * @private
  * @param {Object} value Value in the object/array
- * @returns {Object} DOM element summary if value is a node, otherwise just the value
+ * @return {Object} DOM element summary if value is a node, otherwise just the value
  */
 ve.convertDomElements = function ( value ) {
 	// Use duck typing rather than instanceof Node; the latter doesn't always work correctly
@@ -671,7 +685,7 @@ ve.convertDomElements = function ( value ) {
  * Check whether a given DOM element has a block element type.
  *
  * @param {HTMLElement|string} element Element or element name
- * @returns {boolean} Element is a block element
+ * @return {boolean} Element is a block element
  */
 ve.isBlockElement = function ( element ) {
 	var elementName = typeof element === 'string' ? element : element.nodeName;
@@ -682,7 +696,7 @@ ve.isBlockElement = function ( element ) {
  * Check whether a given DOM element is a void element (can't have children).
  *
  * @param {HTMLElement|string} element Element or element name
- * @returns {boolean} Element is a void element
+ * @return {boolean} Element is a void element
  */
 ve.isVoidElement = function ( element ) {
 	var elementName = typeof element === 'string' ? element : element.nodeName;
@@ -723,23 +737,54 @@ ve.elementTypes = {
  * normalization bugs in Internet Explorer, use #parseXhtml and #serializeXhtml.
  *
  * @param {string} html HTML string
- * @returns {HTMLDocument} Document constructed from the HTML string
+ * @return {HTMLDocument} Document constructed from the HTML string
  */
 ve.createDocumentFromHtml = function ( html ) {
-	// Try using DOMParser if available. This only works in Firefox 12+ and very modern
-	// versions of other browsers (Chrome 30+, Opera 17+, IE10+)
-	var newDocument, $iframe, iframe;
+	var newDocument;
+
+	newDocument = ve.createDocumentFromHtmlUsingDomParser( html );
+	if ( newDocument ) {
+		return newDocument;
+	}
+
+	newDocument = ve.createDocumentFromHtmlUsingIframe( html );
+	if ( newDocument ) {
+		return newDocument;
+	}
+
+	return ve.createDocumentFromHtmlUsingInnerHtml( html );
+};
+
+/**
+ * Private method for creating an HTMLDocument using the DOMParser
+ *
+ * @private
+ * @param {string} html HTML string
+ * @return {HTMLDocument|undefined} Document constructed from the HTML string or undefined if it failed
+ */
+ve.createDocumentFromHtmlUsingDomParser = function ( html ) {
+	var newDocument;
+
+	// IE doesn't like empty strings
+	html = html || '<body></body>';
+
 	try {
-		if ( html === '' ) {
-			// IE doesn't like empty strings
-			html = '<body></body>';
-		}
 		newDocument = new DOMParser().parseFromString( html, 'text/html' );
 		if ( newDocument ) {
 			return newDocument;
 		}
 	} catch ( e ) { }
+};
 
+/**
+ * Private fallback for browsers which don't support DOMParser
+ *
+ * @private
+ * @param {string} html HTML string
+ * @return {HTMLDocument|undefined} Document constructed from the HTML string or undefined if it failed
+ */
+ve.createDocumentFromHtmlUsingIframe = function ( html ) {
+	var newDocument, $iframe, iframe;
 	// Here's what this fallback code should look like:
 	//
 	//     var newDocument = document.implementation.createHtmlDocument( '' );
@@ -766,6 +811,8 @@ ve.createDocumentFromHtml = function ( html ) {
 	// value is not actually a Document, but something which behaves just like an empty regular
 	// object...), so we're detecting that and using the innerHTML hack described above.
 
+	html = html || '<body></body>';
+
 	// Create an invisible iframe
 	$iframe = $( '<iframe frameborder="0" width="0" height="0" />' );
 	iframe = $iframe.get( 0 );
@@ -784,12 +831,42 @@ ve.createDocumentFromHtml = function ( html ) {
 		// Surprise! The document is not a document! Only happens on Opera.
 		// (Or its nodes are not actually nodes, while the document
 		// *is* a document. This only happens when debugging with Dragonfly.)
+		return;
+	}
+
+	return newDocument;
+};
+
+/**
+ * Private fallback for browsers which don't support iframe technique
+ *
+ * @private
+ * @param {string} html HTML string
+ * @return {HTMLDocument} Document constructed from the HTML string
+ */
+ve.createDocumentFromHtmlUsingInnerHtml = function ( html ) {
+	var i, htmlAttributes, wrapper, attributes,
 		newDocument = document.implementation.createHTMLDocument( '' );
-		// Carefully unwrap the HTML out of the root node (and doctype, if any).
-		// <html> might have some arguments here, but they're apparently not important.
-		html = html.replace(/^\s*(?:<!doctype[^>]*>)?\s*<html[^>]*>/i, '' );
-		html = html.replace(/<\/html>\s*$/i, '' );
-		newDocument.documentElement.innerHTML = html;
+
+	html = html || '<body></body>';
+
+	// Carefully unwrap the HTML out of the root node (and doctype, if any).
+	newDocument.documentElement.innerHTML = html
+		.replace( /^\s*(?:<!doctype[^>]*>)?\s*<html[^>]*>/i, '' )
+		.replace( /<\/html>\s*$/i, '' );
+
+	// Preserve <html> attributes, if any
+	htmlAttributes = html.match( /<html([^>]*>)/i );
+	if ( htmlAttributes && htmlAttributes[ 1 ] ) {
+		wrapper = document.createElement( 'div' );
+		wrapper.innerHTML = '<div ' + htmlAttributes[ 1 ] + '></div>';
+		attributes = wrapper.firstChild.attributes;
+		for ( i = 0; i < attributes.length; i++ ) {
+			newDocument.documentElement.setAttribute(
+				attributes[ i ].name,
+				attributes[ i ].value
+			);
+		}
 	}
 
 	return newDocument;
@@ -800,7 +877,7 @@ ve.createDocumentFromHtml = function ( html ) {
  *
  * @param {string} url URL to resolve
  * @param {HTMLDocument} base Document whose base URL to use
- * @returns {string} Resolved URL
+ * @return {string} Resolved URL
  */
 ve.resolveUrl = function ( url, base ) {
 	var node = base.createElement( 'a' );
@@ -808,6 +885,70 @@ ve.resolveUrl = function ( url, base ) {
 	// If doc.baseURI isn't set, node.href will be an empty string
 	// This is crazy, returning the original URL is better
 	return node.href || url;
+};
+
+/**
+ * Modify a set of DOM elements to resolve attributes in the context of another document.
+ *
+ * This performs node.setAttribute( 'attr', nodeInDoc[attr] ); for every node.
+ *
+ * @param {jQuery} $elements Set of DOM elements to modify
+ * @param {HTMLDocument} doc Document to resolve against (different from $elements' .ownerDocument)
+ * @param {string[]} attrs Attributes to resolve
+ */
+ve.resolveAttributes = function ( $elements, doc, attrs ) {
+	var i, len, attr;
+
+	/**
+	 * Callback for jQuery.fn.each that resolves the value of attr to the computed
+	 * property value. Called in the context of an HTMLElement.
+	 *
+	 * @private
+	 */
+	function resolveAttribute() {
+		var nodeInDoc = doc.createElement( this.nodeName );
+		nodeInDoc.setAttribute( attr, this.getAttribute( attr ) );
+		if ( nodeInDoc[ attr ] ) {
+			this.setAttribute( attr, nodeInDoc[ attr ] );
+		}
+	}
+
+	for ( i = 0, len = attrs.length; i < len; i++ ) {
+		attr = attrs[ i ];
+		$elements.find( '[' + attr + ']' ).addBack( '[' + attr + ']' ).each( resolveAttribute );
+	}
+};
+
+/**
+ * Take a target document with a possibly relative base URL, and modify it to be absolute.
+ * The base URL of the target document is resolved using the base URL of the source document.
+ *
+ * Note that the the fallbackBase parameter will be used if there is no <base> tag, even if
+ * the document does have a valid base URL: this is to work around Firefox's behavior of having
+ * documents created by DOMParser inherit the base URL of the main document.
+ *
+ * @param {HTMLDocument} targetDoc Document whose base URL should be resolved
+ * @param {HTMLDocument} sourceDoc Document whose base URL should be used for resolution
+ * @param {string} [fallbackBase] Base URL to use if resolving the base URL fails or there is no <base> tag
+ */
+ve.fixBase = function ( targetDoc, sourceDoc, fallbackBase ) {
+	var baseNode = targetDoc.getElementsByTagName( 'base' )[ 0 ];
+	if ( baseNode ) {
+		if ( !targetDoc.baseURI ) {
+			// <base> tag present but not valid, try resolving its URL
+			baseNode.setAttribute( 'href', ve.resolveUrl( baseNode.getAttribute( 'href' ), sourceDoc ) );
+			if ( !targetDoc.baseURI && fallbackBase ) {
+				// That didn't work, use the fallback
+				baseNode.setAttribute( 'href', fallbackBase );
+			}
+		}
+		// else: <base> tag present and valid, do nothing
+	} else if ( fallbackBase ) {
+		// No <base> tag, add one
+		baseNode = targetDoc.createElement( 'base' );
+		baseNode.setAttribute( 'href', fallbackBase );
+		targetDoc.head.appendChild( baseNode );
+	}
 };
 
 /**
@@ -832,7 +973,8 @@ ve.isUriComponentValid = function ( s ) {
  * Safe version of decodeURIComponent() that doesn't throw exceptions.
  *
  * If the native decodeURIComponent() call threw an exception, the original string
- * will be returned
+ * will be returned.
+ *
  * @param {string} s String to decode
  * @return {string} Decoded string, or same string if decoding failed
  * @see #isUriComponentValid
@@ -853,7 +995,7 @@ ve.safeDecodeURIComponent = function ( s ) {
  * if the browser is broken, but newlines are preserved in all other cases.
  *
  * @param {HTMLElement} element HTML element to get inner HTML of
- * @returns {string} Inner HTML
+ * @return {string} Inner HTML
  */
 ve.properInnerHtml = function ( element ) {
 	return ve.fixupPreBug( element ).innerHTML;
@@ -864,7 +1006,7 @@ ve.properInnerHtml = function ( element ) {
  *
  * @see ve#properInnerHtml
  * @param {HTMLElement} element HTML element to get outer HTML of
- * @returns {string} Outer HTML
+ * @return {string} Outer HTML
  */
 ve.properOuterHtml = function ( element ) {
 	return ve.fixupPreBug( element ).outerHTML;
@@ -878,7 +1020,7 @@ ve.properOuterHtml = function ( element ) {
  * broken, just return the original node.
  *
  * @param {HTMLElement} element HTML element to fix up
- * @returns {HTMLElement} Either element, or a fixed-up clone of it
+ * @return {HTMLElement} Either element, or a fixed-up clone of it
  */
 ve.fixupPreBug = function ( element ) {
 	var div, $element;
@@ -903,9 +1045,9 @@ ve.fixupPreBug = function ( element ) {
 		var matches;
 		if ( this.firstChild && this.firstChild.nodeType === Node.TEXT_NODE ) {
 			matches = this.firstChild.data.match( /^(\r\n|\r|\n)/ );
-			if ( matches && matches[1] ) {
+			if ( matches && matches[ 1 ] ) {
 				// Prepend a newline exactly like the one we saw
-				this.firstChild.insertData( 0, matches[1] );
+				this.firstChild.insertData( 0, matches[ 1 ] );
 			}
 		}
 	} );
@@ -942,7 +1084,7 @@ ve.normalizeAttributeValue = function ( name, value, nodeName ) {
  *
  * @param {string} html HTML string. Must also be valid XML
  * @param {boolean} unmask Map the masked attributes back to their originals
- * @returns {string} HTML string modified to mask/unmask broken attributes
+ * @return {string} HTML string modified to mask/unmask broken attributes
  */
 ve.transformStyleAttributes = function ( html, unmask ) {
 	var xmlDoc, fromAttr, toAttr, i, len,
@@ -961,8 +1103,8 @@ ve.transformStyleAttributes = function ( html, unmask ) {
 
 	// Go through and mask/unmask each attribute on all elements that have it
 	for ( i = 0, len = maskAttrs.length; i < len; i++ ) {
-		fromAttr = unmask ? 'data-ve-' + maskAttrs[i] : maskAttrs[i];
-		toAttr = unmask ? maskAttrs[i] : 'data-ve-' + maskAttrs[i];
+		fromAttr = unmask ? 'data-ve-' + maskAttrs[ i ] : maskAttrs[ i ];
+		toAttr = unmask ? maskAttrs[ i ] : 'data-ve-' + maskAttrs[ i ];
 		/*jshint loopfunc:true */
 		$( xmlDoc ).find( '[' + fromAttr + ']' ).each( function () {
 			var toAttrValue, fromAttrNormalized,
@@ -1089,6 +1231,7 @@ ve.normalizeNode = function ( node ) {
 
 /**
  * Translate rect by some fixed vector and return a new offset object
+ *
  * @param {Object} rect Offset object containing all or any of top, left, bottom, right, width & height
  * @param {number} x Horizontal translation
  * @param {number} y Vertical translation
@@ -1119,6 +1262,7 @@ ve.translateRect = function ( rect, x, y ) {
 
 /**
  * Get the start and end rectangles (in a text flow sense) from a list of rectangles
+ *
  * @param {Array} rects Full list of rectangles
  * @return {Object|null} Object containing two rectangles: start and end, or null if there are no rectangles
  */
@@ -1128,22 +1272,22 @@ ve.getStartAndEndRects = function ( rects ) {
 		return null;
 	}
 	for ( i = 0, l = rects.length; i < l; i++ ) {
-		if ( !startRect || rects[i].top < startRect.top ) {
+		if ( !startRect || rects[ i ].top < startRect.top ) {
 			// Use ve.extendObject as ve.copy copies non-plain objects by reference
-			startRect = ve.extendObject( {}, rects[i] );
-		} else if ( rects[i].top === startRect.top ) {
+			startRect = ve.extendObject( {}, rects[ i ] );
+		} else if ( rects[ i ].top === startRect.top ) {
 			// Merge rects with the same top coordinate
-			startRect.left = Math.min( startRect.left, rects[i].left );
-			startRect.right = Math.max( startRect.right, rects[i].right );
+			startRect.left = Math.min( startRect.left, rects[ i ].left );
+			startRect.right = Math.max( startRect.right, rects[ i ].right );
 			startRect.width = startRect.right - startRect.left;
 		}
-		if ( !endRect || rects[i].bottom > endRect.bottom ) {
+		if ( !endRect || rects[ i ].bottom > endRect.bottom ) {
 			// Use ve.extendObject as ve.copy copies non-plain objects by reference
-			endRect = ve.extendObject( {}, rects[i] );
-		} else if ( rects[i].bottom === endRect.bottom ) {
+			endRect = ve.extendObject( {}, rects[ i ] );
+		} else if ( rects[ i ].bottom === endRect.bottom ) {
 			// Merge rects with the same bottom coordinate
-			endRect.left = Math.min( endRect.left, rects[i].left );
-			endRect.right = Math.max( endRect.right, rects[i].right );
+			endRect.left = Math.min( endRect.left, rects[ i ].left );
+			endRect.right = Math.max( endRect.right, rects[ i ].right );
 			endRect.width = startRect.right - startRect.left;
 		}
 	}
@@ -1156,8 +1300,8 @@ ve.getStartAndEndRects = function ( rects ) {
 /**
  * Find the nearest common ancestor of DOM nodes
  *
- * @param {Node...} DOM nodes in the same document
- * @returns {Node|null} Nearest common ancestor node
+ * @param {...Node|null} DOM nodes
+ * @return {Node|null} Nearest common ancestor; or null if there is none / an argument is null
  */
 ve.getCommonAncestor = function () {
 	var i, j, nodeCount, chain, node,
@@ -1177,9 +1321,11 @@ ve.getCommonAncestor = function () {
 			node = node.parentNode;
 		}
 		if ( chain.length === 0 ) {
+			// args[ i ] was null (so no common ancestor)
 			return null;
 		}
 		if ( i > 0 && chain[ 0 ] !== chains[ chains.length - 1 ][ 0 ] ) {
+			// no common ancestor (different documents or unattached branches)
 			return null;
 		}
 		if ( minHeight === null || minHeight > chain.length ) {
@@ -1188,8 +1334,9 @@ ve.getCommonAncestor = function () {
 		chains.push( chain );
 	}
 
-	// Step through chains in parallel, until they differ
-	// All chains are guaranteed to start with documentNode
+	// Step through chains in parallel, until they differ.
+	// All chains are guaranteed to start with the common document element (or the common root
+	// of an unattached branch)
 	for ( i = 1; i < minHeight; i++ ) {
 		node = chains[ 0 ][ i ];
 		for ( j = 1; j < nodeCount; j++ ) {
@@ -1225,38 +1372,59 @@ ve.getOffsetPath = function ( ancestor, node, nodeOffset ) {
 };
 
 /**
- * Compare two offset paths for position in document
+ * Compare two tuples in lexicographical order.
  *
- * @param {number[]} path1 First offset path
- * @param {number[]} path2 Second offset path
- * @return {number} negative, zero or positive number
+ * This function first compares `a[0]` with `b[0]`, then `a[1]` with `b[1]`, etc.
+ * until it encounters a pair where `a[k] != b[k]`; then returns `a[k] - b[k]`.
+ *
+ * If `a[k] == b[k]` for every `k`, this function returns 0.
+ *
+ * If a and b are of unequal length, but `a[k] == b[k]` for all `k` that exist in both a and b, then
+ * this function returns `Infinity` (if a is longer) or `-Infinity` (if b is longer).
+ *
+ * @param {number[]} a First tuple
+ * @param {number[]} b Second tuple
+ * @return {number} `a[k] - b[k]` where k is the lowest k such that `a[k] != b[k]`
  */
-ve.compareOffsetPaths = function ( path1, path2 ) {
+ve.compareTuples = function ( a, b ) {
 	var i, len;
-	for ( i = 0, len = Math.min( path1.length, path2.length ); i < len; i++ ) {
-		if ( path1[ i ] !== path2[ i ] ) {
-			return path1[ i ] - path2[ i ];
+	for ( i = 0, len = Math.min( a.length, b.length ); i < len; i++ ) {
+		if ( a[ i ] !== b[ i ] ) {
+			return a[ i ] - b[ i ];
 		}
 	}
-	return path1.length - path2.length;
+	if ( a.length > b.length ) {
+		return Infinity;
+	}
+	if ( a.length < b.length ) {
+		return -Infinity;
+	}
+	return 0;
 };
 
 /**
  * Compare two nodes for position in document
  *
- * @param {Node} node1 First node
- * @param {number} offset1 First offset
- * @param {Node} node2 Second node
- * @param {number} offset2 Second offset
- * @return {number} negative, zero or positive number
+ * Return null if either position is either null or incomparable (e.g. where one of the nodes
+ * is detached or the nodes are from different documents).
+ *
+ * @param {Node|null} node1 First node
+ * @param {number|null} offset1 First offset
+ * @param {Node|null} node2 Second node
+ * @param {number|null} offset2 Second offset
+ * @return {number|null} negative, zero or positive number, or null if nodes null or incomparable
  */
-ve.compareDocumentOrder = function ( node1, offset1, node2, offset2 ) {
 
+ve.compareDocumentOrder = function ( node1, offset1, node2, offset2 ) {
 	var commonAncestor = ve.getCommonAncestor( node1, node2 );
 	if ( commonAncestor === null ) {
-		throw new Error( 'No common ancestor' );
+		// Signal no common ancestor. In theory we could disallow this case, and check
+		// the nodes for detachedness and same-documentness before each call, but such
+		// guard checks would duplicate (either explicitly or implicitly) much of the
+		// branch traversal performed in this method.
+		return null;
 	}
-	return ve.compareOffsetPaths(
+	return ve.compareTuples(
 		ve.getOffsetPath( commonAncestor, node1, offset1 ),
 		ve.getOffsetPath( commonAncestor, node2, offset2 )
 	);
@@ -1271,8 +1439,203 @@ ve.compareDocumentOrder = function ( node1, offset1, node2, offset2 ) {
  * not to need this information before the platform is constructed.
  *
  * @see ve.init.Platform#getSystemPlatform
- * @returns {string} Client platform string
+ * @return {string} Client platform string
  */
 ve.getSystemPlatform = function () {
 	return ( ve.init.platform && ve.init.platform.constructor || ve.init.Platform ).static.getSystemPlatform();
+};
+
+/**
+ * Highlight text where a substring query matches
+ *
+ * @param {string} text Text
+ * @param {string} query Query to find
+ * @return {jQuery} Text with query substring wrapped in highlighted span
+ */
+ve.highlightQuery = function ( text, query ) {
+	var $result = $( '<span>' ),
+		offset = text.toLowerCase().indexOf( query.toLowerCase() );
+
+	if ( !query.length || offset === -1 ) {
+		return $result.text( text );
+	}
+	$result.append(
+		document.createTextNode( text.slice( 0, offset ) ),
+		$( '<span>' )
+			.addClass( 've-ui-query-highlight' )
+			.text( text.slice( offset, offset + query.length ) ),
+		document.createTextNode( text.slice( offset + query.length ) )
+	);
+	return $result.contents();
+};
+
+/**
+ * Get the closest matching DOM position in document order (forward or reverse)
+ *
+ * A DOM position is represented as an object with "node" and "offset" properties. The noDescend
+ * option can be used to exclude the positions inside certain element nodes; it is a jQuery
+ * selector/function ( used as a test by $node.is() - see http://api.jquery.com/is/ ); it defaults
+ * to ve.rejectsCursor . Void elements (those matching ve.isVoidElement) are always excluded.
+ *
+ * If the skipSoft option is true (default), positions cursor-equivalent to the start position are
+ * stepped over and the nearest non-equivalent position is returned. Cursor-equivalent positions
+ * include just before/just after the boundary of a text element or an annotation element. So in
+ * &lt;#text&gt;X&lt;/#text&gt;&lt;b&gt;&lt;#text&gt;y&lt;/#text&gt;&lt;/b&gt; there are four
+ * cursor-equivalent positions between X and Y.
+ * Chromium normalizes cursor focus/offset, when they are set, to the start-most equivalent
+ * position in document order. Firefox does not normalize, but jumps when cursoring over positions
+ * that are equivalent to the start position.
+ *
+ * As well as the end position, an array of the steps taken is returned. This will have length 1
+ * unless skipSoft is true. Each step gives the node, the type of crossing (which can be
+ * "enter", "leave", or "cross" for any node, or "internal" for a step over a
+ * character in a text node), and the offset (defined for "internal" steps only).
+ *
+ * Limitation: skipSoft treats the interior of grapheme clusters as non-equivalent, but in fact
+ * browser cursoring does skip over most grapheme clusters e.g. 'x\u0301' (though not all e.g.
+ * '\u062D\u0627').
+ *
+ * Limitation: some DOM positions cannot actually hold the cursor; e.g. the start of the interior
+ * of a table node.
+ *
+ * @param {Object} position Start position
+ * @param {Node} position.node Start node
+ * @param {Node} position.offset Start offset
+ * @param {number} direction +1 for forward, -1 for reverse
+ * @param {Object} [options]
+ * @param {Function|string} [options.noDescend] Selector or function: nodes to skip over
+ * @param {boolean} [options.skipSoft] Skip tags that don't expend a cursor press (default: true)
+ * @return {Object} The adjacent DOM position encountered
+ * @return {Node|null} return.node The node, or null if we stepped past the root node
+ * @return {number|null} return.offset The offset, or null if we stepped past the root node
+ * @return {Object[]} return.steps Steps taken {node: x, type: leave|cross|enter|internal, offset: n}
+ */
+ve.adjacentDomPosition = function ( position, direction, options ) {
+	var forward, childNode, isHard, noDescend, skipSoft,
+		node = position.node,
+		offset = position.offset,
+		steps = [];
+
+	options = options || {};
+	noDescend = options.noDescend || ve.rejectsCursor;
+	skipSoft = 'skipSoft' in options ? options.skipSoft : true;
+
+	direction = direction < 0 ? -1 : 1;
+	forward = ( direction === 1 );
+
+	while ( true ) {
+		// If we're at the node's leading edge, move to the adjacent position in the parent node
+		if ( offset === ( forward ? node.length || node.childNodes.length : 0 ) ) {
+			steps.push( {
+				node: node,
+				type: 'leave'
+			} );
+			isHard = ve.hasHardCursorBoundaries( node );
+			if ( node.parentNode === null ) {
+				return {
+					node: null,
+					offset: null,
+					steps: steps
+				};
+			}
+			offset = Array.prototype.indexOf.call( node.parentNode.childNodes, node ) +
+				( forward ? 1 : 0 );
+			node = node.parentNode;
+			if ( !skipSoft || isHard ) {
+				return {
+					node: node,
+					offset: offset,
+					steps: steps
+				};
+			}
+			// Else take another step
+			continue;
+		}
+		// Else we're in the interior of a node
+
+		// If we're in a text node, move to the position in this node at the next offset
+		if ( node.nodeType === Node.TEXT_NODE ) {
+			steps.push( {
+				node: node,
+				type: 'internal',
+				offset: offset - ( forward ? 0 : 1 )
+			} );
+			return {
+				node: node,
+				offset: offset + direction,
+				steps: steps
+			};
+		}
+		// Else we're in the interior of an element node
+
+		childNode = node.childNodes[ forward ? offset : offset - 1 ];
+
+		// If the child is uncursorable, or is an element matching noDescend, do not
+		// descend into it: instead, return the position just beyond it in the current node
+		if (
+			childNode.nodeType === Node.ELEMENT_NODE &&
+			( ve.isVoidElement( childNode ) || $( childNode ).is( noDescend ) )
+		) {
+			steps.push( {
+				node: childNode,
+				type: 'cross'
+			} );
+			return {
+				node: node,
+				offset: offset + ( forward ? 1 : -1 ),
+				steps: steps
+			};
+		}
+
+		// Go to the closest offset inside the child node
+		isHard = ve.hasHardCursorBoundaries( childNode );
+		node = childNode;
+		offset = forward ? 0 : node.length || node.childNodes.length;
+		steps.push( {
+			node: node,
+			type: 'enter'
+		} );
+		if ( !skipSoft || isHard ) {
+			return {
+				node: node,
+				offset: offset,
+				steps: steps
+			};
+		}
+	}
+};
+
+/**
+ * Test whether crossing a node's boundaries uses up a cursor press
+ *
+ * Essentially, this is true unless the node is a text node or an annotation node
+ *
+ * @param {Node} node Element node or text node
+ * @return {boolean} Whether crossing the node's boundaries uses up a cursor press
+ */
+ve.hasHardCursorBoundaries = function ( node ) {
+	return node.nodeType === node.ELEMENT_NODE && (
+		ve.isBlockElement( node ) || ve.isVoidElement( node )
+	);
+};
+
+/**
+ * Tests whether an adjacent cursor would be prevented from entering the node
+ *
+ * @param {Node} [node] Element node or text node; defaults to "this" if a Node
+ * @return {boolean} Whether an adjacent cursor would be prevented from entering
+ */
+ve.rejectsCursor = function ( node ) {
+	if ( !node && this instanceof Node ) {
+		node = this;
+	}
+	if ( node.nodeType === node.TEXT_NODE ) {
+		return false;
+	}
+	if ( ve.isVoidElement( node ) ) {
+		return true;
+	}
+	// We don't need to check whether the ancestor-nearest contenteditable tag is
+	// false, because if so then there can be no adjacent cursor.
+	return node.contentEditable === 'false';
 };

@@ -43,7 +43,7 @@ ve.ui.MWWikitextSwitchConfirmDialog.static.actions = [
 	{
 		action: 'cancel',
 		label: OO.ui.deferMsg( 'visualeditor-mweditmodesource-warning-cancel' ),
-		flags: 'safe'
+		flags: [ 'safe', 'back' ]
 	},
 	{
 		action: 'switch',
@@ -66,14 +66,14 @@ ve.ui.MWWikitextSwitchConfirmDialog.prototype.getActionProcess = function ( acti
 	if ( action === 'switch' ) {
 		return new OO.ui.Process( function () {
 			this.getActions().setAbilities( { cancel: false, discard: false } );
-			this.getActions().get()[1].pushPending();
-			this.target.switchToWikitextEditor( false );
+			this.getActions().get()[ 1 ].pushPending();
+			this.target.switchToWikitextEditor( false, true );
 		}, this );
 	} else if ( action === 'discard' ) {
 		return new OO.ui.Process( function () {
 			this.getActions().setAbilities( { cancel: false, switch: false } );
-			this.getActions().get()[2].pushPending();
-			this.target.switchToWikitextEditor( true );
+			this.getActions().get()[ 2 ].pushPending();
+			this.target.switchToWikitextEditor( true, true );
 		}, this );
 	} else if ( action === 'cancel' ) {
 		return new OO.ui.Process( function () {

@@ -12,13 +12,13 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-contrib-csslint' );
 	grunt.loadNpmTasks( 'grunt-contrib-jshint' );
 	grunt.loadNpmTasks( 'grunt-contrib-watch' );
+	grunt.loadNpmTasks( 'grunt-jsonlint' );
 	grunt.loadNpmTasks( 'grunt-banana-checker' );
 	grunt.loadNpmTasks( 'grunt-jscs' );
 	grunt.loadTasks( 'lib/ve/build/tasks' );
 	grunt.loadTasks( 'build/tasks' );
 
 	grunt.initConfig( {
-		pkg: grunt.file.readJSON( 'package.json' ),
 		jsduckcatconfig: {
 			main: {
 				target: '.jsduck/categories.json',
@@ -36,7 +36,7 @@ module.exports = function ( grunt ) {
 								'Tests'
 							]
 						},
-						include: [ 'UnicodeJS', 'OOJS UI', 'Upstream' ]
+						include: [ 'UnicodeJS', 'OOjs UI', 'Upstream' ]
 					}
 				]
 			}
@@ -62,7 +62,15 @@ module.exports = function ( grunt ) {
 			]
 		},
 		jscs: {
-			src: '<%= jshint.all %>'
+			fix: {
+				options: {
+					fix: true
+				},
+				src: '<%= jshint.all %>'
+			},
+			main: {
+				src: '<%= jshint.all %>'
+			}
 		},
 		csslint: {
 			options: {
@@ -71,7 +79,20 @@ module.exports = function ( grunt ) {
 			all: 'modules/**/*.css'
 		},
 		banana: {
-			all: 'modules/ve-{mw,wmf}/i18n/'
+			options: {
+				disallowDuplicateTranslations: false
+			},
+			all: [
+				'modules/ve-{mw,wmf}/i18n/',
+				'modules/ve-mw/tests/browser/i18n'
+			]
+		},
+		jsonlint: {
+			all: [
+				'**/*.json',
+				'!node_modules/**',
+				'!lib/**'
+			]
 		},
 		copy: {
 			jsduck: {
@@ -96,9 +117,13 @@ module.exports = function ( grunt ) {
 		require( 'child_process' ).exec( 'git ls-files --modified', function ( err, stdout, stderr ) {
 			var ret = err || stderr || stdout;
 			if ( ret ) {
-				grunt.log.write( ret );
-				grunt.log.error( 'Unstaged changes.' );
-				done( false );
+				grunt.log.error( 'Unstaged changes in these files:' );
+				grunt.log.error( ret );
+				// Show a condensed diff
+				require( 'child_process' ).exec( 'git diff -U1 | tail -n +3', function ( err, stdout, stderr ) {
+					grunt.log.write( err || stderr || stdout );
+					done( false );
+				} );
 			} else {
 				grunt.log.ok( 'No unstaged changes.' );
 				done();
@@ -107,7 +132,8 @@ module.exports = function ( grunt ) {
 	} );
 
 	grunt.registerTask( 'build', [ 'jsduckcatconfig', 'buildloader' ] );
-	grunt.registerTask( 'lint', [ 'jshint', 'jscs', 'csslint', 'banana' ] );
+	grunt.registerTask( 'lint', [ 'jshint', 'jscs:main', 'csslint', 'jsonlint', 'banana' ] );
+	grunt.registerTask( 'fix', [ 'jscs:fix' ] );
 	grunt.registerTask( 'test', [ 'build', 'lint' ] );
 	grunt.registerTask( 'test-ci', [ 'git-status' ] );
 	grunt.registerTask( 'default', 'test' );

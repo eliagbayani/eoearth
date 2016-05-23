@@ -36,18 +36,6 @@ OO.inheritClass( ve.ce.Annotation, ve.ce.View );
 
 ve.ce.Annotation.static.tagName = 'span';
 
-/**
- * Whether this annotation's continuation (or lack thereof) needs to be forced.
- *
- * This should be set to true only for annotations that aren't continued by browsers but are in DM,
- * or the other way around, or those where behavior is inconsistent between browsers.
- *
- * @static
- * @property
- * @inheritable
- */
-ve.ce.Annotation.static.forceContinuation = false;
-
 /* Static Methods */
 
 /**
@@ -56,7 +44,7 @@ ve.ce.Annotation.static.forceContinuation = false;
  * @static
  * @inheritable
  * @param {ve.dm.Annotation} annotation Annotation model
- * @returns {string} Description of annotation
+ * @return {string} Description of annotation
  */
 ve.ce.Annotation.static.getDescription = function () {
 	return '';
@@ -66,7 +54,8 @@ ve.ce.Annotation.static.getDescription = function () {
 
 /**
  * Get the content branch node this annotation is rendered in, if any.
- * @returns {ve.ce.ContentBranchNode|null} Content branch node or null if none
+ *
+ * @return {ve.ce.ContentBranchNode|null} Content branch node or null if none
  */
 ve.ce.Annotation.prototype.getParentNode = function () {
 	return this.parentNode;
@@ -75,6 +64,22 @@ ve.ce.Annotation.prototype.getParentNode = function () {
 /** */
 ve.ce.Annotation.prototype.getModelHtmlDocument = function () {
 	return this.parentNode && this.parentNode.getModelHtmlDocument();
+};
+
+ve.ce.Annotation.prototype.appendChild = function ( childNode ) {
+	this.$element.append( childNode );
+};
+
+ve.ce.Annotation.prototype.getContentContainer = function () {
+	return this.$element[ 0 ];
+};
+
+ve.ce.Annotation.prototype.attachContents = function () {
+	// Do nothing; already attached
+};
+
+ve.ce.Annotation.prototype.appendTo = function ( node ) {
+	node.appendChild( this.$element[ 0 ] );
 };
 
 /**

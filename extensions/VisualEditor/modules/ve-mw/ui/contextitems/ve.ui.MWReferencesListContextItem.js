@@ -8,14 +8,14 @@
  * Context item for a MWReferencesList.
  *
  * @class
- * @extends ve.ui.ContextItem
+ * @extends ve.ui.LinearContextItem
  *
  * @constructor
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.MWReferencesListContextItem = function VeMWReferencesListContextItem() {
+ve.ui.MWReferencesListContextItem = function VeUiMWReferencesListContextItem() {
 	// Parent constructor
 	ve.ui.MWReferencesListContextItem.super.apply( this, arguments );
 
@@ -25,7 +25,7 @@ ve.ui.MWReferencesListContextItem = function VeMWReferencesListContextItem() {
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.MWReferencesListContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.MWReferencesListContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 

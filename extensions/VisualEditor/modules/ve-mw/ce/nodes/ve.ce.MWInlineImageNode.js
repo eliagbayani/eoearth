@@ -17,15 +17,24 @@
  * @param {Object} [config] Configuration options
  */
 ve.ce.MWInlineImageNode = function VeCeMWInlineImageNode( model, config ) {
-
+	var isError;
 	// Parent constructor
 	ve.ce.LeafNode.call( this, model, config );
 
-	if ( this.model.getAttribute( 'isLinked' ) ) {
-		this.$element = this.$( '<a>' ).addClass( 'image' );
-		this.$image = this.$( '<img>' ).appendTo( this.$element );
+	isError = this.model.getAttribute( 'isError' );
+
+	if ( isError ) {
+		this.$element = $( '<a>' )
+			.addClass( 'new' )
+			.text( this.model.getFilename() );
+		this.$image = $( '<img>' );
 	} else {
-		this.$element = this.$image = this.$( '<img>' ).appendTo( this.$element );
+		if ( this.model.getAttribute( 'isLinked' ) ) {
+			this.$element = $( '<a>' ).addClass( 'image' );
+			this.$image = $( '<img>' ).appendTo( this.$element );
+		} else {
+			this.$element = this.$image = $( '<img>' ).appendTo( this.$element );
+		}
 	}
 
 	// Mixin constructors
@@ -37,9 +46,9 @@ ve.ce.MWInlineImageNode = function VeCeMWInlineImageNode( model, config ) {
 		.attr( 'height', this.model.getAttribute( 'height' ) );
 
 	if ( this.$element.css( 'direction' ) === 'rtl' ) {
-		this.showHandles( ['sw'] );
+		this.showHandles( [ 'sw' ] );
 	} else {
-		this.showHandles( ['se'] );
+		this.showHandles( [ 'se' ] );
 	}
 
 	this.updateClasses();

@@ -23,7 +23,7 @@ $specialPageAliases['ar'] = array(
 	'UserCredentials' => array( 'شهادات_المستخدم' ),
 );
 
-/** Egyptian Spoken Arabic (مصرى) */
+/** Egyptian Arabic (مصرى) */
 $specialPageAliases['arz'] = array(
 	'RequestAccount' => array( 'طلب_حساب' ),
 	'ConfirmAccounts' => array( 'تأكيد_الحساب' ),
@@ -36,9 +36,21 @@ $specialPageAliases['as'] = array(
 	'ConfirmAccounts' => array( 'একাউণ্ট_নিশ্চিত_কৰক' ),
 );
 
+/** Avaric (авар) */
+$specialPageAliases['av'] = array(
+	'RequestAccount' => array( 'Запросить_учётную_запись' ),
+);
+
 /** Bashkir (башҡортса) */
 $specialPageAliases['ba'] = array(
 	'RequestAccount' => array( 'RequestAccount' ),
+);
+
+/** Western Balochi (بلوچی رخشانی) */
+$specialPageAliases['bgn'] = array(
+	'RequestAccount' => array( 'هیسابی_درخواست' ),
+	'ConfirmAccounts' => array( 'هیسابی_تائید' ),
+	'UserCredentials' => array( 'کارمرزوکی_شناسگ' ),
 );
 
 /** Banjar (Bahasa Banjar) */
@@ -80,9 +92,9 @@ $specialPageAliases['de'] = array(
 
 /** Zazaki (Zazaki) */
 $specialPageAliases['diq'] = array(
-	'RequestAccount' => array( 'HesabWaştış' ),
-	'ConfirmAccounts' => array( 'HesabRaştkerdış' ),
-	'UserCredentials' => array( 'ReferanséKarberan' ),
+	'RequestAccount' => array( 'HesabBıwaze' ),
+	'ConfirmAccounts' => array( 'HesabanRaştKe' ),
+	'UserCredentials' => array( 'ReferansêKarberan' ),
 );
 
 /** Lower Sorbian (dolnoserbski) */
@@ -132,7 +144,7 @@ $specialPageAliases['fr'] = array(
 	'ConfirmAccounts' => array( 'ConfirmerCompte', 'Confirmation_compte', 'ConfirmationCompte' ),
 );
 
-/** Franco-Provençal (arpetan) */
+/** Arpitan (arpetan) */
 $specialPageAliases['frp'] = array(
 	'RequestAccount' => array( 'Demandar_un_compto', 'DemandarUnCompto' ),
 	'ConfirmAccounts' => array( 'Confirmar_lo_compto', 'ConfirmarLoCompto', 'Confirmacion_de_compto', 'ConfirmacionDeCompto' ),
@@ -259,6 +271,13 @@ $specialPageAliases['lb'] = array(
 	'RequestAccount' => array( 'Benotzerkont_ufroen' ),
 	'ConfirmAccounts' => array( 'Benotzerkont_confirméieren' ),
 	'UserCredentials' => array( 'Benotzerinformatiounen' ),
+);
+
+/** Northern Luri (لۊری شومالی) */
+$specialPageAliases['lrc'] = array(
+	'RequestAccount' => array( 'حاستئن_حئساڤ' ),
+	'ConfirmAccounts' => array( 'پوشت_راسکاری_حئساڤیا' ),
+	'UserCredentials' => array( 'ئتئڤار_کاریار' ),
 );
 
 /** Malagasy (Malagasy) */
@@ -441,6 +460,7 @@ $specialPageAliases['uk'] = array(
 
 /** Urdu (اردو) */
 $specialPageAliases['ur'] = array(
+	'RequestAccount' => array( 'درخواست_کھاتہ' ),
 	'ConfirmAccounts' => array( 'تصدیق_کھاتہ_جات' ),
 );
 

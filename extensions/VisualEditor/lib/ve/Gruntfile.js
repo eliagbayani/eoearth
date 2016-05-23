@@ -6,6 +6,26 @@
 
 /*jshint node:true */
 module.exports = function ( grunt ) {
+	var modules = grunt.file.readJSON( 'build/modules.json' ),
+		moduleUtils = require( './build/moduleUtils' ),
+		coreBuildFiles = moduleUtils.makeBuildList( modules, [ 'visualEditor.build' ] ),
+		coreBuildFilesApex = moduleUtils.makeBuildList( modules, [ 'visualEditor.build.apex' ] ),
+		coreBuildFilesMediaWiki = moduleUtils.makeBuildList( modules, [ 'visualEditor.build.mediawiki' ] ),
+		testFiles = moduleUtils.makeBuildList( modules, [ 'visualEditor.test' ] ).scripts,
+		demoPages = ( function () {
+			var pages = {},
+				files = grunt.file.expand( 'demos/ve/pages/*.html' );
+			files.forEach( function ( file ) {
+				var matches = file.match( /^.*(pages\/(.+).html)$/ ),
+					path = matches[ 1 ],
+					name = matches[ 2 ];
+
+				pages[ name ] = path;
+			} );
+			return pages;
+		} )();
+
+	grunt.loadNpmTasks( 'grunt-jsonlint' );
 	grunt.loadNpmTasks( 'grunt-banana-checker' );
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
 	grunt.loadNpmTasks( 'grunt-contrib-concat' );
@@ -22,46 +42,51 @@ module.exports = function ( grunt ) {
 	// We want to use `grunt watch` to start this and karma watch together.
 	grunt.renameTask( 'watch', 'runwatch' );
 
-	var modules = grunt.file.readJSON( 'build/modules.json' ),
-		moduleUtils = require( './build/moduleUtils' ),
-		coreBuildFiles = moduleUtils.makeBuildList( modules, [ 'visualEditor.build' ] ),
-		testFiles = moduleUtils.makeBuildList( modules, [ 'visualEditor.test' ] ).scripts;
-
-	function demoMenu( callback ) {
-		var pages = {},
-			files = grunt.file.expand( 'demos/ve/pages/*.html' );
-		files.forEach( function ( file ) {
-			var matches = file.match( /^.*(pages\/(.+).html)$/ ),
-				path = matches[1],
-				name = matches[2];
-
-			pages[name] = path;
-		} );
-		callback( JSON.stringify( pages, null, '\t' ).split( '\n' ).join( '\n\t\t' ) );
-	}
-
 	grunt.initConfig( {
 		pkg: grunt.file.readJSON( 'package.json' ),
 		clean: {
-			dist: [ 'dist/*', 'test-coverage/*' ]
+			dist: [ 'dist/*', 'coverage/*' ]
 		},
 		concat: {
-			options: {
-				banner: grunt.file.read( 'build/banner.txt' )
-			},
 			js: {
+				options: {
+					banner: grunt.file.read( 'build/banner.txt' )
+				},
 				dest: 'dist/visualEditor.js',
 				src: coreBuildFiles.scripts
 			},
-			css: {
-				dest: 'dist/visualEditor.css',
-				src: coreBuildFiles.styles
+			'css-apex': {
+				options: {
+					banner: grunt.file.read( 'build/banner.txt' )
+				},
+				dest: 'dist/visualEditor-apex.css',
+				src: coreBuildFilesApex.styles
+			},
+			'css-mediawiki': {
+				options: {
+					banner: grunt.file.read( 'build/banner.txt' )
+				},
+				dest: 'dist/visualEditor-mediawiki.css',
+				src: coreBuildFilesMediaWiki.styles
+			},
+			// HACK: Ideally these libraries would provide their own distribution files (T95667)
+			'jquery.i18n': {
+				dest: 'dist/lib/jquery.i18n.js',
+				src: modules[ 'jquery.i18n' ].scripts
+			},
+			'jquery.uls.data': {
+				dest: 'dist/lib/jquery.uls.data.js',
+				src: modules[ 'jquery.uls.data' ].scripts
 			}
 		},
 		cssjanus: {
-			dist: {
-				dest: 'dist/visualEditor.rtl.css',
-				src: 'dist/visualEditor.css'
+			apex: {
+				dest: 'dist/visualEditor-apex.rtl.css',
+				src: 'dist/visualEditor-apex.css'
+			},
+			mediawiki: {
+				dest: 'dist/visualEditor-mediawiki.rtl.css',
+				src: 'dist/visualEditor-mediawiki.css'
 			}
 		},
 		cssUrlEmbed: {
@@ -72,14 +97,21 @@ module.exports = function ( grunt ) {
 			},
 			dist: {
 				files: {
-					'dist/visualEditor.css': 'dist/visualEditor.css',
-					'dist/visualEditor.rtl.css': 'dist/visualEditor.rtl.css'
+					'dist/visualEditor-apex.css': 'dist/visualEditor-apex.css',
+					'dist/visualEditor-apex.rtl.css': 'dist/visualEditor-apex.rtl.css',
+					'dist/visualEditor-mediawiki.css': 'dist/visualEditor-mediawiki.css',
+					'dist/visualEditor-mediawiki.rtl.css': 'dist/visualEditor-mediawiki.rtl.css'
 				}
 			}
 		},
 		copy: {
 			i18n: {
 				src: 'i18n/*.json',
+				dest: 'dist/',
+				expand: true
+			},
+			lib: {
+				src: [ 'lib/**', '!lib/jquery.i18n/**', '!lib/jquery.uls/**' ],
 				dest: 'dist/',
 				expand: true
 			}
@@ -89,68 +121,106 @@ module.exports = function ( grunt ) {
 				targetFile: '.jsduck/eg-iframe.html',
 				template: '.jsduck/eg-iframe.html.template',
 				modules: modules,
-				load: [ 'visualEditor.desktop.standalone' ],
+				load: [
+					'visualEditor.standalone.apex.dist',
+					'visualEditor.standalone.read'
+				],
 				pathPrefix: '../',
 				i18n: [ 'i18n/', 'lib/oojs-ui/i18n/' ],
-				indent: '\t\t'
+				indent: '\t\t',
+				dir: 'ltr'
 			},
 			desktopDemo: {
 				targetFile: 'demos/ve/desktop.html',
 				template: 'demos/ve/demo.html.template',
 				modules: modules,
 				load: [
-					'visualEditor.standalone.read',
-					'visualEditor.desktop.standalone.demo'
+					'visualEditor.desktop.standalone',
+					'visualEditor.standalone.read'
 				],
+				run: [ 'visualEditor.desktop.standalone.demo' ],
 				env: {
 					debug: true
 				},
 				pathPrefix: '../../',
 				i18n: [ 'i18n/', 'lib/oojs-ui/i18n/' ],
 				indent: '\t\t',
-				placeholders: { menu: demoMenu }
+				demoPages: demoPages
 			},
 			desktopDemoDist: {
 				targetFile: 'demos/ve/desktop-dist.html',
 				template: 'demos/ve/demo.html.template',
 				modules: modules,
 				load: [
-					'visualEditor.standalone.read',
-					'visualEditor.desktop.standalone.demo.dist'
+					'visualEditor.standalone.apex.dist',
+					'visualEditor.standalone.read'
 				],
+				run: [ 'visualEditor.desktop.standalone.demo' ],
 				pathPrefix: '../../',
 				i18n: [ 'dist/i18n/', 'lib/oojs-ui/i18n/' ],
 				indent: '\t\t',
-				placeholders: { menu: demoMenu }
+				demoPages: demoPages
 			},
 			mobileDemo: {
 				targetFile: 'demos/ve/mobile.html',
 				template: 'demos/ve/demo.html.template',
 				modules: modules,
 				load: [
-					'visualEditor.standalone.read',
-					'visualEditor.mobile.standalone.demo'
+					'visualEditor.mobile.standalone',
+					'visualEditor.standalone.read'
 				],
+				run: [ 'visualEditor.mobile.standalone.demo' ],
 				env: {
 					debug: true
 				},
 				pathPrefix: '../../',
 				i18n: [ 'i18n/', 'lib/oojs-ui/i18n/' ],
 				indent: '\t\t',
-				placeholders: { menu: demoMenu }
+				demoPages: demoPages
 			},
 			mobileDemoDist: {
 				targetFile: 'demos/ve/mobile-dist.html',
 				template: 'demos/ve/demo.html.template',
 				modules: modules,
 				load: [
-					'visualEditor.standalone.read',
-					'visualEditor.mobile.standalone.demo.dist'
+					'visualEditor.standalone.mediawiki.dist',
+					'visualEditor.standalone.read'
 				],
+				run: [ 'visualEditor.mobile.standalone.demo' ],
 				pathPrefix: '../../',
 				i18n: [ 'dist/i18n/', 'lib/oojs-ui/i18n/' ],
 				indent: '\t\t',
-				placeholders: { menu: demoMenu }
+				demoPages: demoPages
+			},
+			minimalDemo: {
+				targetFile: 'demos/ve/minimal.html',
+				template: 'demos/ve/minimal.html.template',
+				modules: modules,
+				load: [
+					'visualEditor.standalone.apex.dist',
+					'visualEditor.standalone.read'
+				],
+				run: [ 'visualEditor.minimal.standalone.demo' ],
+				pathPrefix: '../../',
+				i18n: [ 'dist/i18n/', 'lib/oojs-ui/i18n/' ],
+				indent: '\t\t',
+				dir: 'ltr',
+				langList: false
+			},
+			minimalDemoRtl: {
+				targetFile: 'demos/ve/minimal-rtl.html',
+				template: 'demos/ve/minimal.html.template',
+				modules: modules,
+				load: [
+					'visualEditor.standalone.apex.dist',
+					'visualEditor.standalone.read'
+				],
+				run: [ 'visualEditor.minimal.standalone.demo' ],
+				pathPrefix: '../../',
+				i18n: [ 'dist/i18n/', 'lib/oojs-ui/i18n/' ],
+				indent: '\t\t',
+				dir: 'rtl',
+				langList: false
 			},
 			test: {
 				targetFile: 'tests/index.html',
@@ -170,14 +240,24 @@ module.exports = function ( grunt ) {
 			},
 			all: [
 				'*.js',
+				'{.jsduck,build,demos,src,tests}/*.js',
 				'{.jsduck,build,demos,src,tests}/**/*.js'
 			]
 		},
 		jscs: {
-			src: [
-				'<%= jshint.all %>',
-				'!tests/ce/imetests/*.js'
-			]
+			fix: {
+				options: {
+					fix: true
+				},
+				src: [
+					'<%= jshint.all %>'
+				]
+			},
+			main: {
+				src: [
+					'<%= jshint.all %>'
+				]
+			}
 		},
 		csslint: {
 			options: {
@@ -185,7 +265,16 @@ module.exports = function ( grunt ) {
 			},
 			all: '{.jsduck,build,demos,src,tests}/**/*.css'
 		},
+		jsonlint: {
+			all: [
+				'**/*.json',
+				'!node_modules/**'
+			]
+		},
 		banana: {
+			options: {
+				disallowDuplicateTranslations: false
+			},
 			all: 'i18n/'
 		},
 		karma: {
@@ -205,6 +294,7 @@ module.exports = function ( grunt ) {
 				},
 				reporters: [ 'dots', 'coverage' ],
 				coverageReporter: { reporters: [
+					{ type: 'json-summary', dir: 'coverage/' },
 					{ type: 'html', dir: 'coverage/' },
 					{ type: 'text-summary', dir: 'coverage/' }
 				] }
@@ -234,9 +324,13 @@ module.exports = function ( grunt ) {
 		require( 'child_process' ).exec( 'git ls-files --modified', function ( err, stdout, stderr ) {
 			var ret = err || stderr || stdout;
 			if ( ret ) {
-				grunt.log.write( ret );
-				grunt.log.error( 'Unstaged changes.' );
-				done( false );
+				grunt.log.error( 'Unstaged changes in these files:' );
+				grunt.log.error( ret );
+				// Show a condensed diff
+				require( 'child_process' ).exec( 'git diff -U1 | tail -n +3', function ( err, stdout, stderr ) {
+					grunt.log.write( err || stderr || stdout );
+					done( false );
+				} );
 			} else {
 				grunt.log.ok( 'No unstaged changes.' );
 				done();
@@ -245,8 +339,9 @@ module.exports = function ( grunt ) {
 	} );
 
 	grunt.registerTask( 'build', [ 'clean', 'concat', 'cssjanus', 'cssUrlEmbed', 'copy', 'buildloader' ] );
-	grunt.registerTask( 'lint', [ 'jshint', 'jscs', 'csslint', 'banana' ] );
+	grunt.registerTask( 'lint', [ 'jshint', 'jscs:main', 'csslint', 'jsonlint', 'banana' ] );
 	grunt.registerTask( 'unit', [ 'karma:main' ] );
+	grunt.registerTask( 'fix', [ 'jscs:fix' ] );
 	grunt.registerTask( '_test', [ 'lint', 'git-build', 'build', 'unit' ] );
 	grunt.registerTask( 'ci', [ '_test', 'git-status' ] );
 	grunt.registerTask( 'watch', [ 'karma:bg:start', 'runwatch' ] );

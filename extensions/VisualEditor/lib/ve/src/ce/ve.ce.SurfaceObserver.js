@@ -103,6 +103,7 @@ ve.ce.SurfaceObserver.prototype.startTimerLoop = function () {
 
 /**
  * Loop once with `setTimeout`
+ *
  * @method
  * @param {boolean} firstTime Wait before polling
  */
@@ -230,6 +231,9 @@ ve.ce.SurfaceObserver.prototype.pollOnceInternal = function ( emitChanges, selec
 	}
 
 	if ( newState.selectionChanged && emitChanges ) {
+		// Caution: selectionChanged is true if the CE selection is different, which can
+		// be the case even if the DM selection is unchanged. So the following line can
+		// emit a rangeChange event with identical oldState and newState.
 		this.emit(
 			'rangeChange',
 			( oldState ? oldState.veRange : null ),
@@ -253,7 +257,7 @@ ve.ce.SurfaceObserver.prototype.setTimeout = function ( callback, timeout ) {
  *
  * Used when you have just polled, but don't want to wait for a 'rangeChange' event.
  *
- * @return {ve.Range} Range
+ * @return {ve.Range|null} Range
  */
 ve.ce.SurfaceObserver.prototype.getRange = function () {
 	if ( !this.rangeState ) {

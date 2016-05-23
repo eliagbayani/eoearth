@@ -29,7 +29,7 @@ class ApiVisualEditor extends ApiBase {
 		parent::__construct( $main, $name );
 		$this->veConfig = $config;
 		$this->serviceClient = new VirtualRESTServiceClient( new MultiHttpClient( array() ) );
-		$this->serviceClient->mount( '/parsoid/', $this->getVRSObject() );
+		$this->serviceClient->mount( '/restbase/', $this->getVRSObject() );
 	}
 
 	/**
@@ -53,20 +53,22 @@ class ApiVisualEditor extends ApiBase {
 		if ( isset( $vrs['modules'] ) && isset( $vrs['modules']['restbase'] ) ) {
 			// if restbase is available, use it
 			$params = $vrs['modules']['restbase'];
+			$params['parsoidCompat'] = false; // backward compatibility
 			$class = 'RestbaseVirtualRESTService';
-			// remove once VE generates restbase paths
-			$params['parsoidCompat'] = true;
 		} elseif ( isset( $vrs['modules'] ) && isset( $vrs['modules']['parsoid'] ) ) {
 			// there's a global parsoid config, use it next
 			$params = $vrs['modules']['parsoid'];
+			$params['restbaseCompat'] = true;
 		} else {
 			// no global modules defined, fall back to old defaults
 			$params = array(
 				'URL' => $config->get( 'VisualEditorParsoidURL' ),
 				'prefix' => $config->get( 'VisualEditorParsoidPrefix' ),
+				'domain' => $config->get( 'VisualEditorParsoidDomain' ),
 				'timeout' => $config->get( 'VisualEditorParsoidTimeout' ),
 				'HTTPProxy' => $config->get( 'VisualEditorParsoidHTTPProxy' ),
-				'forwardCookies' => $config->get( 'VisualEditorParsoidForwardCookies' )
+				'forwardCookies' => $config->get( 'VisualEditorParsoidForwardCookies' ),
+				'restbaseCompat' => true
 			);
 		}
 		// merge the global and service-specific params
@@ -83,10 +85,10 @@ class ApiVisualEditor extends ApiBase {
 		return new $class( $params );
 	}
 
-	private function requestParsoid( $method, $path, $params ) {
+	private function requestRestbase( $method, $path, $params ) {
 		$request = array(
 			'method' => $method,
-			'url' => '/parsoid/local/v1/' . $path
+			'url' => '/restbase/local/v1/' . $path
 		);
 		if ( $method === 'GET' ) {
 			$request['query'] = $params;
@@ -151,12 +153,16 @@ class ApiVisualEditor extends ApiBase {
 		if ( $parserParams['oldid'] === 0 ) {
 			$parserParams['oldid'] = '';
 		}
-		return $this->requestParsoid(
+		$path = 'transform/html/to/wikitext/' . urlencode( $title->getPrefixedDBkey() );
+		if ( $parserParams['oldid'] ) {
+			$path .= '/' . $parserParams['oldid'];
+		}
+		return $this->requestRestbase(
 			'POST',
-			'transform/html/to/wikitext/' . urlencode( $title->getPrefixedDBkey() ),
+			$path,
 			array(
 				'html' => $html,
-				'oldid' => $parserParams['oldid'],
+				'scrubWikitext' => 1,
 			)
 		);
 	}
@@ -172,12 +178,12 @@ class ApiVisualEditor extends ApiBase {
 	}
 
 	protected function parseWikitextFragment( $title, $wikitext ) {
-		return $this->requestParsoid(
+		return $this->requestRestbase(
 			'POST',
 			'transform/wikitext/to/html/' . urlencode( $title->getPrefixedDBkey() ),
 			array(
 				'wikitext' => $wikitext,
-				'body' => 1,
+				'bodyOnly' => 1,
 			)
 		);
 	}
@@ -277,8 +283,11 @@ class ApiVisualEditor extends ApiBase {
 
 		$isSafeAction = in_array( $params['paction'], self::$SAFE_ACTIONS, true );
 
-		if ( !$isSafeAction &&
-			!in_array( $title->getNamespace(), $this->veConfig->get( 'VisualEditorNamespaces' ) ) ) {
+		$availableNamespaces = $this->veConfig->get( 'VisualEditorAvailableNamespaces' );
+		if ( !$isSafeAction && (
+			!isset( $availableNamespaces[$title->getNamespace()] ) ||
+			!$availableNamespaces[$title->getNamespace()]
+		) ) {
 
 			$this->dieUsage( "VisualEditor is not enabled in namespace " .
 				$title->getNamespace(), 'novenamespace' );
@@ -330,12 +339,12 @@ class ApiVisualEditor extends ApiBase {
 					$baseTimestamp = $latestRevision->getTimestamp();
 					$oldid = intval( $parserParams['oldid'] );
 
-					// If requested, request HTML from Parsoid
+					// If requested, request HTML from Parsoid/RESTBase
 					if ( $params['paction'] === 'parse' ) {
-						$content = $this->requestParsoid(
+						$content = $this->requestRestbase(
 							'GET',
-							'page/' . urlencode( $title->getPrefixedDBkey() ) . '/html',
-							$parserParams
+							'page/html/' . urlencode( $title->getPrefixedDBkey() ) . '/' . $oldid,
+							array()
 						);
 						if ( $content === false ) {
 							$this->dieUsage( 'Error contacting the Parsoid server', 'parsoidserver' );
@@ -372,9 +381,9 @@ class ApiVisualEditor extends ApiBase {
 				if ( !$title->exists() ) {
 					$notices[] = $this->msg(
 						$user->isLoggedIn() ? 'newarticletext' : 'newarticletextanon',
-						Skin::makeInternalOrExternalUrl(
+						wfExpandUrl( Skin::makeInternalOrExternalUrl(
 							$this->msg( 'helppage' )->inContentLanguage()->text()
-						)
+						) )
 					)->parseAsBlock();
 					// Page protected from creation
 					if ( $title->getRestrictions( 'create' ) ) {
@@ -491,27 +500,27 @@ class ApiVisualEditor extends ApiBase {
 				$links = array(
 					// Array of linked pages that are missing
 					'missing' => array(),
-					// For current revisions: true (treat all non-missing pages as existing)
-					// For old revisions: array of linked pages that exist
-					'extant' => $restoring || !$cached ? array() : true,
+					// For current revisions: 1 (treat all non-missing pages as known)
+					// For old revisions: array of linked pages that are known
+					'known' => $restoring || !$cached ? array() : 1,
 				);
 				if ( $cached ) {
-					foreach ( $cached->getLinks() as $ns => $dbks ) {
-						foreach ( $dbks as $dbk => $id ) {
-							$pft = Title::makeTitle( $ns, $dbk )->getPrefixedText();
-							if ( $id == 0 ) {
-								$links['missing'][] = $pft;
-							} elseif ( $restoring ) {
-								$links['extant'][] = $pft;
+					foreach ( $cached->getLinks() as $namespace => $cachedTitles ) {
+						foreach ( $cachedTitles as $cachedTitleText => $exists ) {
+							$cachedTitle = Title::makeTitle( $namespace, $cachedTitleText );
+							if ( !$cachedTitle->isKnown() ) {
+								$links['missing'][] = $cachedTitle->getPrefixedText();
+							} elseif ( $links['known'] !== 1 ) {
+								$links['known'][] = $cachedTitle->getPrefixedText();
 							}
 						}
 					}
 				}
 				// Add information about current page
-				if ( !$title->exists() ) {
+				if ( !$title->isKnown() ) {
 					$links['missing'][] = $title->getPrefixedText();
-				} elseif ( $restoring ) {
-					$links['extant'][] = $title->getPrefixedText();
+				} elseif ( $links['known'] !== 1 ) {
+					$links['known'][] = $title->getPrefixedText();
 				}
 
 				// On parser cache miss, just don't bother populating red link data

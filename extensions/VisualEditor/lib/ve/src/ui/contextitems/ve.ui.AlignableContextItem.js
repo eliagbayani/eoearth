@@ -7,24 +7,25 @@
 /**
  * Context item for an alignable node.
  *
- * @extends ve.ui.ContextItem
+ * @class
+ * @extends ve.ui.LinearContextItem
  *
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.AlignableContextItem = function VeAlignable( context, model, config ) {
+ve.ui.AlignableContextItem = function VeUiAlignableContextItem( context, model, config ) {
+	var align;
+
 	// Parent constructor
 	ve.ui.AlignableContextItem.super.call( this, context, model, config );
 
-	var align = model.getAttribute( 'align' );
+	align = model.getAttribute( 'align' );
 
 	this.align = new ve.ui.AlignWidget( {
 		dir: this.context.getSurface().getDir()
 	} );
-	if ( align ) {
-		this.align.selectItem( this.align.getItemFromData( align ) );
-	}
+	this.align.selectItemByData( align );
 	this.align.connect( this, { choose: 'onAlignChoose' } );
 
 	// Initialization
@@ -33,13 +34,13 @@ ve.ui.AlignableContextItem = function VeAlignable( context, model, config ) {
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.AlignableContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.AlignableContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 
 ve.ui.AlignableContextItem.static.name = 'alignable';
 
-ve.ui.AlignableContextItem.static.icon = 'align-float-left';
+ve.ui.AlignableContextItem.static.icon = 'alignLeft';
 
 ve.ui.AlignableContextItem.static.label = OO.ui.deferMsg( 'visualeditor-alignablecontextitem-title' );
 

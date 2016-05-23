@@ -44,11 +44,13 @@ ve.ui.MWMediaSearchWidget = function VeUiMWMediaSearchWidget( config ) {
 	this.queryMediaQueueCallback = this.queryMediaQueue.bind( this );
 	this.layoutQueue = [];
 	this.numItems = 0;
+	this.currentItemCache = [];
+
+	this.resultsSize = {};
 
 	this.selected = null;
 
 	this.noItemsMessage = new OO.ui.LabelWidget( {
-		$: this.$,
 		label: ve.msg( 'visualeditor-dialog-media-noresults' ),
 		classes: [ 've-ui-mwMediaSearchWidget-noresults' ]
 	} );
@@ -62,6 +64,8 @@ ve.ui.MWMediaSearchWidget = function VeUiMWMediaSearchWidget( config ) {
 		remove: 'onResultsRemove'
 	} );
 
+	this.resizeHandler = ve.debounce( this.afterResultsResize.bind( this ), 500 );
+
 	// Initialization
 	this.$element.addClass( 've-ui-mwMediaSearchWidget' );
 };
@@ -72,6 +76,49 @@ OO.inheritClass( ve.ui.MWMediaSearchWidget, OO.ui.SearchWidget );
 
 /* Methods */
 
+/**
+ * Respond to window resize and check if the result display should
+ * be updated.
+ */
+ve.ui.MWMediaSearchWidget.prototype.afterResultsResize = function () {
+	var items = this.currentItemCache,
+		value = this.query.getValue();
+
+	if (
+		items.length > 0 &&
+		(
+			this.resultsSize.width !== this.$results.width() ||
+			this.resultsSize.height !== this.$results.height()
+		)
+	) {
+		this.resetRows();
+		this.itemCache = {};
+		this.processQueueResults( items, value );
+		if ( this.results.getItems().length > 0 ) {
+			this.lazyLoadResults();
+		}
+
+		// Cache the size
+		this.resultsSize = {
+			width: this.$results.width(),
+			height: this.$results.height()
+		};
+	}
+};
+
+/**
+ * Teardown the widget; disconnect the window resize event.
+ */
+ve.ui.MWMediaSearchWidget.prototype.teardown = function () {
+	$( window ).off( 'resize', this.resizeHandler );
+};
+
+/**
+ * Setup the widget; activate the resize event.
+ */
+ve.ui.MWMediaSearchWidget.prototype.setup = function () {
+	$( window ).on( 'resize', this.resizeHandler );
+};
 /**
  * Query all sources for media.
  *
@@ -93,6 +140,7 @@ ve.ui.MWMediaSearchWidget.prototype.queryMediaQueue = function () {
 		.then( function ( items ) {
 			if ( items.length > 0 ) {
 				search.processQueueResults( items, value );
+				search.currentItemCache = search.currentItemCache.concat( items );
 			}
 
 			search.query.popPending();
@@ -121,14 +169,13 @@ ve.ui.MWMediaSearchWidget.prototype.processQueueResults = function ( items ) {
 	}
 
 	for ( i = 0, len = items.length; i < len; i++ ) {
-		title = new mw.Title( items[i].title ).getMainText();
+		title = new mw.Title( items[ i ].title ).getMainText();
 		// Do not insert duplicates
 		if ( !Object.prototype.hasOwnProperty.call( this.itemCache, title ) ) {
-			this.itemCache[title] = true;
+			this.itemCache[ title ] = true;
 			resultWidgets.push(
 				new ve.ui.MWMediaResultWidget( {
-					$: this.$,
-					data: items[i],
+					data: items[ i ],
 					rowHeight: this.rowHeight,
 					maxWidth: this.results.$element.width() / 3,
 					minWidth: 30,
@@ -159,6 +206,7 @@ ve.ui.MWMediaSearchWidget.prototype.onQueryChange = function ( value ) {
 
 	// Reset
 	this.itemCache = {};
+	this.currentItemCache = [];
 	this.resetRows();
 
 	// Empty the results queue
@@ -200,10 +248,10 @@ ve.ui.MWMediaSearchWidget.prototype.lazyLoadResults = function () {
 
 	// Lazy-load results
 	for ( i = 0; i < items.length; i++ ) {
-		elementTop = items[i].$element.position().top;
-		if ( elementTop <= position && !items[i].hasSrc() ) {
+		elementTop = items[ i ].$element.position().top;
+		if ( elementTop <= position && !items[ i ].hasSrc() ) {
 			// Load the image
-			items[i].lazyLoad();
+			items[ i ].lazyLoad();
 		}
 	}
 };
@@ -216,10 +264,11 @@ ve.ui.MWMediaSearchWidget.prototype.resetRows = function () {
 	var i, len;
 
 	for ( i = 0, len = this.rows.length; i < len; i++ ) {
-		this.rows[i].$element.remove();
+		this.rows[ i ].$element.remove();
 	}
 
 	this.rows = [];
+	this.itemCache = {};
 };
 
 /**
@@ -237,13 +286,13 @@ ve.ui.MWMediaSearchWidget.prototype.getAvailableRow = function () {
 		row = this.rows.length - 1;
 	}
 
-	if ( !this.rows[row] ) {
+	if ( !this.rows[ row ] ) {
 		// Create new row
-		this.rows[row] = {
+		this.rows[ row ] = {
 			isFull: false,
 			width: 0,
 			items: [],
-			$element: this.$( '<div>' )
+			$element: $( '<div>' )
 					.addClass( 've-ui-mwMediaResultWidget-row' )
 					.css( {
 						overflow: 'hidden'
@@ -252,15 +301,15 @@ ve.ui.MWMediaSearchWidget.prototype.getAvailableRow = function () {
 					.attr( 'data-full', false )
 		};
 		// Append to results
-		this.results.$element.append( this.rows[row].$element );
-	} else if ( this.rows[row].isFull ) {
+		this.results.$element.append( this.rows[ row ].$element );
+	} else if ( this.rows[ row ].isFull ) {
 		row++;
 		// Create new row
-		this.rows[row] = {
+		this.rows[ row ] = {
 			isFull: false,
 			width: 0,
 			items: [],
-			$element: this.$( '<div>' )
+			$element: $( '<div>' )
 				.addClass( 've-ui-mwMediaResultWidget-row' )
 				.css( {
 					overflow: 'hidden'
@@ -269,7 +318,7 @@ ve.ui.MWMediaSearchWidget.prototype.getAvailableRow = function () {
 				.attr( 'data-full', false )
 		};
 		// Append to results
-		this.results.$element.append( this.rows[row].$element );
+		this.results.$element.append( this.rows[ row ].$element );
 	}
 
 	return row;
@@ -279,6 +328,7 @@ ve.ui.MWMediaSearchWidget.prototype.getAvailableRow = function () {
  * Respond to add results event in the results widget.
  * Override the way SelectWidget and GroupElement append the items
  * into the group so we can append them in groups of rows.
+ *
  * @param {ve.ui.MWMediaResultWidget[]} items An array of item elements
  */
 ve.ui.MWMediaSearchWidget.prototype.onResultsAdd = function ( items ) {
@@ -294,25 +344,25 @@ ve.ui.MWMediaSearchWidget.prototype.onResultsAdd = function ( items ) {
 		// Go over the added items
 		row = search.getAvailableRow();
 		for ( i = 0, ilen = items.length; i < ilen; i++ ) {
-			itemWidth = items[i].$element.outerWidth( true );
+			itemWidth = items[ i ].$element.outerWidth( true );
 
 			// Add items to row until it is full
-			if ( search.rows[row].width + itemWidth >= maxRowWidth ) {
+			if ( search.rows[ row ].width + itemWidth >= maxRowWidth ) {
 				// Mark this row as full
-				search.rows[row].isFull = true;
-				search.rows[row].$element.attr( 'data-full', true );
+				search.rows[ row ].isFull = true;
+				search.rows[ row ].$element.attr( 'data-full', true );
 
 				// Find the resize factor
-				effectiveWidth = search.rows[row].width;
+				effectiveWidth = search.rows[ row ].width;
 				resizeFactor = maxRowWidth / effectiveWidth;
 
-				search.rows[row].$element.attr( 'data-effectiveWidth', effectiveWidth );
-				search.rows[row].$element.attr( 'data-resizeFactor', resizeFactor );
-				search.rows[row].$element.attr( 'data-row', row );
+				search.rows[ row ].$element.attr( 'data-effectiveWidth', effectiveWidth );
+				search.rows[ row ].$element.attr( 'data-resizeFactor', resizeFactor );
+				search.rows[ row ].$element.attr( 'data-row', row );
 
 				// Resize all images in the row to fit the width
-				for ( j = 0, jlen = search.rows[row].items.length; j < jlen; j++ ) {
-					search.rows[row].items[j].resizeThumb( resizeFactor );
+				for ( j = 0, jlen = search.rows[ row ].items.length; j < jlen; j++ ) {
+					search.rows[ row ].items[ j ].resizeThumb( resizeFactor );
 				}
 
 				// find another row
@@ -320,14 +370,14 @@ ve.ui.MWMediaSearchWidget.prototype.onResultsAdd = function ( items ) {
 			}
 
 			// Add the commulative
-			search.rows[row].width += itemWidth;
+			search.rows[ row ].width += itemWidth;
 
 			// Store reference to the item and to the row
-			search.rows[row].items.push( items[i] );
-			items[i].setRow( row );
+			search.rows[ row ].items.push( items[ i ] );
+			items[ i ].setRow( row );
 
 			// Append the item
-			search.rows[row].$element.append( items[i].$element );
+			search.rows[ row ].$element.append( items[ i ].$element );
 		}
 
 		// If we have less than 4 rows, call for more images
@@ -354,6 +404,7 @@ ve.ui.MWMediaSearchWidget.prototype.runLayoutQueue = function () {
 /**
  * Respond to removing results event in the results widget.
  * Clear the relevant rows.
+ *
  * @param {OO.ui.OptionWidget[]} items Removed items
  */
 ve.ui.MWMediaSearchWidget.prototype.onResultsRemove = function ( items ) {
@@ -361,11 +412,13 @@ ve.ui.MWMediaSearchWidget.prototype.onResultsRemove = function ( items ) {
 		// In the case of the media search widget, if any items are removed
 		// all are removed (new search)
 		this.resetRows();
+		this.currentItemCache = [];
 	}
 };
 
 /**
  * Set language for the search results.
+ *
  * @param {string} lang Language
  */
 ve.ui.MWMediaSearchWidget.prototype.setLang = function ( lang ) {
@@ -374,7 +427,8 @@ ve.ui.MWMediaSearchWidget.prototype.setLang = function ( lang ) {
 
 /**
  * Get language for the search results.
- * @returns {string} lang Language
+ *
+ * @return {string} lang Language
  */
 ve.ui.MWMediaSearchWidget.prototype.getLang = function () {
 	return this.lang;

@@ -27,54 +27,20 @@ OO.inheritClass( ve.ui.PlainTextFileTransferHandler, ve.ui.FileTransferHandler )
 
 ve.ui.PlainTextFileTransferHandler.static.name = 'plainTextFile';
 
-ve.ui.PlainTextFileTransferHandler.static.types = ['text/plain'];
+ve.ui.PlainTextFileTransferHandler.static.types = [ 'text/plain' ];
+
+ve.ui.PlainTextFileTransferHandler.static.extension = [ 'txt' ];
 
 /* Methods */
 
 /**
  * @inheritdoc
  */
-ve.ui.PlainTextFileTransferHandler.prototype.process = function () {
-	this.createProgress( this.insertableDataDeferred.promise() );
-	this.reader.readAsText( this.file );
-};
-
-/**
- * @inheritdoc
- */
-ve.ui.PlainTextFileTransferHandler.prototype.onFileProgress = function ( e ) {
-	if ( e.lengthComputable ) {
-		this.setProgress( 100 * e.loaded / e.total );
-	} else {
-		this.setProgress( false );
-	}
-};
-
-/**
- * @inheritdoc
- */
 ve.ui.PlainTextFileTransferHandler.prototype.onFileLoad = function () {
-	this.insertableDataDeferred.resolve( this.reader.result );
-	this.setProgress( 100 );
-};
+	this.resolve( this.reader.result );
 
-/**
- * @inheritdoc
- */
-ve.ui.PlainTextFileTransferHandler.prototype.onFileLoadEnd = function () {
-	// 'loadend' fires after 'load'/'abort'/'error'.
-	// Reject the deferred if it hasn't already resolved.
-	this.insertableDataDeferred.reject();
-};
-
-/**
- * @inheritdoc
- */
-ve.ui.PlainTextFileTransferHandler.prototype.abort = function () {
 	// Parent method
-	ve.ui.PlainTextFileTransferHandler.super.prototype.abort.call( this );
-
-	this.reader.abort();
+	ve.ui.PlainTextFileTransferHandler.super.prototype.onFileLoad.apply( this, arguments );
 };
 
 /* Registration */

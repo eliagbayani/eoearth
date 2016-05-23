@@ -7,13 +7,14 @@
 /**
  * Context item for a link.
  *
- * @extends ve.ui.ContextItem
+ * @class
+ * @extends ve.ui.LinearContextItem
  *
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.LinkContextItem = function VeLinkContextItem( context, model, config ) {
+ve.ui.LinkContextItem = function VeUiLinkContextItem( context, model, config ) {
 	// Parent constructor
 	ve.ui.LinkContextItem.super.call( this, context, model, config );
 
@@ -23,7 +24,7 @@ ve.ui.LinkContextItem = function VeLinkContextItem( context, model, config ) {
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.LinkContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.LinkContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 

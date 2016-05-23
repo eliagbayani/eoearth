@@ -7,14 +7,15 @@
 /**
  * Context item for a tool.
  *
- * @extends ve.ui.ContextItem
+ * @class
+ * @extends ve.ui.LinearContextItem
  *
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model the item is related to
  * @param {Function} tool Tool class the item is based on
  * @param {Object} config Configuration options
  */
-ve.ui.ToolContextItem = function VeToolContextItem( context, model, tool, config ) {
+ve.ui.ToolContextItem = function VeUiToolContextItem( context, model, tool, config ) {
 	// Parent constructor
 	ve.ui.ToolContextItem.super.call( this, context, model, config );
 
@@ -29,7 +30,7 @@ ve.ui.ToolContextItem = function VeToolContextItem( context, model, tool, config
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.ToolContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.ToolContextItem, ve.ui.LinearContextItem );
 
 /* Methods */
 
@@ -37,7 +38,7 @@ OO.inheritClass( ve.ui.ToolContextItem, ve.ui.ContextItem );
  * @inheritdoc
  */
 ve.ui.ToolContextItem.prototype.getCommand = function () {
-	return ve.ui.commandRegistry.lookup( this.tool.static.commandName );
+	return ve.init.target.commandRegistry.lookup( this.tool.static.commandName );
 };
 
 /**

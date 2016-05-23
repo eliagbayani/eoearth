@@ -45,9 +45,11 @@ ve.ui.WindowAction.static.methods = [ 'open', 'close', 'toggle' ];
  * @return {boolean} Action was executed
  */
 ve.ui.WindowAction.prototype.open = function ( name, data, action ) {
-	var windowType = this.getWindowType( name ),
+	var currentInspector, inspectorWindowManager,
+		windowType = this.getWindowType( name ),
 		windowManager = windowType && this.getWindowManager( windowType ),
-		autoClosePromise = $.Deferred().resolve().promise(),
+		currentWindow = windowManager.getCurrentWindow(),
+		autoClosePromises = [],
 		surface = this.surface,
 		fragment = surface.getModel().getFragment( undefined, true ),
 		dir = surface.getView().getDocument().getDirectionFromSelection( fragment.getSelection() ) ||
@@ -60,11 +62,24 @@ ve.ui.WindowAction.prototype.open = function ( name, data, action ) {
 	data = ve.extendObject( { dir: dir }, data, { fragment: fragment } );
 	if ( windowType === 'toolbar' || windowType === 'inspector' ) {
 		data = ve.extendObject( data, { surface: surface } );
+		// Auto-close the current window if it is different to the one we are
+		// trying to open.
 		// TODO: Make auto-close a window manager setting
-		autoClosePromise = windowManager.closeWindow( windowManager.getCurrentWindow() );
+		if ( currentWindow && currentWindow.constructor.static.name !== name ) {
+			autoClosePromises.push( windowManager.closeWindow( currentWindow ) );
+		}
 	}
 
-	autoClosePromise.always( function () {
+	// If we're opening a dialog, close all inspectors first
+	if ( windowType === 'dialog' ) {
+		inspectorWindowManager = this.getWindowManager( 'inspector' );
+		currentInspector = inspectorWindowManager.getCurrentWindow();
+		if ( currentInspector ) {
+			autoClosePromises.push( inspectorWindowManager.closeWindow( currentInspector ) );
+		}
+	}
+
+	$.when.apply( $, autoClosePromises ).always( function () {
 		windowManager.getWindow( name ).then( function ( win ) {
 			var opening = windowManager.openWindow( win, data );
 
@@ -141,7 +156,7 @@ ve.ui.WindowAction.prototype.toggle = function ( name, data ) {
 };
 
 /**
- * Get the type of a window class
+ * Get the specified window type
  *
  * @param {string} name Window name
  * @return {string|null} Window type: 'inspector', 'toolbar' or 'dialog'
@@ -159,9 +174,9 @@ ve.ui.WindowAction.prototype.getWindowType = function ( name ) {
 };
 
 /**
- * Get the window manager for a specified window class
+ * Get the window manager for a specified window type
  *
- * @param {Function} windowClass Window class
+ * @param {Function} windowType Window type: 'inspector', 'toolbar', or 'dialog'
  * @return {ve.ui.WindowManager|null} Window manager
  */
 ve.ui.WindowAction.prototype.getWindowManager = function ( windowType ) {

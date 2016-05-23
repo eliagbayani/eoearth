@@ -9,14 +9,17 @@
  * @param {string} [data.dataUri] Data URI to convert to a blob
  * @param {Blob} [data.blob] File blob
  * @param {string} [data.stringData] String data
+ * @param {string} [data.htmlStringData] HTML string data
  * @param {DataTransferItem} [data.item] Native data transfer item
+ * @param {string} [name] Item's name, for types which support it, e.g. File
  */
-ve.ui.DataTransferItem = function VeUiDataTransferItem( kind, type, data ) {
+ve.ui.DataTransferItem = function VeUiDataTransferItem( kind, type, data, name ) {
 	this.kind = kind;
 	this.type = type;
 	this.data = data;
 	this.blob = this.data.blob || null;
 	this.stringData = this.data.stringData || ve.getProp( this.blob, 'name' ) || null;
+	this.name = name;
 };
 
 /* Inheritance */
@@ -29,42 +32,46 @@ OO.initClass( ve.ui.DataTransferItem );
  * Create a data transfer item from a file blob.
  *
  * @param {Blob} blob File blob
+ * @param {string} [htmlStringData] HTML string representation of data transfer
  * @return {ve.ui.DataTransferItem} New data transfer item
  */
-ve.ui.DataTransferItem.static.newFromBlob = function ( blob ) {
-	return new ve.ui.DataTransferItem( 'file', blob.type, { blob: blob } );
+ve.ui.DataTransferItem.static.newFromBlob = function ( blob, htmlStringData ) {
+	return new ve.ui.DataTransferItem( 'file', blob.type, { blob: blob, htmlStringData: htmlStringData }, blob.name );
 };
 
 /**
  * Create a data transfer item from a data URI.
  *
  * @param {string} dataUri Data URI
+ * @param {string} [htmlStringData] HTML string representation of data transfer
  * @return {ve.ui.DataTransferItem} New data transfer item
  */
-ve.ui.DataTransferItem.static.newFromDataUri = function ( dataUri ) {
+ve.ui.DataTransferItem.static.newFromDataUri = function ( dataUri, htmlStringData ) {
 	var parts = dataUri.split( ',' );
-	return new ve.ui.DataTransferItem( 'file', parts[0].match( /^data:([^;]+)/ )[1], { dataUri: parts[1] } );
+	return new ve.ui.DataTransferItem( 'file', parts[ 0 ].match( /^data:([^;]+)/ )[ 1 ], { dataUri: parts[ 1 ], htmlStringData: htmlStringData } );
 };
 
 /**
  * Create a data transfer item from string data.
  *
- * @param {string} stringData String data
- * @param {string} type MIME type
+ * @param {string} stringData Native string data
+ * @param {string} type Native MIME type
+ * @param {string} [htmlStringData] HTML string representation of data transfer
  * @return {ve.ui.DataTransferItem} New data transfer item
  */
-ve.ui.DataTransferItem.static.newFromString = function ( stringData, type ) {
-	return new ve.ui.DataTransferItem( 'string', type || 'text/plain', { stringData: stringData } );
+ve.ui.DataTransferItem.static.newFromString = function ( stringData, type, htmlStringData ) {
+	return new ve.ui.DataTransferItem( 'string', type || 'text/plain', { stringData: stringData, htmlStringData: htmlStringData } );
 };
 
 /**
  * Create a data transfer item from a native data transfer item.
  *
  * @param {DataTransferItem} item Native data transfer item
+ * @param {string} [htmlStringData] HTML string representation of data transfer
  * @return {ve.ui.DataTransferItem} New data transfer item
  */
-ve.ui.DataTransferItem.static.newFromItem = function ( item ) {
-	return new ve.ui.DataTransferItem( item.kind, item.type, { item: item } );
+ve.ui.DataTransferItem.static.newFromItem = function ( item, htmlStringData ) {
+	return new ve.ui.DataTransferItem( item.kind, item.type, { item: item, htmlStringData: htmlStringData }, item.getAsFile().name );
 };
 
 /**
@@ -75,11 +82,11 @@ ve.ui.DataTransferItem.static.newFromItem = function ( item ) {
  * @return {Blob} File blob
  */
 ve.ui.DataTransferItem.prototype.getAsFile = function () {
+	var binary, array, i;
+
 	if ( this.data.item ) {
 		return this.data.item.getAsFile();
 	}
-
-	var binary, array, i;
 
 	if ( !this.blob && this.data.dataUri ) {
 		binary = atob( this.data.dataUri );
@@ -94,6 +101,15 @@ ve.ui.DataTransferItem.prototype.getAsFile = function () {
 		);
 	}
 	return this.blob;
+};
+
+/**
+ * Get the extension of the item's name
+ *
+ * @return {string|null} The extension of the item's name, or null if not present
+ */
+ve.ui.DataTransferItem.prototype.getExtension = function () {
+	return this.name ? this.name.split( '.' ).pop() : null;
 };
 
 /**

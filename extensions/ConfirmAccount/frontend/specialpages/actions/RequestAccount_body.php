@@ -112,7 +112,7 @@ class RequestAccountPage extends SpecialPage {
 
 		$form .= '<fieldset><legend>' . $this->msg( 'requestaccount-leg-user' )->escaped() . '</legend>';
 		$form .= $this->msg( 'requestaccount-acc-text' )->parseAsBlock() . "\n";
-		$form .= '<table cellpadding=\'4\'>';
+		$form .= '<table style="padding:4px;">';
 		if ( $this->hasItem( 'UserName' ) ) {
 			$form .= "<tr><td>" . Xml::label( $this->msg( 'username' )->text(), 'wpUsername' ) . "</td>";
 			$form .= "<td>" . Xml::input( 'wpUsername', 30, $this->mUsername, array( 'id' => 'wpUsername' ) ) . "</td></tr>\n";
@@ -143,12 +143,12 @@ class RequestAccountPage extends SpecialPage {
 			$form .=  $this->msg( 'requestaccount-areas-text' )->parseAsBlock() . "\n";
 
 			$form .= "<div style='height:150px; overflow:scroll; background-color:#f9f9f9;'>";
-			$form .= "<table cellspacing='5' cellpadding='0' style='background-color:#f9f9f9;'><tr valign='top'>";
+			$form .= "<table style='border-spacing:5px; padding:0px; background-color:#f9f9f9;'><tr valign='top'>";
 			$count = 0;
 			foreach ( $userAreas as $name => $conf ) {
 				$count++;
 				if ( $count > 5 ) {
-					$form .= "</tr><tr valign='top'>";
+					$form .= "</tr><tr style='vertical-align:top;'>";
 					$count = 1;
 				}
 				$formName = "wpArea-" . htmlspecialchars( str_replace( ' ', '_', $name ) );
@@ -170,7 +170,7 @@ class RequestAccountPage extends SpecialPage {
 			$form .= '<fieldset>';
 			$form .= '<legend>' . $this->msg( 'requestaccount-leg-person' )->escaped() . '</legend>';
 			if ( $this->hasItem( 'RealName' ) ) {
-				$form .= '<table cellpadding=\'4\'>';
+				$form .= '<table style="padding:4px;">';
 				$form .= "<tr><td>" . Xml::label( $this->msg( 'requestaccount-real' )->text(), 'wpRealName' ) . "</td>";
 				$form .= "<td>" . Xml::input( 'wpRealName', 35, $this->mRealName, array( 'id' => 'wpRealName' ) ) . "</td></tr>\n";
 				$form .= '</table>';
@@ -228,7 +228,14 @@ class RequestAccountPage extends SpecialPage {
 			# Hook point to add captchas
 			$form .= '<fieldset>';
 			$form .= $this->msg( 'captcha-createaccount' )->parseAsBlock();
+            
+            /* original, commented due to error, suggested fix below
 			$form .= $captcha->getForm();
+            */
+			
+			//fix from: https://www.mediawiki.org/wiki/Topic:Sxl47i90ybevish0
+			$form .= $captcha->getForm($this->getOutput());
+			
 			$form .= '</fieldset>';
 		}
 		$form .= Html::Hidden( 'title', $this->getPageTitle()->getPrefixedDBKey() ) . "\n";
@@ -268,7 +275,7 @@ class RequestAccountPage extends SpecialPage {
 			$wgCaptchaTriggers['createaccount'] = false;
 		}
 		$abortError = '';
-		if ( !wfRunHooks( 'AbortNewAccount', array( $u, &$abortError ) ) ) {
+		if ( !Hooks::run( 'AbortNewAccount', array( $u, &$abortError ) ) ) {
 			// Hook point to add extra creation throttles and blocks
 			wfDebug( "RequestAccount::doSubmit: a hook blocked creation\n" );
 			$this->showForm( $abortError );
@@ -351,7 +358,7 @@ class RequestAccountPage extends SpecialPage {
 	 * @return void
 	 */
 	protected function confirmEmailToken( $code ) {
-		global $wgConfirmAccountContact, $wgPasswordSender, $wgPasswordSenderName;
+		global $wgConfirmAccountContact, $wgPasswordSender;
 
 		$reqUser = $this->getUser();
 		$out = $this->getOutput();
@@ -368,11 +375,11 @@ class RequestAccountPage extends SpecialPage {
 				$subject = $this->msg(
 					'requestaccount-email-subj-admin' )->inContentLanguage()->escaped();
 				$body = $this->msg(
-					'requestaccount-email-body-admin', $name )->rawParams(
-						$title->getFullUrl() )->inContentLanguage()->escaped();
+					'requestaccount-email-body-admin', $name )->params(
+						$title->getFullUrl() )->inContentLanguage()->text();
 				# Actually send the email...
 				if ( $wgConfirmAccountContact != '' ) {
-					$source = new MailAddress( $wgPasswordSender, $wgPasswordSenderName );
+					$source = new MailAddress( $wgPasswordSender, wfMessage( 'emailsender' )->text() );
 					$target = new MailAddress( $wgConfirmAccountContact );
 					$result = UserMailer::send( $target, $source, $subject, $body );
 					if ( !$result->isOK() ) {
@@ -390,7 +397,7 @@ class RequestAccountPage extends SpecialPage {
 			$out->returnToMain();
 		} else {
 			# Maybe the user confirmed after account was created...
-			$user = User::newFromConfirmationCode( $code );
+			$user = User::newFromConfirmationCode( $code, User::READ_LATEST );
 			if ( is_object( $user ) ) {
 				$user->confirmEmail();
 				$user->saveSettings();
@@ -406,5 +413,9 @@ class RequestAccountPage extends SpecialPage {
 				$out->addWikiMsg( 'confirmemail_invalid' );
 			}
 		}
+	}
+
+	protected function getGroupName() {
+		return 'login';
 	}
 }

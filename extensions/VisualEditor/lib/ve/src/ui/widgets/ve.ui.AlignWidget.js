@@ -15,28 +15,27 @@
  * @cfg {string} [dir='ltr'] Interface directionality
  */
 ve.ui.AlignWidget = function VeUiAlignWidget( config ) {
+	var alignButtons;
+
 	config = config || {};
 
 	// Parent constructor
 	ve.ui.AlignWidget.super.call( this, config );
 
-	var alignButtons = [
+	alignButtons = [
 			new OO.ui.ButtonOptionWidget( {
-				$: this.$,
 				data: 'left',
-				icon: 'align-float-left',
+				icon: 'alignLeft',
 				label: ve.msg( 'visualeditor-align-widget-left' )
 			} ),
 			new OO.ui.ButtonOptionWidget( {
-				$: this.$,
 				data: 'center',
-				icon: 'align-center',
+				icon: 'alignCentre',
 				label: ve.msg( 'visualeditor-align-widget-center' )
 			} ),
 			new OO.ui.ButtonOptionWidget( {
-				$: this.$,
 				data: 'right',
-				icon: 'align-float-right',
+				icon: 'alignRight',
 				label: ve.msg( 'visualeditor-align-widget-right' )
 			} )
 		];

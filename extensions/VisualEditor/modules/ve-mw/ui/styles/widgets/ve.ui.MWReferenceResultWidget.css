@@ -11,7 +11,11 @@
 	border-bottom: solid 1px #eee;
 }
 
-.ve-ui-mwReferenceResultWidget .oo-ui-labelElement-label {
+.ve-ui-mwReferenceResultWidget:last-child {
+	border-bottom: 0;
+}
+
+.ve-ui-mwReferenceResultWidget.oo-ui-labelElement .oo-ui-labelElement-label {
 	white-space: normal;
 }
 
@@ -21,8 +25,4 @@
 	left: 0;
 	bottom: 0;
 	right: 0;
-}
-
-.ve-ui-mwReferenceResultWidget-divider {
-	font-weight: bold;
 }

@@ -25,7 +25,7 @@ $specialPageAliases['ar'] = array(
 	'CreatePageRedirect' => array( 'إنشاء_صفحة_تحويلة' ),
 );
 
-/** Egyptian Spoken Arabic (مصرى) */
+/** Egyptian Arabic (مصرى) */
 $specialPageAliases['arz'] = array(
 	'CreatePageRedirect' => array( 'عمل_صفحه_تحويله' ),
 );
@@ -105,9 +105,9 @@ $specialPageAliases['lb'] = array(
 	'CreatePageRedirect' => array( 'Viruleedung_vu_Säiten_uleeën' ),
 );
 
-/** لوری (لوری) */
+/** Northern Luri (لۊری شومالی) */
 $specialPageAliases['lrc'] = array(
-	'CreatePageRedirect' => array( 'راس_کردن_بلگه_واگردونی' ),
+	'CreatePageRedirect' => array( 'راس_کئردئن_بألگە_واگردونی' ),
 );
 
 /** Malagasy (Malagasy) */

@@ -70,21 +70,21 @@ ve.Range.static.newFromHash = function ( hash ) {
  * @static
  * @param {Array} ranges Array of ve.Range objects (at least one)
  * @param {boolean} backwards Return a backwards range
- * @returns {ve.Range} Range that spans all of the given ranges
+ * @return {ve.Range} Range that spans all of the given ranges
  */
 ve.Range.static.newCoveringRange = function ( ranges, backwards ) {
 	var minStart, maxEnd, i, range;
 	if ( !ranges || ranges.length === 0 ) {
 		throw new Error( 'newCoveringRange() requires at least one range' );
 	}
-	minStart = ranges[0].start;
-	maxEnd = ranges[0].end;
+	minStart = ranges[ 0 ].start;
+	maxEnd = ranges[ 0 ].end;
 	for ( i = 1; i < ranges.length; i++ ) {
-		if ( ranges[i].start < minStart ) {
-			minStart = ranges[i].start;
+		if ( ranges[ i ].start < minStart ) {
+			minStart = ranges[ i ].start;
 		}
-		if ( ranges[i].end > maxEnd ) {
-			maxEnd = ranges[i].end;
+		if ( ranges[ i ].end > maxEnd ) {
+			maxEnd = ranges[ i ].end;
 		}
 	}
 	if ( backwards ) {
@@ -100,7 +100,7 @@ ve.Range.static.newCoveringRange = function ( ranges, backwards ) {
 /**
  * Get a clone.
  *
- * @returns {ve.Range} Clone of range
+ * @return {ve.Range} Clone of range
  */
 ve.Range.prototype.clone = function () {
 	return new this.constructor( this.from, this.to );
@@ -113,7 +113,7 @@ ve.Range.prototype.clone = function () {
  * this is the same as #containsRange( new ve.Range( offset, offset + 1 ) ).
  *
  * @param {number} offset Offset to check
- * @returns {boolean} If offset is within the range
+ * @return {boolean} If offset is within the range
  */
 ve.Range.prototype.containsOffset = function ( offset ) {
 	return offset >= this.start && offset < this.end;
@@ -122,8 +122,8 @@ ve.Range.prototype.containsOffset = function ( offset ) {
 /**
  * Check if another range is within the range.
  *
- * @param {ve.Range} offset Range to check
- * @returns {boolean} If other range is within the range
+ * @param {ve.Range} range Range to check
+ * @return {boolean} If other range is within the range
  */
 ve.Range.prototype.containsRange = function ( range ) {
 	return range.start >= this.start && range.end <= this.end;
@@ -132,7 +132,7 @@ ve.Range.prototype.containsRange = function ( range ) {
 /**
  * Get the length of the range.
  *
- * @returns {number} Length of range
+ * @return {number} Length of range
  */
 ve.Range.prototype.getLength = function () {
 	return this.end - this.start;
@@ -141,7 +141,7 @@ ve.Range.prototype.getLength = function () {
 /**
  * Gets a range with reversed direction.
  *
- * @returns {ve.Range} A new range
+ * @return {ve.Range} A new range
  */
 ve.Range.prototype.flip = function () {
 	return new ve.Range( this.to, this.from );
@@ -151,7 +151,7 @@ ve.Range.prototype.flip = function () {
  * Get a range that's a translated version of this one.
  *
  * @param {number} distance Distance to move range by
- * @returns {ve.Range} New translated range
+ * @return {ve.Range} New translated range
  */
 ve.Range.prototype.translate = function ( distance ) {
 	return new ve.Range( this.from + distance, this.to + distance );
@@ -161,7 +161,7 @@ ve.Range.prototype.translate = function ( distance ) {
  * Check if two ranges are equal, taking direction into account.
  *
  * @param {ve.Range|null} other
- * @returns {boolean}
+ * @return {boolean}
  */
 ve.Range.prototype.equals = function ( other ) {
 	return other && this.from === other.from && this.to === other.to;
@@ -171,26 +171,26 @@ ve.Range.prototype.equals = function ( other ) {
  * Check if two ranges are equal, ignoring direction.
  *
  * @param {ve.Range|null} other
- * @returns {boolean}
+ * @return {boolean}
  */
 ve.Range.prototype.equalsSelection = function ( other ) {
 	return other && this.end === other.end && this.start === other.start;
 };
 
 /**
- * Create a new range with a limited length.
+ * Create a new range with a truncated length.
  *
- * @param {number} length Length of the new range (negative for truncate from right)
- * @returns {ve.Range} A new range
+ * @param {number} limit Maximum length of new range (negative for left-side truncation)
+ * @return {ve.Range} A new range
  */
-ve.Range.prototype.truncate = function ( length ) {
-	if ( length >= 0 ) {
+ve.Range.prototype.truncate = function ( limit ) {
+	if ( limit >= 0 ) {
 		return new ve.Range(
-			this.start, Math.min( this.start + length, this.end )
+			this.start, Math.min( this.start + limit, this.end )
 		);
 	} else {
 		return new ve.Range(
-			Math.max( this.end + length, this.start ), this.end
+			Math.max( this.end + limit, this.start ), this.end
 		);
 	}
 };
@@ -202,7 +202,7 @@ ve.Range.prototype.truncate = function ( length ) {
  * @return {ve.Range} Range covering this range and other
  */
 ve.Range.prototype.expand = function ( other ) {
-	return ve.Range.static.newCoveringRange( [this, other], this.isBackwards() );
+	return ve.Range.static.newCoveringRange( [ this, other ], this.isBackwards() );
 };
 
 /**
@@ -210,7 +210,7 @@ ve.Range.prototype.expand = function ( other ) {
  *
  * A collapsed range has equal start and end values making its length zero.
  *
- * @returns {boolean} Range is collapsed
+ * @return {boolean} Range is collapsed
  */
 ve.Range.prototype.isCollapsed = function () {
 	return this.from === this.to;
@@ -219,7 +219,7 @@ ve.Range.prototype.isCollapsed = function () {
 /**
  * Check if the range is backwards, i.e. from > to
  *
- * @returns {boolean} Range is backwards
+ * @return {boolean} Range is backwards
  */
 ve.Range.prototype.isBackwards = function () {
 	return this.from > this.to;
@@ -228,7 +228,7 @@ ve.Range.prototype.isBackwards = function () {
 /**
  * Get a object summarizing the range for JSON serialization
  *
- * @returns {Object} Object for JSON serialization
+ * @return {Object} Object for JSON serialization
  */
 ve.Range.prototype.toJSON = function () {
 	return {

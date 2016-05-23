@@ -31,6 +31,7 @@ ve.ce.whitespacePattern = /[\u0020\u00A0]/g;
 ve.ce.minImgDataUri = 'data:image/gif;base64,R0lGODdhAQABAADcACwAAAAAAQABAAA';
 ve.ce.unicornImgDataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAATCAQAAADly58hAAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfeChIMMi319aEqAAAAzUlEQVQoz4XSMUoDURAG4K8NIljaeQZrCwsRb5FWL5Daa1iIjQewTycphAQloBEUAoogFmqMsiBmHSzcdfOWlcyU3/+YGXgsqJZMbvv/wLqZDCw1B9rCBSaOmgOHQsfQvVYT7wszIbPSxO9CCF8ebNXx1J2TIvDoxlrKU3mBIYz1U87mMISB3QqXk7e/A4bp1WV/CiE3sFHymZ4X4cO57yLWdVDyjoknr47/MPRcput1k+ljt/O4V1vu2bXViq9qPNW3WfGoxrk37UVfxQ999n1bP+Vh5gAAAABJRU5ErkJggg==';
 ve.ce.chimeraImgDataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAABGdBTUEAALGPC/xhBQAAAThJREFUOMvF088rRFEYxvGpKdnwJ8iStVnMytZ2ipJmI6xmZKEUe5aUULMzCxtlSkzNjCh2lClFSUpDmYj8KBZq6vreetLbrXs5Rjn1aWbuuee575z7nljsH8YkepoNaccsHrGFgWbCWpHCLZb+oroFzKOEbpeFHVp8gitsYltzSRyiqrkKhsKCevGMfWQwor/2ghns4BQTGMMcnlBA3Aa14U5VLeMDnqrq1/cDpHGv35eqrI5pG+Y/qYYp3WiN6zOHs8DcA7IK/BqLWMOuY5inQjwbNqheGnYMO9d+XtiwFu1BQU/y96ooKRO2Yq6vqog3jAbfZgKvuDELfGWFXQeu76GB9bD26MQRNnSMotTVJvGoxs2rx2oR/B47Rtd3pyBv3lCYnEtYWo0Yps8l7F3HKErjJ2G/Hp/F9YtlR3MQiAAAAABJRU5ErkJggg==';
+ve.ce.nailImgDataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAsElEQVQ4y%2B3RzYnCYBSF4ScOOtjBdGGKkCBYRZYWYE%2B2MNvgShAFp4JpQUZwoXFhAoPk0y%2F4s%2FLAXdzFfTn3HF6gT0yxxBZ%2FKDBsC%2FrCBmXDHDCOBfWwDoDqWcXCJjdAJfaxsCIC9h067lzsg3ta6zS0GFSWZTCLhS9C76VpWoffjYWNkyQ5BkAl8ravjzDHrnKSV6FfDb%2BN8n9O80cA3%2B7O%2BmgJW%2BMXffxU%2B0McPlcnctpQa2TeZewAAAAASUVORK5CYII%3D';
 
 /* Static Methods */
 
@@ -43,7 +44,7 @@ ve.ce.chimeraImgDataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAA
  *
  * @method
  * @param {HTMLElement} element DOM element to get text of
- * @returns {string} Plain text of DOM element
+ * @return {string} Plain text of DOM element
  */
 ve.ce.getDomText = function ( element ) {
 	// Inspired by jQuery.text / Sizzle.getText
@@ -63,13 +64,16 @@ ve.ce.getDomText = function ( element ) {
 				// contain a single nbsp/FEFF character in the DOM, so make sure
 				// that character isn't counted
 				return '';
+			} else if ( $element.hasClass( 've-ce-cursorHolder' ) ) {
+				// Cursor holders do not exist in the model
+				return '';
 			} else if ( $element.hasClass( 've-ce-leafNode' ) ) {
 				// For leaf nodes, don't return the content, but return
 				// the right number of placeholder characters so the offsets match up.
 				viewNode = $element.data( 'view' );
 				// Only return snowmen for the first element in a sibling group: otherwise
 				// we'll double-count this node
-				if ( viewNode && element === viewNode.$element[0] ) {
+				if ( viewNode && element === viewNode.$element[ 0 ] ) {
 					// \u2603 is the snowman character: ☃
 					return new Array( viewNode.getOuterLength() + 1 ).join( '\u2603' );
 				}
@@ -101,24 +105,30 @@ ve.ce.getDomText = function ( element ) {
  *
  * @method
  * @param {HTMLElement} element DOM element to get hash of
- * @returns {string} Hash of DOM element
+ * @return {string} Hash of DOM element
  */
 ve.ce.getDomHash = function ( element ) {
-	var nodeType = element.nodeType,
+	var $element,
+		nodeType = element.nodeType,
 		nodeName = element.nodeName,
 		hash = '';
 
 	if ( nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE ) {
 		return '#';
 	} else if ( nodeType === Node.ELEMENT_NODE || nodeType === Node.DOCUMENT_NODE ) {
-		hash += '<' + nodeName + '>';
-		if ( !$( element ).hasClass( 've-ce-branchNode-blockSlug' ) ) {
+		$element = $( element );
+		if ( !(
+			$element.hasClass( 've-ce-branchNode-blockSlug' ) ||
+			$element.hasClass( 've-ce-cursorHolder' ) ||
+			$element.hasClass( 've-ce-nail' )
+		) ) {
+			hash += '<' + nodeName + '>';
 			// Traverse its children
 			for ( element = element.firstChild; element; element = element.nextSibling ) {
 				hash += ve.ce.getDomHash( element );
 			}
+			hash += '</' + nodeName + '>';
 		}
-		hash += '</' + nodeName + '>';
 		// Merge adjacent text node representations
 		hash = hash.replace( /##+/g, '#' );
 	}
@@ -129,9 +139,9 @@ ve.ce.getDomHash = function ( element ) {
  * Get the first cursor offset immediately after a node.
  *
  * @param {Node} node DOM node
- * @returns {Object}
- * @returns {Node} return.node
- * @returns {number} return.offset
+ * @return {Object}
+ * @return {Node} return.node
+ * @return {number} return.offset
  */
 ve.ce.nextCursorOffset = function ( node ) {
 	var nextNode, offset;
@@ -149,9 +159,9 @@ ve.ce.nextCursorOffset = function ( node ) {
  * Get the first cursor offset immediately before a node.
  *
  * @param {Node} node DOM node
- * @returns {Object}
- * @returns {Node} return.node
- * @returns {number} return.offset
+ * @return {Object}
+ * @return {Node} return.node
+ * @return {number} return.offset
  */
 ve.ce.previousCursorOffset = function ( node ) {
 	var previousNode, offset;
@@ -171,7 +181,7 @@ ve.ce.previousCursorOffset = function ( node ) {
  * @method
  * @param {HTMLElement} domNode DOM node
  * @param {number} domOffset DOM offset within the DOM node
- * @returns {number} Linear model offset
+ * @return {number} Linear model offset
  * @throws {Error} domOffset is out of bounds
  * @throws {Error} domNode has no ancestor with a .data( 'view' )
  * @throws {Error} domNode is not in document
@@ -206,7 +216,7 @@ ve.ce.getOffset = function ( domNode, domOffset ) {
 	 * - Traversal-consecutive non-view nodes are either all alienated or all not alienated.
 	 *
 	 * @param {Node} n Node to traverse from
-	 * @returns {Node} Previous traversal node from n
+	 * @return {Node} Previous traversal node from n
 	 * @throws {Error} domNode has no ancestor with a .data( 'view' )
 	 */
 	function traverse( n ) {
@@ -238,7 +248,7 @@ ve.ce.getOffset = function ( domNode, domOffset ) {
 	} else {
 		maxOffset = domNode.data.length;
 	}
-	if ( domOffset < 0 || domOffset > maxOffset) {
+	if ( domOffset < 0 || domOffset > maxOffset ) {
 		throw new Error( 'domOffset is out of bounds' );
 	}
 
@@ -278,12 +288,15 @@ ve.ce.getOffset = function ( domNode, domOffset ) {
 		} else {
 			// Offset is right before childNodes[domOffset]. Set startNode to this node
 			// (i.e. the node right after the offset), then traverse back once.
-			startNode = domNode.childNodes[domOffset];
+			startNode = domNode.childNodes[ domOffset ];
 			node = traverse( startNode );
 		}
 	} else {
 		// Text inside of a block slug doesn't count
-		if ( !$( domNode.parentNode ).hasClass( 've-ce-branchNode-blockSlug' ) ) {
+		if ( !(
+			$( domNode.parentNode ).hasClass( 've-ce-branchNode-blockSlug' ) ||
+			$( domNode.parentNode ).hasClass( 've-ce-cursorHolder' )
+		) ) {
 			lengthSum += domOffset;
 		}
 		startNode = domNode;
@@ -304,7 +317,11 @@ ve.ce.getOffset = function ( domNode, domOffset ) {
 		}
 
 		// Text inside of a block slug doesn't count
-		if ( node.nodeType === Node.TEXT_NODE && !$( node.parentNode ).hasClass( 've-ce-branchNode-blockSlug' ) ) {
+		if (
+			node.nodeType === Node.TEXT_NODE &&
+			!$( node.parentNode ).hasClass( 've-ce-branchNode-blockSlug' ) &&
+			!$( node.parentNode ).hasClass( 've-ce-cursorHolder' )
+		) {
 			lengthSum += node.data.length;
 		}
 		// else: non-text nodes that don't have a .data( 'view' ) don't exist in the DM
@@ -346,7 +363,7 @@ ve.ce.getOffset = function ( domNode, domOffset ) {
  *
  * @method
  * @param {HTMLElement} element Slug DOM element
- * @returns {number} Linear model offset
+ * @return {number} Linear model offset
  * @throws {Error}
  */
 ve.ce.getOffsetOfSlug = function ( element ) {
@@ -363,11 +380,56 @@ ve.ce.getOffsetOfSlug = function ( element ) {
 };
 
 /**
+ * Test whether the DOM position lies straight after annotation boundaries
+ *
+ * "Straight after" means that in document order, there are annotation open/close tags
+ * immediately before the position, and there are none immediately after.
+ *
+ * This is important for cursors: the DM position is ambiguous with respect to annotation
+ * boundaries, and the browser does not fully distinguish this position from the preceding
+ * position immediately before the annotation boundaries (e.g. 'a|&lt;b&gt;c' and 'a&lt;b&gt;|c'),
+ * but the two positions behave differently for insertions (in this case, whether the text
+ * appears bolded or not).
+ *
+ * In Chromium, cursor focus normalizes to the earliest (in document order) of equivalent
+ * positions, at least in reasonably-styled non-BIDI text. But in Firefox, the user can
+ * cursor/click into either the earliest or the latest equivalent position: the cursor lands in
+ * the closest (in document order) to the click location (for mouse actions) or cursor start
+ * location (for cursoring).
+ *
+ * @param {Node} node Position node
+ * @param {number} offset Position offset
+ * @return {boolean} Whether this is the end-most of multiple cursor-equivalent positions
+ */
+ve.ce.isAfterAnnotationBoundary = function ( node, offset ) {
+	var previousNode;
+	if ( node.nodeType === Node.TEXT_NODE ) {
+		if ( offset > 0 ) {
+			return false;
+		}
+		offset = Array.prototype.indexOf.call( node.parentNode.childNodes, node );
+		node = node.parentNode;
+	}
+	if ( offset === 0 ) {
+		return ve.dm.modelRegistry.isAnnotation( node );
+	}
+
+	previousNode = node.childNodes[ offset - 1 ];
+	if ( previousNode.nodeType === Node.ELEMENT_NODE && (
+		previousNode.classList.contains( 've-ce-nail-post-close' ) ||
+		previousNode.classList.contains( 've-ce-nail-post-open' )
+	) ) {
+		return true;
+	}
+	return ve.dm.modelRegistry.isAnnotation( previousNode );
+};
+
+/**
  * Check if keyboard shortcut modifier key is pressed.
  *
  * @method
  * @param {jQuery.Event} e Key press event
- * @returns {boolean} Modifier key is pressed
+ * @return {boolean} Modifier key is pressed
  */
 ve.ce.isShortcutKey = function ( e ) {
 	return !!( e.ctrlKey || e.metaKey );
@@ -381,7 +443,7 @@ ve.ce.isShortcutKey = function ( e ) {
  * @param {number} selection.anchorOffset
  * @param {Node} selection.focusNode
  * @param {number} selection.focusOffset
- * @returns {ve.Range|null} DM range, or null if nothing in the CE document is selected
+ * @return {ve.Range|null} DM range, or null if nothing in the CE document is selected
  */
 ve.ce.veRangeFromSelection = function ( selection ) {
 	try {
@@ -392,4 +454,17 @@ ve.ce.veRangeFromSelection = function ( selection ) {
 	} catch ( e ) {
 		return null;
 	}
+};
+
+/**
+ * Find the link in which a node lies
+ *
+ * @param {Node|null} node The node to test
+ * @return {Node|null} The link within which the node lies (possibly the node itself)
+ */
+ve.ce.linkAt = function ( node ) {
+	if ( node && node.nodeType === Node.TEXT_NODE ) {
+		node = node.parentNode;
+	}
+	return $( node ).closest( '.ve-ce-linkAnnotation' )[ 0 ];
 };

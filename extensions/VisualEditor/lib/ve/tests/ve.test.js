@@ -29,70 +29,70 @@ QUnit.module( 've' );
 QUnit.test( 'compareClassLists', 1, function ( assert ) {
 	var i, cases = [
 		{
-			args: ['', ''],
+			args: [ '', '' ],
 			expected: true
 		},
 		{
-			args: ['', []],
+			args: [ '', [] ],
 			expected: true
 		},
 		{
-			args: [[], []],
+			args: [ [], [] ],
 			expected: true
 		},
 		{
-			args: ['', ['']],
+			args: [ '', [ '' ] ],
 			expected: true
 		},
 		{
-			args: [[], ['']],
+			args: [ [], [ '' ] ],
 			expected: true
 		},
 		{
-			args: ['foo', ''],
+			args: [ 'foo', '' ],
 			expected: false
 		},
 		{
-			args: ['foo', 'foo'],
+			args: [ 'foo', 'foo' ],
 			expected: true
 		},
 		{
-			args: ['foo', 'bar'],
+			args: [ 'foo', 'bar' ],
 			expected: false
 		},
 		{
-			args: ['foo', 'foo bar'],
+			args: [ 'foo', 'foo bar' ],
 			expected: false
 		},
 		{
-			args: ['foo', ['foo']],
+			args: [ 'foo', [ 'foo' ] ],
 			expected: true
 		},
 		{
-			args: [['foo'], 'bar'],
+			args: [ [ 'foo' ], 'bar' ],
 			expected: false
 		},
 		{
-			args: ['foo', ['foo', 'bar']],
+			args: [ 'foo', [ 'foo', 'bar' ] ],
 			expected: false
 		},
 		{
-			args: ['foo', ['foo', 'foo']],
+			args: [ 'foo', [ 'foo', 'foo' ] ],
 			expected: true
 		},
 		{
-			args: [['foo'], 'foo foo'],
+			args: [ [ 'foo' ], 'foo foo' ],
 			expected: true
 		},
 		{
-			args: ['foo bar foo', 'foo foo'],
+			args: [ 'foo bar foo', 'foo foo' ],
 			expected: false
 		}
 	];
 
 	QUnit.expect( cases.length );
 	for ( i = 0; i < cases.length; i++ ) {
-		assert.strictEqual( ve.compareClassLists.apply( ve, cases[i].args ), cases[i].expected );
+		assert.strictEqual( ve.compareClassLists.apply( ve, cases[ i ].args ), cases[ i ].expected );
 	}
 } );
 
@@ -185,7 +185,7 @@ QUnit.test( 'setDomAttributes', 7, function ( assert ) {
 	);
 
 	target = sample.cloneNode();
-	ve.setDomAttributes( target, { onclick: 'alert(1);', foo: 'update', add: 'whee' }, ['foo', 'add'] );
+	ve.setDomAttributes( target, { onclick: 'alert(1);', foo: 'update', add: 'whee' }, [ 'foo', 'add' ] );
 	assert.ok( !target.hasAttribute( 'onclick' ), 'whitelist affects creating attributes' );
 	assert.deepEqual(
 		ve.getDomAttributes( target ),
@@ -194,7 +194,7 @@ QUnit.test( 'setDomAttributes', 7, function ( assert ) {
 	);
 
 	target = document.createElement( 'div' );
-	ve.setDomAttributes( target, { Foo: 'add', Bar: 'add' }, ['bar'] );
+	ve.setDomAttributes( target, { Foo: 'add', Bar: 'add' }, [ 'bar' ] );
 	assert.deepEqual(
 		ve.getDomAttributes( target ),
 		{ bar: 'add' },
@@ -202,7 +202,7 @@ QUnit.test( 'setDomAttributes', 7, function ( assert ) {
 	);
 
 	target = sample.cloneNode();
-	ve.setDomAttributes( target, { foo: 'update', bar: null }, ['bar', 'baz'] );
+	ve.setDomAttributes( target, { foo: 'update', bar: null }, [ 'bar', 'baz' ] );
 	assert.propEqual(
 		ve.getDomAttributes( target ),
 		{ foo: 'one', baz: 'three' },
@@ -266,35 +266,53 @@ QUnit.test( 'getOpeningHtmlTag', 3, function ( assert ) {
 	);
 } );
 
-QUnit.test( 'batchSplice', 8, function ( assert ) {
-	var actualRet, expectedRet, i,
-		actual = [ 'a', 'b', 'c', 'd', 'e' ],
-		expected = actual.slice( 0 ),
-		bigArr = [];
+QUnit.test( 'batchSplice', function ( assert ) {
+	var spliceWasSupported = ve.supportsSplice;
 
-	actualRet = ve.batchSplice( actual, 1, 1, [] );
-	expectedRet = expected.splice( 1, 1 );
-	assert.deepEqual( expectedRet, actualRet, 'removing 1 element (return value)' );
-	assert.deepEqual( expected, actual, 'removing 1 element (array)' );
+	function assertBatchSplice() {
+		var actualRet, expectedRet, msg, i,
+			actual = [ 'a', 'b', 'c', 'd', 'e' ],
+			expected = actual.slice( 0 ),
+			bigArr = [];
 
-	actualRet = ve.batchSplice( actual, 3, 2, [ 'w', 'x', 'y', 'z' ] );
-	expectedRet = expected.splice( 3, 2, 'w', 'x', 'y', 'z' );
-	assert.deepEqual( expectedRet, actualRet, 'replacing 2 elements with 4 elements (return value)' );
-	assert.deepEqual( expected, actual, 'replacing 2 elements with 4 elements (array)' );
+		msg = ve.supportsSplice ? 'Array#splice native' : 'Array#splice polyfill';
 
-	actualRet = ve.batchSplice( actual, 0, 0, [ 'f', 'o', 'o' ] );
-	expectedRet = expected.splice( 0, 0, 'f', 'o', 'o' );
-	assert.deepEqual( expectedRet, actualRet, 'inserting 3 elements (return value)' );
-	assert.deepEqual( expected, actual, 'inserting 3 elements (array)' );
+		actualRet = ve.batchSplice( actual, 1, 1, [] );
+		expectedRet = expected.splice( 1, 1 );
+		assert.deepEqual( expectedRet, actualRet, msg + ': removing 1 element (return value)' );
+		assert.deepEqual( expected, actual, msg + ': removing 1 element (array)' );
 
-	for ( i = 0; i < 2100; i++ ) {
-		bigArr[i] = i;
+		actualRet = ve.batchSplice( actual, 3, 2, [ 'w', 'x', 'y', 'z' ] );
+		expectedRet = expected.splice( 3, 2, 'w', 'x', 'y', 'z' );
+		assert.deepEqual( expectedRet, actualRet, msg + ': replacing 2 elements with 4 elements (return value)' );
+		assert.deepEqual( expected, actual, msg + ': replacing 2 elements with 4 elements (array)' );
+
+		actualRet = ve.batchSplice( actual, 0, 0, [ 'f', 'o', 'o' ] );
+		expectedRet = expected.splice( 0, 0, 'f', 'o', 'o' );
+		assert.deepEqual( expectedRet, actualRet, msg + ': inserting 3 elements (return value)' );
+		assert.deepEqual( expected, actual, msg + ': inserting 3 elements (array)' );
+
+		for ( i = 0; i < 2100; i++ ) {
+			bigArr[ i ] = i;
+		}
+		actualRet = ve.batchSplice( actual, 2, 3, bigArr );
+		expectedRet = expected.splice.apply( expected, [ 2, 3 ].concat( bigArr.slice( 0, 1050 ) ) );
+		expected.splice.apply( expected, [ 1052, 0 ].concat( bigArr.slice( 1050 ) ) );
+		assert.deepEqual( expectedRet, actualRet, msg + ': replacing 3 elements with 2100 elements (return value)' );
+		assert.deepEqual( expected, actual, msg + ': replacing 3 elements with 2100 elements (array)' );
 	}
-	actualRet = ve.batchSplice( actual, 2, 3, bigArr );
-	expectedRet = expected.splice.apply( expected, [2, 3].concat( bigArr.slice( 0, 1050 ) ) );
-	expected.splice.apply( expected, [1052, 0].concat( bigArr.slice( 1050 ) ) );
-	assert.deepEqual( expectedRet, actualRet, 'replacing 3 elements with 2100 elements (return value)' );
-	assert.deepEqual( expected, actual, 'replacing 3 elements with 2100 elements (array)' );
+
+	QUnit.expect( 8 * ( spliceWasSupported ? 2 : 1 ) );
+
+	assertBatchSplice();
+
+	// If the current browser supported native splice,
+	// test again without the native splice.
+	if ( spliceWasSupported ) {
+		ve.supportsSplice = false;
+		assertBatchSplice();
+		ve.supportsSplice = true;
+	}
 } );
 
 QUnit.test( 'insertIntoArray', 3, function ( assert ) {
@@ -313,45 +331,248 @@ QUnit.test( 'insertIntoArray', 3, function ( assert ) {
 	assert.deepEqual( target, [ 'a', 'b', 'c', 'x', 'y' ], 'insert beyond end' );
 } );
 
+QUnit.test( 'binarySearch', 13, function ( assert ) {
+	var data = [ -42, -10, 0, 2, 5, 7, 12, 21, 42, 70, 144, 1001 ];
+
+	function dir( target, item ) {
+		return target > item ? 1 : ( target < item ? -1 : 0 );
+	}
+
+	function assertSearch( target, expectedPath, expectedRet ) {
+		var ret, path = [];
+
+		ret = ve.binarySearch( data, function ( item ) {
+			path.push( item );
+			return dir( target, item );
+		} );
+
+		assert.deepEqual( path, expectedPath, 'Search ' + target );
+		assert.strictEqual( ret, expectedRet, 'Search ' + target + ' (index)' );
+	}
+
+	assertSearch( 12, [ 12 ], 6 );
+	assertSearch( -42, [ 12, 2, -10, -42 ], 0 );
+	assertSearch( 42, [ 12, 70, 42 ], 8 );
+
+	// Out of bounds
+	assertSearch( -2000, [ 12, 2, -10, -42 ], null );
+	assertSearch( 2000, [ 12, 70, 1001 ], null );
+
+	assert.strictEqual(
+		0,
+		ve.binarySearch( data, function ( item ) { return dir( -2000, item ); }, true ),
+		'forInsertion at start'
+	);
+
+	assert.strictEqual(
+		2,
+		ve.binarySearch( [ 1, 2, 4, 5 ], function ( item ) { return dir( 3, item ); }, true ),
+		'forInsertion in the middle'
+	);
+
+	assert.strictEqual(
+		12,
+		ve.binarySearch( data, function ( item ) { return dir( 2000, item ); }, true ),
+		'forInsertion at end'
+	);
+
+} );
+
 QUnit.test( 'escapeHtml', 1, function ( assert ) {
 	assert.strictEqual( ve.escapeHtml( ' "script\' <foo & bar> ' ), ' &quot;script&#039; &lt;foo &amp; bar&gt; ' );
 } );
 
 QUnit.test( 'createDocumentFromHtml', function ( assert ) {
-	var key, doc, expectedHead, expectedBody,
+	var doc, expectedHead, expectedBody,
+		supportsDomParser = !!ve.createDocumentFromHtmlUsingDomParser( '' ),
+		supportsIframe = !!ve.createDocumentFromHtmlUsingIframe( '' ),
 		cases = [
 			{
 				msg: 'simple document with doctype, head and body',
-				html: '<!doctype html><html><head><title>Foo</title></head><body><p>Bar</p></body></html>',
+				html: '<!doctype html><html lang="en"><head><title>Foo</title></head><body><p>Bar</p></body></html>',
 				head: '<title>Foo</title>',
-				body: '<p>Bar</p>'
+				body: '<p>Bar</p>',
+				htmlAttributes: {
+					lang: 'en'
+				}
 			},
 			{
 				msg: 'simple document without doctype',
-				html: '<html><head><title>Foo</title></head><body><p>Bar</p></body></html>',
+				html: '<html lang="en"><head><title>Foo</title></head><body><p>Bar</p></body></html>',
 				head: '<title>Foo</title>',
-				body: '<p>Bar</p>'
+				body: '<p>Bar</p>',
+				htmlAttributes: {
+					lang: 'en'
+				}
 			},
 			{
 				msg: 'document with missing closing tags and missing <html> tag',
 				html: '<!doctype html><head><title>Foo</title><base href="yay"><body><p>Bar<b>Baz',
 				head: '<title>Foo</title><base href="yay" />',
-				body: '<p>Bar<b>Baz</b></p>'
+				body: '<p>Bar<b>Baz</b></p>',
+				htmlAttributes: {}
 			},
 			{
 				msg: 'empty string results in empty document',
 				html: '',
 				head: '',
-				body: ''
+				body: '',
+				htmlAttributes: {}
 			}
 		];
-	QUnit.expect( cases.length * 2 );
-	for ( key in cases ) {
-		doc = ve.createDocumentFromHtml( cases[key].html );
-		expectedHead = $( '<head>' ).html( cases[key].head ).get( 0 );
-		expectedBody = $( '<body>' ).html( cases[key].body ).get( 0 );
-		assert.equalDomElement( $( 'head', doc ).get( 0 ), expectedHead, cases[key].msg + ' (head)' );
-		assert.equalDomElement( $( 'body', doc ).get( 0 ), expectedBody, cases[key].msg + ' (body)' );
+
+	QUnit.expect( cases.length * 3 * ( 2 + ( supportsDomParser ? 1 : 0 ) + ( supportsIframe ? 1 : 0 ) ) );
+
+	function assertCreateDocument( createDocument, msg ) {
+		var i, key, attributes, attributesObject;
+		for ( key in cases ) {
+			doc = createDocument( cases[ key ].html );
+			attributes = $( 'html', doc ).get( 0 ).attributes;
+			attributesObject = {};
+			for ( i = 0; i < attributes.length; i++ ) {
+				attributesObject[ attributes[ i ].name ] = attributes[ i ].value;
+			}
+			expectedHead = $( '<head>' ).html( cases[ key ].head ).get( 0 );
+			expectedBody = $( '<body>' ).html( cases[ key ].body ).get( 0 );
+			assert.equalDomElement( $( 'head', doc ).get( 0 ), expectedHead, msg + ': ' + cases[ key ].msg + ' (head)' );
+			assert.equalDomElement( $( 'body', doc ).get( 0 ), expectedBody, msg + ': ' + cases[ key ].msg + ' (body)' );
+			assert.deepEqual( attributesObject, cases[ key ].htmlAttributes, msg + ': ' + cases[ key ].msg + ' (html attributes)' );
+		}
+	}
+
+	if ( supportsDomParser ) {
+		assertCreateDocument( ve.createDocumentFromHtmlUsingDomParser, 'DOMParser' );
+	}
+	if ( supportsIframe ) {
+		assertCreateDocument( ve.createDocumentFromHtmlUsingIframe, 'IFrame' );
+	}
+	assertCreateDocument( ve.createDocumentFromHtmlUsingInnerHtml, 'innerHTML' );
+	assertCreateDocument( ve.createDocumentFromHtml, 'wrapper' );
+} );
+
+QUnit.test( 'resolveUrl', function ( assert ) {
+	var i, doc,
+		cases = [
+			{
+				base: 'http://example.com',
+				href: 'foo',
+				resolved: 'http://example.com/foo',
+				msg: 'Simple href with domain as base'
+			},
+			{
+				base: 'http://example.com/bar',
+				href: 'foo',
+				resolved: 'http://example.com/foo',
+				msg: 'Simple href with page as base'
+			},
+			{
+				base: 'http://example.com/bar/',
+				href: 'foo',
+				resolved: 'http://example.com/bar/foo',
+				msg: 'Simple href with directory as base'
+			},
+			{
+				base: 'http://example.com/bar/',
+				href: './foo',
+				resolved: 'http://example.com/bar/foo',
+				msg: './ in href'
+			},
+			{
+				base: 'http://example.com/bar/',
+				href: '../foo',
+				resolved: 'http://example.com/foo',
+				msg: '../ in href'
+			},
+			{
+				base: 'http://example.com/bar/',
+				href: '/foo',
+				resolved: 'http://example.com/foo',
+				msg: 'href starting with /'
+			},
+			{
+				base: 'http://example.com/bar/',
+				href: '//example.org/foo',
+				resolved: 'http://example.org/foo',
+				msg: 'protocol-relative href'
+			},
+			{
+				base: 'http://example.com/bar/',
+				href: 'https://example.org/foo',
+				resolved: 'https://example.org/foo',
+				msg: 'href with protocol'
+			}
+		];
+
+	QUnit.expect( cases.length );
+
+	for ( i = 0; i < cases.length; i++ ) {
+		doc = ve.createDocumentFromHtml( '' );
+		doc.head.appendChild( $( '<base>', doc ).attr( 'href', cases[ i ].base )[ 0 ] );
+		assert.strictEqual( ve.resolveUrl( cases[ i ].href, doc ), cases[ i ].resolved, cases[ i ].msg );
+	}
+} );
+
+QUnit.test( 'resolveAttributes', function ( assert ) {
+	var i, doc, $html,
+		cases = [
+			{
+				base: 'http://example.com',
+				html: '<div><a href="foo">foo</a></div><a href="bar">bar</a><img src="baz">',
+				resolved: '<div><a href="http://example.com/foo">foo</a></div><a href="http://example.com/bar">bar</a><img src="http://example.com/baz">',
+				msg: 'href and src resolved'
+			}
+		];
+
+	QUnit.expect( cases.length );
+
+	for ( i = 0; i < cases.length; i++ ) {
+		doc = ve.createDocumentFromHtml( '' );
+		doc.head.appendChild( $( '<base>', doc ).attr( 'href', cases[ i ].base )[ 0 ] );
+		$html = $( '<div>' ).append( cases[ i ].html );
+		ve.resolveAttributes( $html, doc, ve.dm.Converter.static.computedAttributes );
+		assert.strictEqual(
+			$html.html(),
+			cases[ i ].resolved,
+			cases[ i ].msg
+		);
+	}
+} );
+
+QUnit.test( 'fixBase', function ( assert ) {
+	var i, targetDoc, sourceDoc,
+		cases = [
+			{
+				targetBase: '//example.org/foo',
+				sourceBase: 'https://example.com',
+				fixedBase: 'https://example.org/foo',
+				msg: 'Protocol-relative base is made absolute'
+			},
+			{
+				targetBase: 'http://example.org/foo',
+				sourceBase: 'https://example.com',
+				fixedBase: 'http://example.org/foo',
+				msg: 'Fully specified base is left alone'
+			},
+			{
+				// No targetBase
+				sourceBase: 'https://example.com',
+				fallbackBase: 'https://example.org/foo',
+				fixedBase: 'https://example.org/foo',
+				msg: 'When base is missing, fallback base is used'
+			}
+		];
+	QUnit.expect( cases.length );
+	for ( i = 0; i < cases.length; i++ ) {
+		targetDoc = ve.createDocumentFromHtml( '' );
+		sourceDoc = ve.createDocumentFromHtml( '' );
+		if ( cases[ i ].targetBase ) {
+			targetDoc.head.appendChild( $( '<base>', targetDoc ).attr( 'href', cases[ i ].targetBase )[ 0 ] );
+		}
+		if ( cases[ i ].sourceBase ) {
+			sourceDoc.head.appendChild( $( '<base>', sourceDoc ).attr( 'href', cases[ i ].sourceBase )[ 0 ] );
+		}
+		ve.fixBase( targetDoc, sourceDoc, cases[ i ].fallbackBase );
+		assert.strictEqual( targetDoc.baseURI, cases[ i ].fixedBase, cases[ i ].msg );
 	}
 } );
 
@@ -407,14 +628,14 @@ QUnit.test( 'graphemeSafeSubstring', function ( assert ) {
 	QUnit.expect( cases.length * 2 );
 	for ( i = 0; i < cases.length; i++ ) {
 		assert.strictEqual(
-			ve.graphemeSafeSubstring( text, cases[i].start, cases[i].end, true ),
-			cases[i].expected[0],
-			cases[i].msg + ' (outer)'
+			ve.graphemeSafeSubstring( text, cases[ i ].start, cases[ i ].end, true ),
+			cases[ i ].expected[ 0 ],
+			cases[ i ].msg + ' (outer)'
 		);
 		assert.strictEqual(
-			ve.graphemeSafeSubstring( text, cases[i].start, cases[i].end, false ),
-			cases[i].expected[1],
-			cases[i].msg + ' (inner)'
+			ve.graphemeSafeSubstring( text, cases[ i ].start, cases[ i ].end, false ),
+			cases[ i ].expected[ 1 ],
+			cases[ i ].msg + ' (inner)'
 		);
 	}
 } );
@@ -484,30 +705,30 @@ QUnit.test( 'transformStyleAttributes', function ( assert ) {
 	ve.isStyleAttributeBroken = true;
 
 	for ( i = 0; i < cases.length; i++ ) {
-		if ( cases[i].normalize ) {
+		if ( cases[ i ].normalize ) {
 			oldNormalizeAttributeValue = ve.normalizeAttributeValue;
-			ve.normalizeAttributeValue = cases[i].normalize;
+			ve.normalizeAttributeValue = cases[ i ].normalize;
 		}
-		if ( cases[i].before ) {
+		if ( cases[ i ].before ) {
 			assert.strictEqual(
-				ve.transformStyleAttributes( cases[i].before, false )
+				ve.transformStyleAttributes( cases[ i ].before, false )
 					// Firefox adds linebreaks after <!DOCTYPE>s
 					.replace( '<!DOCTYPE html>\n', '<!DOCTYPE html>' ),
-				cases[i].masked || cases[i].before,
-				cases[i].msg + ' (masking)'
+				cases[ i ].masked || cases[ i ].before,
+				cases[ i ].msg + ' (masking)'
 			);
 		} else {
-			assert.ok( true, cases[i].msg + ' (no masking test)' );
+			assert.ok( true, cases[ i ].msg + ' (no masking test)' );
 		}
 		assert.strictEqual(
-			ve.transformStyleAttributes( cases[i].masked || cases[i].before, true )
+			ve.transformStyleAttributes( cases[ i ].masked || cases[ i ].before, true )
 				// Firefox adds a linebreak after <!DOCTYPE>s
 				.replace( '<!DOCTYPE html>\n', '<!DOCTYPE html>' ),
-			cases[i].after || cases[i].before,
-			cases[i].msg + ' (unmasking)'
+			cases[ i ].after || cases[ i ].before,
+			cases[ i ].msg + ' (unmasking)'
 		);
 
-		if ( cases[i].normalize ) {
+		if ( cases[ i ].normalize ) {
 			ve.normalizeAttributeValue = oldNormalizeAttributeValue;
 		}
 	}
@@ -633,11 +854,11 @@ QUnit.test( 'normalizeNode', function ( assert ) {
 	ve.isNormalizeBroken = true;
 
 	for ( i = 0; i < cases.length; i++ ) {
-		actual = ve.test.utils.buildDom( cases[i].before );
-		expected = ve.test.utils.buildDom( cases[i].after );
+		actual = ve.test.utils.buildDom( cases[ i ].before );
+		expected = ve.test.utils.buildDom( cases[ i ].after );
 		ve.normalizeNode( actual );
-		assert.equalDomElement( actual, expected, cases[i].msg );
-		assert.ok( actual.isEqualNode( expected ), cases[i].msg + ' (isEqualNode)' );
+		assert.equalDomElement( actual, expected, cases[ i ].msg );
+		assert.ok( actual.isEqualNode( expected ), cases[ i ].msg + ' (isEqualNode)' );
 	}
 
 	ve.isNormalizeBroken = wasNormalizeBroken;
@@ -659,28 +880,36 @@ QUnit.test( 'getCommonAncestor', function ( assert ) {
 		{ nodes: 'img textE', ancestor: 'body' },
 		{ nodes: 'textA textB textC textD', ancestor: 'div' },
 		{ nodes: 'textA i b textC', ancestor: 'p' },
-		{ nodes: 'body div head p', ancestor: 'html' }
+		{ nodes: 'body div head p', ancestor: 'html' },
+		{ nodes: 'b null', ancestor: 'null' },
+		{ nodes: 'null b', ancestor: 'null' },
+		{ nodes: 'b i null', ancestor: 'null' },
+		{ nodes: 'b null i', ancestor: 'null' },
+		{ nodes: 'b unattached', ancestor: 'null' },
+		{ nodes: 'unattached b', ancestor: 'null' }
 	];
 	nodes = {};
 	nodes.html = doc.documentElement;
 	nodes.head = doc.head;
 	nodes.body = doc.body;
-	nodes.div = doc.getElementsByTagName( 'div' )[0];
-	nodes.p = doc.getElementsByTagName( 'p' )[0];
-	nodes.b = doc.getElementsByTagName( 'b' )[0];
-	nodes.i = doc.getElementsByTagName( 'i' )[0];
-	nodes.img = doc.getElementsByTagName( 'img' )[0];
-	nodes.textA = nodes.p.childNodes[0];
-	nodes.textB = nodes.b.childNodes[0];
-	nodes.textC = nodes.p.childNodes[2];
-	nodes.textD = nodes.div.childNodes[1];
-	nodes.textE = nodes.body.childNodes[1];
+	nodes.div = doc.getElementsByTagName( 'div' )[ 0 ];
+	nodes.p = doc.getElementsByTagName( 'p' )[ 0 ];
+	nodes.b = doc.getElementsByTagName( 'b' )[ 0 ];
+	nodes.i = doc.getElementsByTagName( 'i' )[ 0 ];
+	nodes.img = doc.getElementsByTagName( 'img' )[ 0 ];
+	nodes.textA = nodes.p.childNodes[ 0 ];
+	nodes.textB = nodes.b.childNodes[ 0 ];
+	nodes.textC = nodes.p.childNodes[ 2 ];
+	nodes.textD = nodes.div.childNodes[ 1 ];
+	nodes.textE = nodes.body.childNodes[ 1 ];
+	nodes.null = null;
+	nodes.unattached = doc.createElement( 'div' ).appendChild( doc.createElement( 'span' ) );
 	function getNode( name ) {
 		return nodes[ name ];
 	}
 	QUnit.expect( tests.length );
 	for ( i = 0, len = tests.length; i < len; i++ ) {
-		test = tests[i];
+		test = tests[ i ];
 		testNodes = test.nodes.split( /\s+/ ).map( getNode );
 		ancestorNode = nodes[ test.ancestor ];
 		assert.equal(
@@ -688,5 +917,120 @@ QUnit.test( 'getCommonAncestor', function ( assert ) {
 			ancestorNode,
 			test.nodes + ' -> ' + test.ancestor
 		);
+	}
+} );
+
+QUnit.test( 'adjacentDomPosition', function ( assert ) {
+	var tests, direction, i, len, test, offsetPaths, position, div;
+
+	// In the following tests, the html is put inside the top-level div as innerHTML. Then
+	// ve.adjacentDomNode is called with the position just inside the div (i.e.
+	// { node: div, offset: 0 } for forward direction tests, and
+	// { node: div, offset: div.childNodes.length } for reverse direction tests). The result
+	// of the first call is passed into the function again, and so on iteratively until the
+	// function returns null. The 'path' properties are a list of descent offsets to find a
+	// particular position node from the top-level div. E.g. a path of [ 5, 7 ] refers to the
+	// node div.childNodes[ 5 ].childNodes[ 7 ] .
+	tests = [
+		{
+			title: 'Simple p node',
+			html: '<p>x</p>',
+			options: { skipSoft: false },
+			expectedOffsetPaths: [
+				[ 0 ],
+				[ 0, 0 ],
+				[ 0, 0, 0 ],
+				[ 0, 0, 1 ],
+				[ 0, 1 ],
+				[ 1 ]
+			]
+		},
+		{
+			title: 'Filtered descent',
+			html: '<div class="x">foo</div><div class="y">bar</div>',
+			options: { skipSoft: false, noDescend: '.x' },
+			expectedOffsetPaths: [
+				[ 0 ],
+				[ 1 ],
+				[ 1, 0 ],
+				[ 1, 0, 0 ],
+				[ 1, 0, 1 ],
+				[ 1, 0, 2 ],
+				[ 1, 0, 3 ],
+				[ 1, 1 ],
+				[ 2 ]
+			]
+		},
+		{
+			title: 'Empty tags and heavy nesting',
+			html: '<div><br/><p>foo <b>bar <i>baz</i></b></p></div>',
+			options: { skipSoft: false },
+			expectedOffsetPaths: [
+				[ 0 ],
+				[ 0, 0 ],
+				// The <br/> tag is void, so should get skipped
+				[ 0, 1 ],
+				[ 0, 1, 0 ],
+				[ 0, 1, 0, 0 ],
+				[ 0, 1, 0, 1 ],
+				[ 0, 1, 0, 2 ],
+				[ 0, 1, 0, 3 ],
+				[ 0, 1, 0, 4 ],
+				[ 0, 1, 1 ],
+				[ 0, 1, 1, 0 ],
+				[ 0, 1, 1, 0, 0 ],
+				[ 0, 1, 1, 0, 1 ],
+				[ 0, 1, 1, 0, 2 ],
+				[ 0, 1, 1, 0, 3 ],
+				[ 0, 1, 1, 0, 4 ],
+				[ 0, 1, 1, 1 ],
+				[ 0, 1, 1, 1, 0 ],
+				[ 0, 1, 1, 1, 0, 0 ],
+				[ 0, 1, 1, 1, 0, 1 ],
+				[ 0, 1, 1, 1, 0, 2 ],
+				[ 0, 1, 1, 1, 0, 3 ],
+				[ 0, 1, 1, 1, 1 ],
+				[ 0, 1, 1, 2 ],
+				[ 0, 1, 2 ],
+				[ 0, 2 ],
+				[ 1 ]
+			]
+		}
+	];
+
+	QUnit.expect( 2 * tests.length );
+
+	div = document.createElement( 'div' );
+	div.contentEditable = true;
+
+	for ( direction in { forward: undefined, backward: undefined } ) {
+		for ( i = 0, len = tests.length; i < len; i++ ) {
+			test = tests[ i ];
+			div.innerHTML = test.html;
+			offsetPaths = [];
+			position = {
+				node: div,
+				offset: direction === 'backward' ? div.childNodes.length : 0
+			};
+			while ( position.node !== null ) {
+				offsetPaths.push(
+					ve.getOffsetPath( div, position.node, position.offset )
+				);
+				position = ve.adjacentDomPosition(
+					position,
+					direction === 'backward' ? -1 : 1,
+					test.options
+				);
+			}
+			assert.deepEqual(
+				offsetPaths,
+				(
+					direction === 'backward' ?
+					test.expectedOffsetPaths.slice().reverse() :
+					test.expectedOffsetPaths
+				),
+				test.title + ' (' + direction + ')'
+			);
+		}
 	}
 } );

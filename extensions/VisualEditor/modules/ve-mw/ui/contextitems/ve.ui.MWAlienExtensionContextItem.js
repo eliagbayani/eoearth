@@ -8,14 +8,14 @@
  * Context item for a MWAlienExtension.
  *
  * @class
- * @extends ve.ui.ContextItem
+ * @extends ve.ui.LinearContextItem
  *
  * @constructor
  * @param {ve.ui.Context} context Context item is in
  * @param {ve.dm.Model} model Model item is related to
  * @param {Object} config Configuration options
  */
-ve.ui.MWAlienExtensionContextItem = function VeMWAlienExtensionContextItem( context, model ) {
+ve.ui.MWAlienExtensionContextItem = function VeUiMWAlienExtensionContextItem( context, model ) {
 	// Parent constructor
 	ve.ui.MWAlienExtensionContextItem.super.apply( this, arguments );
 
@@ -27,7 +27,7 @@ ve.ui.MWAlienExtensionContextItem = function VeMWAlienExtensionContextItem( cont
 
 /* Inheritance */
 
-OO.inheritClass( ve.ui.MWAlienExtensionContextItem, ve.ui.ContextItem );
+OO.inheritClass( ve.ui.MWAlienExtensionContextItem, ve.ui.LinearContextItem );
 
 /* Static Properties */
 
@@ -35,7 +35,10 @@ ve.ui.MWAlienExtensionContextItem.static.name = 'alienExtension';
 
 ve.ui.MWAlienExtensionContextItem.static.icon = 'alienextension';
 
-ve.ui.MWAlienExtensionContextItem.static.modelClasses = [ ve.dm.MWAlienExtensionNode ];
+ve.ui.MWAlienExtensionContextItem.static.modelClasses = [
+	ve.dm.MWAlienInlineExtensionNode,
+	ve.dm.MWAlienBlockExtensionNode
+];
 
 ve.ui.MWAlienExtensionContextItem.static.commandName = 'alienExtension';
 
@@ -44,3 +47,10 @@ ve.ui.MWAlienExtensionContextItem.static.commandName = 'alienExtension';
 /* Registration */
 
 ve.ui.contextItemFactory.register( ve.ui.MWAlienExtensionContextItem );
+
+ve.ui.commandRegistry.register(
+	new ve.ui.Command(
+		'alienExtension', 'window', 'open',
+		{ args: [ 'alienExtension' ], supportedSelections: [ 'linear' ] }
+	)
+);

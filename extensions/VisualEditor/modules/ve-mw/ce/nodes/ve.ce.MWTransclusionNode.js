@@ -11,8 +11,10 @@
  * @class
  * @abstract
  * @extends ve.ce.LeafNode
- * @mixins ve.ce.FocusableNode
+ * @mixins OO.ui.mixin.IconElement
  * @mixins ve.ce.GeneratedContentNode
+ * @mixins ve.ce.FocusableNode
+ * @mixins ve.ce.TableCellableNode
  *
  * @constructor
  * @param {ve.dm.MWTransclusionNode} model Model to observe
@@ -20,21 +22,23 @@
  */
 ve.ce.MWTransclusionNode = function VeCeMWTransclusionNode( model, config ) {
 	// Parent constructor
-	ve.ce.LeafNode.call( this, model, config );
+	ve.ce.MWTransclusionNode.super.call( this, model, config );
 
 	// Mixin constructors
-	ve.ce.FocusableNode.call( this );
-	OO.ui.IconElement.call( this, config );
+	OO.ui.mixin.IconElement.call( this, config );
 	ve.ce.GeneratedContentNode.call( this );
+	ve.ce.FocusableNode.call( this );
+	ve.ce.TableCellableNode.call( this );
 };
 
 /* Inheritance */
 
 OO.inheritClass( ve.ce.MWTransclusionNode, ve.ce.LeafNode );
 
-OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.FocusableNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, OO.ui.mixin.IconElement );
 OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.GeneratedContentNode );
-OO.mixinClass( ve.ce.MWTransclusionNode, OO.ui.IconElement );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.FocusableNode );
+OO.mixinClass( ve.ce.MWTransclusionNode, ve.ce.TableCellableNode );
 
 /* Static Properties */
 
@@ -47,25 +51,36 @@ ve.ce.MWTransclusionNode.static.primaryCommandName = 'transclusion';
 /* Static Methods */
 
 /**
- * @inheritdoc
+ * Get a list of descriptions of template parts in a transclusion node
+ *
+ * @static
+ * @param {ve.dm.Node} model Node model
+ * @return {string[]} List of template part descriptions
  */
-ve.ce.MWTransclusionNode.static.getDescription = function ( model ) {
+ve.ce.MWTransclusionNode.static.getTemplatePartDescriptions = function ( model ) {
 	var i, len, part,
 		parts = model.getPartsList(),
 		words = [];
 
 	for ( i = 0, len = parts.length; i < len; i++ ) {
-		part = parts[i];
+		part = parts[ i ];
 		if ( part.template ) {
 			words.push( part.template );
 		}
 	}
 
-	return words
+	return words;
+};
+
+/**
+ * @inheritdoc
+ */
+ve.ce.MWTransclusionNode.static.getDescription = function ( model ) {
+	return this.getTemplatePartDescriptions( model )
 		.map( function ( template ) {
 			var title = mw.Title.newFromText( template, mw.config.get( 'wgNamespaceIds' ).template );
 			if ( title ) {
-				return title.getRelativeText( 10 );
+				return title.getRelativeText( mw.config.get( 'wgNamespaceIds' ).template );
 			} else {
 				return template;
 			}
@@ -123,7 +138,7 @@ ve.ce.MWTransclusionNode.prototype.generateContents = function ( config ) {
 ve.ce.MWTransclusionNode.prototype.onParseSuccess = function ( deferred, response ) {
 	var contentNodes;
 
-	if ( !response || response.error || !response.visualeditor || response.visualeditor.result !== 'success' ) {
+	if ( ve.getProp( response, 'visualeditor', 'result' ) !== 'success' ) {
 		return this.onParseError.call( this, deferred );
 	}
 
@@ -132,8 +147,8 @@ ve.ce.MWTransclusionNode.prototype.onParseSuccess = function ( deferred, respons
 	// HACK: if $content consists of a single paragraph, unwrap it.
 	// We have to do this because the PHP parser wraps everything in <p>s, and inline templates
 	// will render strangely when wrapped in <p>s.
-	if ( contentNodes.length === 1 && contentNodes[0].nodeName.toLowerCase() === 'p' ) {
-		contentNodes = Array.prototype.slice.apply( contentNodes[0].childNodes );
+	if ( contentNodes.length === 1 && contentNodes[ 0 ].nodeName.toLowerCase() === 'p' ) {
+		contentNodes = Array.prototype.slice.apply( contentNodes[ 0 ].childNodes );
 	}
 
 	deferred.resolve( contentNodes );
@@ -163,7 +178,7 @@ ve.ce.MWTransclusionNode.prototype.render = function ( generatedContents ) {
  * @inheritdoc
  */
 ve.ce.MWTransclusionNode.prototype.getRenderedDomElements = function ( domElements ) {
-	var $elements = this.$( ve.ce.GeneratedContentNode.prototype.getRenderedDomElements.call( this, domElements ) ),
+	var $elements = $( ve.ce.GeneratedContentNode.prototype.getRenderedDomElements.call( this, domElements ) ),
 		transclusionNode = this;
 	if ( this.getModelHtmlDocument() ) {
 		$elements
@@ -204,7 +219,7 @@ ve.ce.MWTransclusionNode.prototype.onParseError = function ( deferred ) {
  */
 ve.ce.MWTransclusionBlockNode = function VeCeMWTransclusionBlockNode( model ) {
 	// Parent constructor
-	ve.ce.MWTransclusionNode.call( this, model );
+	ve.ce.MWTransclusionBlockNode.super.call( this, model );
 };
 
 /* Inheritance */
@@ -227,7 +242,7 @@ ve.ce.MWTransclusionBlockNode.static.tagName = 'div';
  */
 ve.ce.MWTransclusionInlineNode = function VeCeMWTransclusionInlineNode( model ) {
 	// Parent constructor
-	ve.ce.MWTransclusionNode.call( this, model );
+	ve.ce.MWTransclusionInlineNode.super.call( this, model );
 };
 
 /* Inheritance */

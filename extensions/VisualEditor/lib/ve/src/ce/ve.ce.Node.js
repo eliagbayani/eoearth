@@ -63,7 +63,7 @@ ve.ce.Node.static.primaryCommandName = null;
  * @static
  * @inheritable
  * @param {ve.dm.Node} node Node model
- * @returns {string} Description of node
+ * @return {string} Description of node
  */
 ve.ce.Node.static.getDescription = function () {
 	return '';
@@ -149,6 +149,20 @@ ve.ce.Node.prototype.isAlignable = function () {
 /**
  * @inheritdoc ve.Node
  */
+ve.ce.Node.prototype.isCellable = function () {
+	return this.model.isCellable();
+};
+
+/**
+ * @inheritdoc ve.Node
+ */
+ve.ce.Node.prototype.isCellEditable = function () {
+	return this.model.isCellEditable();
+};
+
+/**
+ * @inheritdoc ve.Node
+ */
 ve.ce.Node.prototype.hasSignificantWhitespace = function () {
 	return this.model.hasSignificantWhitespace();
 };
@@ -191,7 +205,7 @@ ve.ce.Node.prototype.getOffset = function () {
 /**
  * Check if the node can be split.
  *
- * @returns {boolean} Node can be split
+ * @return {boolean} Node can be split
  */
 ve.ce.Node.prototype.splitOnEnter = function () {
 	return this.constructor.static.splitOnEnter;

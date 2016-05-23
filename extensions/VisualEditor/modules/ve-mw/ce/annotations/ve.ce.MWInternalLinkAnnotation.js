@@ -21,23 +21,10 @@ ve.ce.MWInternalLinkAnnotation = function VeCeMWInternalLinkAnnotation() {
 	ve.ce.MWInternalLinkAnnotation.super.apply( this, arguments );
 
 	// DOM changes
-	this.$element.addClass( 've-ce-mwInternalLinkAnnotation' );
+	this.$anchor.addClass( 've-ce-mwInternalLinkAnnotation' );
 
 	// Style based on link cache information
-	ve.init.platform.linkCache.styleElement( this.model.getAttribute( 'lookupTitle' ), annotation.$element );
-
-	// HACK: Override href in case hrefPrefix isn't set
-	// This is a workaround for bug 58314 until such time as Parsoid gets rid of
-	// ../-prefixed hrefs.
-	if ( this.model.getAttribute( 'hrefPrefix' ) === undefined ) {
-		this.$element.attr( 'href', ve.resolveUrl(
-			// Repeat '../' wgPageName.split( '/' ).length - 1 times
-			// (= the number of slashes in wgPageName)
-			new Array( mw.config.get( 'wgPageName' ).split( '/' ).length ).join( '../' ) +
-				this.model.getHref(),
-			this.getModelHtmlDocument()
-		) );
-	}
+	ve.init.platform.linkCache.styleElement( this.model.getAttribute( 'lookupTitle' ), annotation.$anchor );
 };
 
 /* Inheritance */

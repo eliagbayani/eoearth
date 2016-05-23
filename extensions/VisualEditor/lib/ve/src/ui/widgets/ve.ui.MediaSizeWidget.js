@@ -34,53 +34,42 @@ ve.ui.MediaSizeWidget = function VeUiMediaSizeWidget( scalable, config ) {
 
 	// Define button select widget
 	this.sizeTypeSelectWidget = new OO.ui.ButtonSelectWidget( {
-		$: this.$,
 		classes: [ 've-ui-mediaSizeWidget-section-sizetype' ]
 	} );
 	this.sizeTypeSelectWidget.addItems( [
 		new OO.ui.ButtonOptionWidget( {
-			$: this.$,
 			data: 'default',
 			label: ve.msg( 'visualeditor-mediasizewidget-sizeoptions-default' )
 		} ),
 		// TODO: when upright is supported by Parsoid
 		// new OO.ui.ButtonOptionWidget( {
-		// $: this.$,
 		// data: 'scale',
 		// label: ve.msg( 'visualeditor-mediasizewidget-sizeoptions-scale' )
 		// } ),
 		new OO.ui.ButtonOptionWidget( {
-			$: this.$,
 			data: 'custom',
 			label: ve.msg( 'visualeditor-mediasizewidget-sizeoptions-custom' )
 		} )
 	] );
 
 	// Define scale
-	this.scaleInput = new OO.ui.TextInputWidget( {
-		$: this.$
-	} );
+	this.scaleInput = new OO.ui.TextInputWidget();
 	scalePercentLabel = new OO.ui.LabelWidget( {
-		$: this.$,
 		input: this.scaleInput,
 		label: ve.msg( 'visualeditor-mediasizewidget-label-scale-percent' )
 	} );
 
-	this.dimensionsWidget = new ve.ui.DimensionsWidget( {
-		$: this.$
-	} );
+	this.dimensionsWidget = new ve.ui.DimensionsWidget( { validate: this.isValid.bind( this ) } );
 
 	// Error label is available globally so it can be displayed and
 	// hidden as needed
 	this.errorLabel = new OO.ui.LabelWidget( {
-		$: this.$,
 		label: ve.msg( 'visualeditor-mediasizewidget-label-defaulterror' )
 	} );
 
 	// Field layouts
 	fieldScale = new OO.ui.FieldLayout(
 		this.scaleInput, {
-			$: this.$,
 			align: 'right',
 			// TODO: when upright is supported by Parsoid
 			// classes: ['ve-ui-mediaSizeWidget-section-scale'],
@@ -91,18 +80,16 @@ ve.ui.MediaSizeWidget = function VeUiMediaSizeWidget( scalable, config ) {
 	// this.scaleInput.$element.append( scalePercentLabel.$element );
 	fieldCustom = new OO.ui.FieldLayout(
 		this.dimensionsWidget, {
-			$: this.$,
 			align: 'right',
 			label: ve.msg( 'visualeditor-mediasizewidget-label-custom' ),
-			classes: ['ve-ui-mediaSizeWidget-section-custom']
+			classes: [ 've-ui-mediaSizeWidget-section-custom' ]
 		}
 	);
 
 	// Buttons
 	this.fullSizeButton = new OO.ui.ButtonWidget( {
-		$: this.$,
 		label: ve.msg( 'visualeditor-mediasizewidget-button-originaldimensions' ),
-		classes: ['ve-ui-mediaSizeWidget-button-fullsize']
+		classes: [ 've-ui-mediaSizeWidget-button-fullsize' ]
 	} );
 
 	// Build GUI
@@ -114,15 +101,15 @@ ve.ui.MediaSizeWidget = function VeUiMediaSizeWidget( scalable, config ) {
 			// fieldScale.$element,
 			fieldCustom.$element,
 			this.fullSizeButton.$element,
-			this.$( '<div>' )
+			$( '<div>' )
 				.addClass( 've-ui-mediaSizeWidget-label-error' )
 				.append( this.errorLabel.$element )
 		);
 
 	// Events
 	this.dimensionsWidget.connect( this, {
-		widthChange: ['onDimensionsChange', 'width'],
-		heightChange: ['onDimensionsChange', 'height']
+		widthChange: [ 'onDimensionsChange', 'width' ],
+		heightChange: [ 'onDimensionsChange', 'height' ]
 	} );
 	// TODO: when upright is supported by Parsoid
 	// this.scaleInput.connect( this, { change: 'onScaleChange' } );
@@ -182,6 +169,7 @@ ve.ui.MediaSizeWidget.prototype.onScalableCurrentSizeChange = function ( dimensi
 
 /**
  * Respond to default size or status change in the scalable object.
+ *
  * @param {boolean} isDefault Current default state
  */
 ve.ui.MediaSizeWidget.prototype.onScalableDefaultSizeChange = function ( isDefault ) {
@@ -221,7 +209,7 @@ ve.ui.MediaSizeWidget.prototype.onDimensionsChange = function ( type, value ) {
 	} else {
 		this.setSizeType( 'custom' );
 		if ( $.isNumeric( value ) ) {
-			dimensions[type] = Number( value );
+			dimensions[ type ] = Number( value );
 			this.setCurrentDimensions( dimensions );
 		} else {
 			this.validateDimensions();
@@ -236,18 +224,15 @@ ve.ui.MediaSizeWidget.prototype.onScaleChange = function () {
 	// If the input changed (and not empty), set to 'custom'
 	// Otherwise, set to 'default'
 	if ( !this.dimensionsWidget.isEmpty() ) {
-		this.sizeTypeSelectWidget.selectItem(
-			this.sizeTypeSelectWidget.getItemFromData( 'scale' )
-		);
+		this.sizeTypeSelectWidget.selectItemByData( 'scale' );
 	} else {
-		this.sizeTypeSelectWidget.selectItem(
-			this.sizeTypeSelectWidget.getItemFromData( 'default' )
-		);
+		this.sizeTypeSelectWidget.selectItemByData( 'default' );
 	}
 };
 
 /**
  * Respond to size type change
+ *
  * @param {OO.ui.OptionWidget} item Selected size type item
  * @fires changeSizeType
  */
@@ -286,6 +271,7 @@ ve.ui.MediaSizeWidget.prototype.onSizeTypeChoose = function ( item ) {
 
 /**
  * Set the placeholder value of the scale input
+ *
  * @param {number} value Placeholder value
  */
 ve.ui.MediaSizeWidget.prototype.setScalePlaceholder = function ( value ) {
@@ -294,7 +280,8 @@ ve.ui.MediaSizeWidget.prototype.setScalePlaceholder = function ( value ) {
 
 /**
  * Get the placeholder value of the scale input
- * @returns {string} Placeholder value
+ *
+ * @return {string} Placeholder value
  */
 ve.ui.MediaSizeWidget.prototype.getScalePlaceholder = function () {
 	return this.scaleInput.$element.prop( 'placeholder' );
@@ -302,6 +289,7 @@ ve.ui.MediaSizeWidget.prototype.getScalePlaceholder = function () {
 
 /**
  * Select a size type in the select widget
+ *
  * @param {string} sizeType The size type to select
  */
 ve.ui.MediaSizeWidget.prototype.setSizeType = function ( sizeType ) {
@@ -320,7 +308,7 @@ ve.ui.MediaSizeWidget.prototype.setSizeType = function ( sizeType ) {
 /**
  * Get the size type from the select widget
  *
- * @returns {string} The size type
+ * @return {string} The size type
  */
 ve.ui.MediaSizeWidget.prototype.getSizeType = function () {
 	return this.sizeTypeSelectWidget.getSelectedItem() ? this.sizeTypeSelectWidget.getSelectedItem().getData() : '';
@@ -370,7 +358,8 @@ ve.ui.MediaSizeWidget.prototype.setScalable = function ( scalable ) {
 
 /**
  * Get the attached scalable object
- * @returns {ve.dm.Scalable} The scalable object representing the media
+ *
+ * @return {ve.dm.Scalable} The scalable object representing the media
  * source being resized.
  */
 ve.ui.MediaSizeWidget.prototype.getScalable = function () {
@@ -391,7 +380,8 @@ ve.ui.MediaSizeWidget.prototype.onFullSizeButtonClick = function () {
 
 /**
  * Set the image aspect ratio explicitly
- * @param {number} Numerical value of an aspect ratio
+ *
+ * @param {number} ratio Numerical value of an aspect ratio
  */
 ve.ui.MediaSizeWidget.prototype.setRatio = function ( ratio ) {
 	this.scalable.setRatio( ratio );
@@ -399,7 +389,8 @@ ve.ui.MediaSizeWidget.prototype.setRatio = function ( ratio ) {
 
 /**
  * Get the current aspect ratio
- * @returns {number} Aspect ratio
+ *
+ * @return {number} Aspect ratio
  */
 ve.ui.MediaSizeWidget.prototype.getRatio = function () {
 	return this.scalable.getRatio();
@@ -408,6 +399,7 @@ ve.ui.MediaSizeWidget.prototype.getRatio = function () {
 /**
  * Set the maximum dimensions for the image. These will be limited only if
  * enforcedMax is true.
+ *
  * @param {Object} dimensions Height and width
  */
 ve.ui.MediaSizeWidget.prototype.setMaxDimensions = function ( dimensions ) {
@@ -418,7 +410,8 @@ ve.ui.MediaSizeWidget.prototype.setMaxDimensions = function ( dimensions ) {
 
 /**
  * Retrieve the currently defined maximum dimensions
- * @returns {Object} dimensions Height and width
+ *
+ * @return {Object} dimensions Height and width
  */
 ve.ui.MediaSizeWidget.prototype.getMaxDimensions = function () {
 	return this.scalable.getMaxDimensions();
@@ -426,7 +419,8 @@ ve.ui.MediaSizeWidget.prototype.getMaxDimensions = function () {
 
 /**
  * Retrieve the current dimensions
- * @returns {Object} Width and height
+ *
+ * @return {Object} Width and height
  */
 ve.ui.MediaSizeWidget.prototype.getCurrentDimensions = function () {
 	return this.currentDimensions;
@@ -434,6 +428,7 @@ ve.ui.MediaSizeWidget.prototype.getCurrentDimensions = function () {
 
 /**
  * Disable or enable the entire widget
+ *
  * @param {boolean} isDisabled Disable the widget
  */
 ve.ui.MediaSizeWidget.prototype.setDisabled = function ( isDisabled ) {
@@ -482,7 +477,7 @@ ve.ui.MediaSizeWidget.prototype.setCurrentDimensions = function ( dimensions ) {
 
 	if (
 		// Update only if the dimensions object is valid
-		this.scalable.isDimensionsObjectValid( normalizedDimensions ) &&
+		ve.dm.Scalable.static.isDimensionsObjectValid( normalizedDimensions ) &&
 		// And only if the dimensions object is not default
 		!this.scalable.isDefault()
 	) {
@@ -509,7 +504,7 @@ ve.ui.MediaSizeWidget.prototype.setCurrentDimensions = function ( dimensions ) {
  * dimensions for thumbnails when the image type changes. Triggers the error
  * class if needed.
  *
- * @returns {boolean} Current dimensions are valid
+ * @return {boolean} Current dimensions are valid
  */
 ve.ui.MediaSizeWidget.prototype.validateDimensions = function () {
 	var isValid = this.isValid();
@@ -517,7 +512,7 @@ ve.ui.MediaSizeWidget.prototype.validateDimensions = function () {
 	if ( this.valid !== isValid ) {
 		this.valid = isValid;
 		this.errorLabel.toggle( !isValid );
-		this.$element.toggleClass( 've-ui-mediaSizeWidget-input-hasError', !isValid );
+		this.dimensionsWidget.setValidityFlag();
 		// Emit change event
 		this.emit( 'valid', this.valid );
 	}
@@ -545,7 +540,8 @@ ve.ui.MediaSizeWidget.prototype.updateDefaultDimensions = function () {
 
 /**
  * Check if the custom dimensions are empty.
- * @returns {boolean} Both width/height values are empty
+ *
+ * @return {boolean} Both width/height values are empty
  */
 ve.ui.MediaSizeWidget.prototype.isCustomEmpty = function () {
 	return this.dimensionsWidget.isEmpty();
@@ -553,6 +549,7 @@ ve.ui.MediaSizeWidget.prototype.isCustomEmpty = function () {
 
 /**
  * Toggle a disabled state for the full size button
+ *
  * @param {boolean} isDisabled Disabled or not
  */
 ve.ui.MediaSizeWidget.prototype.toggleFullSizeButtonDisabled = function ( isDisabled ) {
@@ -561,7 +558,8 @@ ve.ui.MediaSizeWidget.prototype.toggleFullSizeButtonDisabled = function ( isDisa
 
 /**
  * Check if the scale input is empty.
- * @returns {boolean} Scale input value is empty
+ *
+ * @return {boolean} Scale input value is empty
  */
 ve.ui.MediaSizeWidget.prototype.isScaleEmpty = function () {
 	return ( this.scaleInput.getValue() === '' );
@@ -569,7 +567,8 @@ ve.ui.MediaSizeWidget.prototype.isScaleEmpty = function () {
 
 /**
  * Check if all inputs are empty.
- * @returns {boolean} All input values are empty
+ *
+ * @return {boolean} All input values are empty
  */
 ve.ui.MediaSizeWidget.prototype.isEmpty = function () {
 	return ( this.isCustomEmpty() && this.isScaleEmpty() );
@@ -581,7 +580,8 @@ ve.ui.MediaSizeWidget.prototype.isEmpty = function () {
  * 2. If inputs have non numeric values, input is invalid
  * 3. If inputs have numeric values, validate through scalable
  *    calculations to see if the dimensions follow the rules.
- * @returns {boolean} Valid or invalid dimension values
+ *
+ * @return {boolean} Valid or invalid dimension values
  */
 ve.ui.MediaSizeWidget.prototype.isValid = function () {
 	var itemType = this.sizeTypeSelectWidget.getSelectedItem() ?

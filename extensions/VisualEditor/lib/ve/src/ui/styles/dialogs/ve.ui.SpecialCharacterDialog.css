@@ -1,7 +1,7 @@
 /*!
  * VisualEditor UserInterface SpecialCharacterDialog styles.
  *
- * @copyright 2011-2014 VisualEditor Team and others; see http://ve.mit-license.org
+ * @copyright 2011-2015 VisualEditor Team and others; see http://ve.mit-license.org
  */
 
 .ve-ui-specialCharacterDialog .oo-ui-outlineOptionWidget {
@@ -20,6 +20,15 @@
 
 .ve-ui-specialCharacterDialog .oo-ui-bookletLayout {
 	height: 150px;
+}
+
+/* When displaying inside another dialog, make the menu narrower */
+.oo-ui-dialog .ve-ui-specialCharacterDialog .oo-ui-bookletLayout .oo-ui-menuLayout-menu {
+	width: 10em;
+}
+
+.oo-ui-dialog .ve-ui-specialCharacterDialog .oo-ui-bookletLayout .oo-ui-menuLayout-content {
+	left: 10em;
 }
 
 .oo-ui-bookletLayout-stackLayout > .ve-ui-specialCharacterPage {
@@ -47,10 +56,10 @@
 	display: inline-block;
 	margin: 0 3px 3px 0;
 	border: 1px solid #e6e6e6;
-	-webkit-transition: all 200ms;
-	-moz-transition: all 200ms;
-	-o-transition: all 200ms;
-	transition: all 200ms;
+	-webkit-transition: border-color 200ms;
+	-moz-transition: border-color 200ms;
+	-o-transition: border-color 200ms;
+	transition: border-color 200ms;
 }
 
 .ve-ui-specialCharacterPage-character:hover {
