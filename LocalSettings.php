@@ -19,6 +19,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 // Define constants for my additional namespaces.
 define("NS_ForReview", 5000); // This MUST be even.
 define("NS_ForReview_TALK", 5001); // This MUST be the following odd integer.
+$wgExtraNamespaces[NS_ForReview]      = "ForReview";
+$wgExtraNamespaces[NS_ForReview_TALK] = "ForReview_talk"; // Note underscores in the namespace name.
 // end by eli =====================
 
 
@@ -233,6 +235,11 @@ require_once "$IP/extensions/ConfirmAccount/ConfirmAccount.php";    //downloaded
 require_once("$IP/extensions/EmailUsers/EmailUsers.php");           //DONE[***] copied from MW 1.25.2
 wfLoadExtension( 'EmbedVideo' );                                    //DONE[***] copied from MW 1.25.2
 
+/* seems not needed
+$wgEnableAPI = true;
+$wgEnableWriteAPI = true; //are required in order to use the write API.
+*/
+
 //===================VisualEditor===================================
 require_once "$IP/extensions/VisualEditor/VisualEditor.php";
 
@@ -244,9 +251,13 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 
 // OPTIONAL: Enable VisualEditor's experimental code features
 #$wgDefaultUserOptions['visualeditor-enable-experimental'] = 1;
-                                              
+
+/*seems not needed
 //from: https://www.mediawiki.org/wiki/Thread:Extension_talk:VisualEditor/Enable_Visual_Editor_for_'create'_page
 $wgVisualEditorNamespaces = array(NS_MAIN, NS_TALK, NS_USER, NS_USER_TALK, NS_ForReview, NS_ForReview_TALK);
+*/
+
+$wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in VisualEditor
 
 ///* not needed on mac mini
 $wgVirtualRestConfig['modules']['parsoid'] = array(
@@ -315,8 +326,6 @@ $wgGroupPermissions['EoE_Managing_Editor']['talk']  = true;
 
 //from Lockdown
 // Add namespaces.
-$wgExtraNamespaces[NS_ForReview]      = "ForReview";
-$wgExtraNamespaces[NS_ForReview_TALK] = "ForReview_talk"; // Note underscores in the namespace name.
 
 $wgSpecialPageLockdown['*']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
@@ -468,5 +477,6 @@ $wgShowIPinHeader = false;
 $wgActionLockdown['history']              = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 //$wgNamespacePermissionLockdown[*]['move'] = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor'); - this caused probs.
 //==================================================
-$wgReadOnly = 'Upgrading to MediaWiki 1.26.2';
+// $wgReadOnly = 'Upgrading to MediaWiki 1.26.2'; //uncomment this line everytime we upgrade to have database-readonly access.
+//==================================================
 
