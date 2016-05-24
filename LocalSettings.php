@@ -17,10 +17,12 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 // start by eli =====================
 // Define constants for my additional namespaces.
+/*
 define("NS_ForReview", 5000); // This MUST be even.
 define("NS_ForReview_TALK", 5001); // This MUST be the following odd integer.
 $wgExtraNamespaces[NS_ForReview]      = "ForReview";
 $wgExtraNamespaces[NS_ForReview_TALK] = "ForReview_talk"; // Note underscores in the namespace name.
+*/
 // end by eli =====================
 
 
@@ -331,8 +333,13 @@ $wgSpecialPageLockdown['*']         = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
+/*
 $wgNamespacePermissionLockdown[NS_ForReview]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_ForReview_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+*/
+
+$wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
 $wgNamespacePermissionLockdown[NS_MAIN]['edit']         = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_MAIN]['createpage']   = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
