@@ -260,6 +260,7 @@ $wgVisualEditorNamespaces = array(NS_MAIN, NS_TALK, NS_USER, NS_USER_TALK, NS_Fo
 */
 
 $wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in VisualEditor
+$wgContentNamespaces[] = NS_TEMPLATE_TALK; //this adds this namespace in VisualEditor
 
 ///* not needed on mac mini
 $wgVirtualRestConfig['modules']['parsoid'] = array(
@@ -338,10 +339,25 @@ $wgNamespacePermissionLockdown[NS_ForReview]['*']      = array('EoE_Author', 'Eo
 $wgNamespacePermissionLockdown[NS_ForReview_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 */
 
-$wgNamespacePermissionLockdown[NS_TEMPLATE]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_TEMPLATE]['createpage']   = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_TEMPLATE]['delete']       = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_TEMPLATE]['undelete']     = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
+foreach($spaces as $space)
+{
+    $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+    $wgNamespacePermissionLockdown[$space]['createpage']   = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+    $wgNamespacePermissionLockdown[$space]['delete']       = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+    $wgNamespacePermissionLockdown[$space]['undelete']     = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+}
+
+/* To modify NS_MEDIAWIKI & NS_MEDIAWIKI_TALK user must be both 'administrator' and 'EoE_Administrator' */
+$spaces = array(NS_MEDIAWIKI, NS_MEDIAWIKI_TALK);
+foreach($spaces as $space)
+{
+    $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Administrator');
+    $wgNamespacePermissionLockdown[$space]['createpage']   = array('EoE_Administrator');
+    $wgNamespacePermissionLockdown[$space]['delete']       = array(''); //no one can delete
+    $wgNamespacePermissionLockdown[$space]['undelete']     = array(''); //no one can undelete
+    $wgNamespacePermissionLockdown[$space]['move']         = array(''); //no one can move
+}
 
 $wgNamespacePermissionLockdown[NS_MAIN]['edit']         = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_MAIN]['createpage']   = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
