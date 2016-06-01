@@ -2,46 +2,54 @@
 $GLOBALS['doc_root'] = "/var/www/html";                    //for archive
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";     //for mac mini
 
-
 $destination_title = "Black-footed penguin";
+// $destination_title = "Cholera";
 
-$destination_title = str_replace(" ", "_", $destination_title);
-if($wiki_path = get_wiki_text($destination_title))
+process_title($destination_title);
+
+
+
+function process_title($destination_title)
 {
-    $destination_dates = get_dates($wiki_path);
-    // $post_titles = array("\(About_the_EoE\)");
-    // $post_titles = array("\(Agricultural_\&_Resource_Economics\)");
-    $post_titles = get_post_titles();
-    
-    foreach($post_titles as $post_title)
-    {   //Palau_\(About_the_EoE\)
-        $title = $destination_title . "_" . $post_title;
+    $destination_title = str_replace(" ", "_", $destination_title);
+    if($wiki_path = get_wiki_text($destination_title))
+    {
+        $destination_dates = get_dates($wiki_path);
+        // $post_titles = array("\(About_the_EoE\)");
+        // $post_titles = array("\(Agricultural_\&_Resource_Economics\)");
+        $post_titles = get_post_titles();
 
-        if($wiki_path = get_wiki_text($title))
-        {
-            $title_dates = get_dates($wiki_path);
-            if($destination_dates == $title_dates) //then put the redirect
+        foreach($post_titles as $post_title)
+        {   //Palau_\(About_the_EoE\)
+            $title = $destination_title . "_" . $post_title;
+
+            if($wiki_path = get_wiki_text($title))
             {
-                //start saving...
-                $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
-                $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[$destination_title]]"); fclose($handle);
-                echo "\n saving redirect on title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
-                
-                //start edit the search results topic page e.g. "About_the_EoE_\(search_results_for\)"
-                if(preg_match("/\((.*?)\\\\\)/ims", $post_title, $arr)) //post_title is e.g. "\(About_the_EoE\)"
+                $title_dates = get_dates($wiki_path);
+                if($destination_dates == $title_dates) //then put the redirect
                 {
-                    $search_title = $arr[1]; // e.g. "About_the_EoE"
-                    $search_title .= "_\(search_results_for\)";
-                    edit_the_search_results_topic_page($search_title, $title, $destination_title);
-                    
-                    echo "\n" . $arr[1] . "\n";
+                    //start saving...
+                    $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
+                    $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[$destination_title]]"); fclose($handle);
+                    echo "\n saving redirect on title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
+
+                    //start edit the search results topic page e.g. "About_the_EoE_\(search_results_for\)"
+                    if(preg_match("/\((.*?)\\\\\)/ims", $post_title, $arr)) //post_title is e.g. "\(About_the_EoE\)"
+                    {
+                        $search_title = $arr[1]; // e.g. "About_the_EoE"
+                        $search_title .= "_\(search_results_for\)";
+                        edit_the_search_results_topic_page($search_title, $title, $destination_title);
+
+                        echo "\n" . $arr[1] . "\n";
+                    }
                 }
             }
         }
+
     }
+    else exit("\nnot valid title [$destination_title]\n");
     
 }
-else exit("\nnot valid title [$destination_title]\n");
 
 /*
 $destination_title = "Agricultural_\&_Resource_Economics_\(search_results_for\)";
@@ -52,7 +60,6 @@ function edit_the_search_results_topic_page($page_to_open, $to_replace, $replace
     $to_replace = str_replace("\\", "", $to_replace);
     $to_replace = str_replace("_", " ", $to_replace);
     $to_replace = str_replace("&", "&amp;", $to_replace);
-
     $replace_with = str_replace("_", " ", $replace_with);
     
     echo "\n -- to replace [$to_replace]\n";
