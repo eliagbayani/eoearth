@@ -2,16 +2,62 @@
 $GLOBALS['doc_root'] = "/var/www/html";                    //for archive
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";     //for mac mini
 
+/*
 $destination_title = "Black-footed penguin";
-// $destination_title = "Cholera";
-
+$destination_title = "Scope &amp; Content";
+$destination_title = "Environment &amp; Security";
+$destination_title = "Ecoregions (collection)";
+$destination_title = "Black, Joseph";
 process_title($destination_title);
+*/
 
+process_urls();
+
+function process_urls()
+{
+    $domain = "http://editors.eol.localhost";
+    $url = $domain . "/eoearth/wiki/Search_Results_for_Main_Topics";
+    $html = file_get_contents($url);
+    if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr))
+    {
+        //href="/eoearth/wiki/About_the_EoE_(search_results_for)"
+        if(preg_match_all("/href=\"(.*?)\"/ims", $arr[1], $arr2)) //23 urls
+        {
+            foreach($arr2[1] as $url)
+            {
+                $html = file_get_contents($domain.$url);
+                
+                if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
+                if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4))
+                {
+                    // if(preg_match_all("/href=(.*?)<\/a>/ims", $arr4[1], $arr5)) //many urls
+                    if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) //many urls
+                    {
+                        foreach($arr5[1] as $row)
+                        {
+                            if(stripos($row, $titlex) !== false)
+                            {
+                                echo "\n$row";
+                                $row = str_replace(" $titlex", "", $row);
+                                echo " - [$row]";
+                            }
+                        }
+                    }
+                }
+                break; //debug
+            }
+        }
+    }
+}
 
 
 function process_title($destination_title)
 {
     $destination_title = str_replace(" ", "_", $destination_title);
+    $destination_title = str_replace("&amp;", "\&", $destination_title);
+    $destination_title = str_replace("(", "\(", $destination_title);
+    $destination_title = str_replace(")", "\)", $destination_title);
+    
     if($wiki_path = get_wiki_text($destination_title))
     {
         $destination_dates = get_dates($wiki_path);
@@ -30,7 +76,7 @@ function process_title($destination_title)
                 {
                     //start saving...
                     $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
-                    $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[$destination_title]]"); fclose($handle);
+                    $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[" . str_replace("\\", "", $destination_title) . "]]"); fclose($handle);
                     echo "\n saving redirect on title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
 
                     //start edit the search results topic page e.g. "About_the_EoE_\(search_results_for\)"
@@ -39,16 +85,13 @@ function process_title($destination_title)
                         $search_title = $arr[1]; // e.g. "About_the_EoE"
                         $search_title .= "_\(search_results_for\)";
                         edit_the_search_results_topic_page($search_title, $title, $destination_title);
-
-                        echo "\n" . $arr[1] . "\n";
                     }
                 }
             }
         }
 
     }
-    else exit("\nnot valid title [$destination_title]\n");
-    
+    // else echo("\nnot valid title or does not exist [$destination_title]\n");
 }
 
 /*
@@ -60,7 +103,11 @@ function edit_the_search_results_topic_page($page_to_open, $to_replace, $replace
     $to_replace = str_replace("\\", "", $to_replace);
     $to_replace = str_replace("_", " ", $to_replace);
     $to_replace = str_replace("&", "&amp;", $to_replace);
+
+    $replace_with = str_replace("\\", "", $replace_with);
     $replace_with = str_replace("_", " ", $replace_with);
+    $replace_with = str_replace("&", "&amp;", $replace_with);
+    
     
     echo "\n -- to replace [$to_replace]\n";
     echo "\n -- replace with [$replace_with]\n";
@@ -85,7 +132,7 @@ function get_wiki_text($title)
     $temp_wiki_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/temp.wiki";
     $handle = fopen($temp_wiki_file, "w"); fclose($handle); //initialize temp wiki
     
-    echo "\n reading title: [$title]";  shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/getText.php " . $title . " > $temp_wiki_file");
+    echo "\n reading title: [$title]\n";  shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/getText.php " . $title . " > $temp_wiki_file");
     if(filesize($temp_wiki_file)) return $temp_wiki_file;
     else return false;
 }
@@ -137,6 +184,8 @@ function get_post_titles()
     "\(Water\)",
     "\(Weather_\&_Climate\)",
     "\(Wildlife\)");
+
+    $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
 }
 /*
