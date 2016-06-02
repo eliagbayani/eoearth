@@ -1,25 +1,41 @@
 <?php
-$GLOBALS['doc_root'] = "/var/www/html";                    //for archive
-$GLOBALS['doc_root'] = "/Library/WebServer/Documents";     //for mac mini
+$GLOBALS['doc_root'] = "/var/www/html";                 //for archive
+$GLOBALS['domain'] = "http://editors.eol.org";          //for mac mini
 
-/*
-$destination_title = "Black-footed penguin";
-$destination_title = "Scope &amp; Content";
-$destination_title = "Environment &amp; Security";
-$destination_title = "Ecoregions (collection)";
-$destination_title = "Black, Joseph";
-$destination_title = "Heaviside's dolphin";
-$destination_title = "Capitalism 3.0: Chapter 6";
+$GLOBALS['doc_root'] = "/Library/WebServer/Documents";  //for mac mini
+$GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
 
-process_title($destination_title);
-*/
+if($title = @$argv[1])
+{
+    print_r($argv);
+    process_title($title);
+}
+else
+{
+    // process_one();
+    process_urls();
+}
 
-process_urls();
+function process_one()
+{
+    $destination_title = "Black-footed penguin";
+    $destination_title = "Scope &amp; Content";
+    $destination_title = "Environment &amp; Security";
+    $destination_title = "Ecoregions (collection)";
+    $destination_title = "Black, Joseph";
+    $destination_title = "Heaviside's dolphin";
+    $destination_title = "Capitalism 3.0: Chapter 6";
+    $destination_title = "United States";
+    $destination_title = "Saddle-backed dolphin";
+    $destination_title = "Hector's dolphin";
+    $destination_title = "Rough-toothed dolphin";
+    $destination_title = "Argentina";
+    process_title($destination_title);
+}
 
 function process_urls()
 {
-    $domain = "http://editors.eol.localhost";
-    $url = $domain . "/eoearth/wiki/Search_Results_for_Main_Topics";
+    $url = $GLOBALS['domain'] . "/eoearth/wiki/Search_Results_for_Main_Topics";
     $html = file_get_contents($url);
     if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr))
     {
@@ -28,8 +44,7 @@ function process_urls()
         {
             foreach($arr2[1] as $url)
             {
-                $html = file_get_contents($domain.$url);
-                
+                $html = file_get_contents($GLOBALS['domain'].$url);
                 if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
                 if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4))
                 {
@@ -41,8 +56,11 @@ function process_urls()
                             if(stripos($row, $titlex) !== false)
                             {
                                 echo "\n$row";
-                                $row = str_replace(" $titlex", "", $row);
-                                echo " - [$row]";
+                                $row = trim(str_replace(" $titlex", "", $row));
+                                echo " --- [$row]";
+                                
+                                /* process_title($row); -- for some reason this does not work, thus using shell below which works */
+                                echo "\n processing: [$row]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki.php " . "\"$row\""); echo "\n";
                             }
                         }
                     }
@@ -52,7 +70,6 @@ function process_urls()
         }
     }
 }
-
 
 function process_title($destination_title)
 {
@@ -66,7 +83,7 @@ function process_title($destination_title)
     {
         $destination_dates = get_dates($wiki_path);
         if(!$destination_dates) { echo "\nno dates\n"; return; }
-        
+
         // $post_titles = array("\(About_the_EoE\)");
         // $post_titles = array("\(Agricultural_\&_Resource_Economics\)");
         $post_titles = get_post_titles();
@@ -93,11 +110,11 @@ function process_title($destination_title)
                         edit_the_search_results_topic_page($search_title, $title, $destination_title);
                     }
                 }
+                else echo "\nDates are not equal.\n";
             }
         }
 
     }
-    // else echo("\nnot valid title or does not exist [$destination_title]\n");
 }
 
 /*
@@ -140,7 +157,11 @@ function get_wiki_text($title)
     
     echo "\n reading title: [$title]\n";  shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/getText.php " . $title . " > $temp_wiki_file");
     if(filesize($temp_wiki_file)) return $temp_wiki_file;
-    else return false;
+    else 
+    {
+        echo("\nnot valid title or does not exist [$title]\n");
+        return false;
+    }
 }
 
 function get_dates($wiki)
@@ -191,7 +212,7 @@ function get_post_titles()
     "\(Weather_\&_Climate\)",
     "\(Wildlife\)");
 
-    $search_titles = array("\(About_the_EoE\)");
+    // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
 }
 /*
