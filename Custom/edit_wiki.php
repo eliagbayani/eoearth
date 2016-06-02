@@ -2,8 +2,10 @@
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
 $GLOBALS['domain'] = "http://editors.eol.org";          //for mac mini
 
+/*
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";  //for mac mini
 $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
+*/
 
 if($title = @$argv[1])
 {
@@ -42,7 +44,36 @@ function process_urls()
         //href="/eoearth/wiki/About_the_EoE_(search_results_for)"
         if(preg_match_all("/href=\"(.*?)\"/ims", $arr[1], $arr2)) //23 urls
         {
-            foreach($arr2[1] as $url)
+            /* working but not being used anymore... decided to run these 23 urls one by one in archive...
+            $urls = $arr2[1];
+            */
+            
+            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Ecology_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Environmental_%26_Earth_Science_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Energy_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Environmental_Law_%26_Policy_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Environmental_Humanities_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Food_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Forests_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Geography_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Hazards_%26_Disasters_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Health_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Mining_%26_Materials_(search_results_for)");
+            // $urls = array("/eoearth/wiki/People_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Physics_%26_Chemistry_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Pollution_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Water_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
+            print_r($urls);
+
+            foreach($urls as $url)
             {
                 $html = file_get_contents($GLOBALS['domain'].$url);
                 if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
@@ -60,7 +91,7 @@ function process_urls()
                                 echo " --- [$row]";
                                 
                                 /* process_title($row); -- for some reason this does not work, thus using shell below which works */
-                                echo "\n processing: [$row]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki.php " . "\"$row\""); echo "\n";
+                                echo "\n processing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki.php " . "\"$row\"");
                             }
                         }
                     }
