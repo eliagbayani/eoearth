@@ -8,6 +8,9 @@ $destination_title = "Scope &amp; Content";
 $destination_title = "Environment &amp; Security";
 $destination_title = "Ecoregions (collection)";
 $destination_title = "Black, Joseph";
+$destination_title = "Heaviside's dolphin";
+$destination_title = "Capitalism 3.0: Chapter 6";
+
 process_title($destination_title);
 */
 
@@ -57,10 +60,13 @@ function process_title($destination_title)
     $destination_title = str_replace("&amp;", "\&", $destination_title);
     $destination_title = str_replace("(", "\(", $destination_title);
     $destination_title = str_replace(")", "\)", $destination_title);
+    $destination_title = str_replace("'", "\'", $destination_title);
     
     if($wiki_path = get_wiki_text($destination_title))
     {
         $destination_dates = get_dates($wiki_path);
+        if(!$destination_dates) { echo "\nno dates\n"; return; }
+        
         // $post_titles = array("\(About_the_EoE\)");
         // $post_titles = array("\(Agricultural_\&_Resource_Economics\)");
         $post_titles = get_post_titles();
