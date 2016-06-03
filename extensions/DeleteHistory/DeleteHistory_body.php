@@ -55,7 +55,8 @@ class DeleteHistory extends SpecialPage
             return;
         }
 
-        $dbw =& wfGetDB( DB_MASTER );
+        // $dbw =& wfGetDB( DB_MASTER );    //commented by Eli caused an error: <b>Strict Standards</b>:  Only variables should be assigned by reference
+        $dbw = wfGetDB( DB_MASTER );        //added by Eli, removed the error message
 
         // Get request data from, e.g.
         $param = $wgRequest->getText('param');
@@ -200,10 +201,13 @@ class DeleteHistory extends SpecialPage
                     ");
             }
 
-            if ($out_opt)
+            if(isset($out_opt))
             {
-                $wgOut->addWikiText('=' . wfMsg('opt_stat') . '=');
-                $wgOut->addHTML($out_opt . '<br />');
+                if ($out_opt)
+                {
+                    $wgOut->addWikiText('=' . wfMsg('opt_stat') . '=');
+                    $wgOut->addHTML($out_opt . '<br />');
+                }
             }
             if ($out_logs)
             {
