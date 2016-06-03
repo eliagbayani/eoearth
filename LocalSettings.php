@@ -242,6 +242,9 @@ $wgEnableAPI = true;
 $wgEnableWriteAPI = true; //are required in order to use the write API.
 */
 
+//===================DeleteHistory===================================
+$wgGroupPermissions['sysop']['DeleteHistory'] = true;
+require_once("$IP/extensions/DeleteHistory/DeleteHistory.php");
 //===================VisualEditor===================================
 require_once "$IP/extensions/VisualEditor/VisualEditor.php";
 
