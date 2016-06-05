@@ -48,7 +48,7 @@ function process_urls()
             $urls = $arr2[1];
             // */
             
-            // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
             // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
@@ -96,7 +96,7 @@ function process_urls()
                         }
                     }
                 }
-                break; //debug
+                // break; //debug
             }
         }
     }
@@ -146,6 +146,58 @@ function process_title($destination_title)
         }
 
     }
+    else //The whole-word search is negative
+    {
+        //will search for the first among the 23 options - e.g. Pinniped (About the EoE)
+        echo "\n =========================================================";
+        echo "\n The whole-word search is negative for [$destination_title]"; // e.g. $destination_title = "Pinniped"
+        echo "\n =========================================================\n";
+        $post_titles = get_post_titles();
+        // $post_titles = array("\(About_the_EoE\)"); //debug
+        
+        foreach($post_titles as $post_title)
+        {
+            $title = $destination_title . "_" . $post_title;
+            if($wiki_path = get_wiki_text($title))
+            {
+                $found = $title; //e.g. "Pinniped_\(About_the_EoE\)"
+                if($destination_dates = get_dates($wiki_path)) //proceed only if there are dates found
+                {
+                    second_try($found, $post_title, $destination_title, $destination_dates);
+                    return; //just get the first available post_title among the 23
+                }
+            }
+        }
+        echo "\nStill nothing found any for [$destination_title]\n";
+    }
+    
+}
+
+function second_try($found, $post_title_param, $destination_title, $destination_dates)
+{
+    echo "\nfound             : [$found]";
+    echo "\npost_title        : [$post_title_param]";
+    echo "\ndestination_title : [$destination_title]\n";
+    
+    $post_titles = get_post_titles();
+    // $post_titles = array("\(Biodiversity\)"); //debug
+    
+    $post_titles = array_diff($post_titles, array($post_title_param)); //exclude the $post_title_param
+    foreach($post_titles as $post_title)
+    {
+        $title = $destination_title . "_" . $post_title;
+        if($wiki_path = get_wiki_text($title)) //$title e.g. Pinniped_\(Biodiversity\), if exists then put the redirect to $found on it
+        {
+            $title_dates = get_dates($wiki_path);
+            if($destination_dates == $title_dates) //then put the redirect
+            {
+                //start saving...
+                $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
+                $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[" . str_replace("\\", "", $found) . "]]"); fclose($handle);
+                echo "\n saving redirect on title: [$title]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
+            }
+        }
+    }
 }
 
 /*
@@ -161,7 +213,6 @@ function edit_the_search_results_topic_page($page_to_open, $to_replace, $replace
     $replace_with = str_replace("\\", "", $replace_with);
     $replace_with = str_replace("_", " ", $replace_with);
     $replace_with = str_replace("&", "&amp;", $replace_with);
-    
     
     echo "\n -- to replace [$to_replace]\n";
     echo "\n -- replace with [$replace_with]\n";
@@ -185,12 +236,13 @@ function get_wiki_text($title)
 {
     $temp_wiki_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/temp.wiki";
     $handle = fopen($temp_wiki_file, "w"); fclose($handle); //initialize temp wiki
-    
+    clearstatcache(); //important additon, a function to clear the information that PHP caches about a file.
     echo "\n reading title: [$title]\n";  shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/getText.php " . $title . " > $temp_wiki_file");
     if(filesize($temp_wiki_file)) return $temp_wiki_file;
     else 
     {
-        echo("\nnot valid title or does not exist [$title]\n");
+        // echo("\nnot valid title or does not exist [$title]");
+        // echo "\nfilesize[$temp_wiki_file]: " . filesize($temp_wiki_file) . "\n";
         return false;
     }
 }
