@@ -342,6 +342,10 @@ $wgNamespacePermissionLockdown[NS_ForReview]['*']      = array('EoE_Author', 'Eo
 $wgNamespacePermissionLockdown[NS_ForReview_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 */
 
+//so that public won't see articles in Template namespace, or those for review articles
+$wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Member', 'EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Member', 'EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+
 $spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
 foreach($spaces as $space)
 {
