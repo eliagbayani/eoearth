@@ -1,5 +1,7 @@
 <?php
 /* This is run in command-line. Can be ran in two ways:
+Note: in archive, we need to use: 
+$ sudo php edit_wiki.php
 
 1st: provide a title
 $ php Custom/edit_wiki.php "Agriculture II"
@@ -306,6 +308,9 @@ function get_post_titles()
     "\(Water\)",
     "\(Weather_\&_Climate\)",
     "\(Wildlife\)");
+
+    //additional
+    $search_titles[] = "\(Aquaculture\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
