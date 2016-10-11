@@ -286,6 +286,15 @@ if ( $_SERVER['REMOTE_ADDR'] == '127.0.0.1' ) {
 */
 //==================================================================
 
+require_once "$IP/extensions/UserFunctions/UserFunctions.php";      //added 10-Oct-2016
+
+//================================================= UserFunctions: https://www.mediawiki.org/wiki/Extension:UserFunctions
+$wgUFEnablePersonalDataFunctions = true;
+$wgUFAllowedNamespaces = array(NS_MAIN => true, NS_USER => true);
+// $wgUFEnableSpecialContexts = false;
+//================================================= 
+
+
 # End of automatically generated settings.
 # Add more configuration options below.
 
