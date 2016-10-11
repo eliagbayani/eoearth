@@ -1,11 +1,14 @@
 <?php
-$GLOBALS['doc_root'] = "/var/www/html";                 //for archive
-$GLOBALS['domain'] = "http://editors.eol.org";          //for mac mini
 
-/*
+/* for archive server (remote)
+$GLOBALS['doc_root'] = "/var/www/html";                 //for archive
+$GLOBALS['domain'] = "http://editors.eol.org";          //for archive
+*/
+
+// /* for mac mini (local)
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";  //for mac mini
 $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
-*/
+// */
 
 if($title = @$argv[1])
 {
