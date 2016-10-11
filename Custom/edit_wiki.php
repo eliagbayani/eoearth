@@ -56,7 +56,7 @@ function process_urls()
         //href="/eoearth/wiki/About_the_EoE_(search_results_for)"
         if(preg_match_all("/href=\"(.*?)\"/ims", $arr[1], $arr2)) //23 urls
         {
-            // /* working but not being used anymore... decided to run these 23 urls one by one in archive...
+            // /* working but not being used anymore... decided to run these 23 urls one by one in archive... bec it will take time and better to run them one by one for manageability
             $urls = $arr2[1];
             // */
             
