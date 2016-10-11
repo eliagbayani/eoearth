@@ -1,4 +1,13 @@
 <?php
+/* This is run in command-line. Can be ran in two ways:
+
+1st: provide a title
+$ php Custom/edit_wiki.php "Agriculture II"
+
+2nd: will run many titles...
+$ php Custom/edit_wiki.php
+*/
+
 
 /* for archive server (remote)
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
@@ -15,13 +24,13 @@ if($title = @$argv[1])
     print_r($argv);
     process_title($title);
 }
-else
+else //will run many titles...
 {
     // process_one();
     process_urls();
 }
 
-function process_one()
+function process_one() //you can use command line with interactive title like so: $ php Custom/edit_wiki.php "Agriculture II"
 {
     $destination_title = "Black-footed penguin";
     $destination_title = "Scope &amp; Content";
