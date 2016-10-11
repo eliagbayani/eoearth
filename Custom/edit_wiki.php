@@ -311,6 +311,12 @@ function get_post_titles()
 
     //additional
     $search_titles[] = "\(Aquaculture\)";
+    $search_titles[] = "\(Complex_Systems\)";
+    $search_titles[] = "\(Consumption\)";
+    $search_titles[] = "\(Ecosystem_Services\)";
+    $search_titles[] = "\(Food_security\)";
+    $search_titles[] = "\(Fisheries\)";
+    $search_titles[] = "\(Global\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
