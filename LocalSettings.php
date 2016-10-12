@@ -316,8 +316,8 @@ $wgEmailAuthentication  = true;
 $wgEnableEmail          = true;
 $wgAllowHTMLEmail       = true;
 $wgEnableUserEmail      = true; # UPO
-$wgEmergencyContact     = "eagbayani@eol.org";
-$wgPasswordSender       = "eagbayani@eol.org";
+$wgEmergencyContact     = "hammockj@si.edu";
+$wgPasswordSender       = "hammockj@si.edu";
 $wgEnotifUserTalk       = true; # UPO
 $wgEnotifWatchlist      = true; # UPO
 
@@ -446,7 +446,7 @@ $wgConfirmAccountRequestFormItems = array(  'UserName'        => array( 'enabled
 
 $wgConfirmAccountRequestFormItems['Biography']['minWords'] = 0;
 // $wgGroupPermissions['sysop']['createaccount'] = false; //do this to disable sysop from creating accounts
-$wgConfirmAccountContact = 'eagbayani@eol.org'; // a beaurocrat or EoE_Topic_Editor or EoE_Managing_Editor
+$wgConfirmAccountContact = 'hammockj@si.edu'; // a beaurocrat or EoE_Topic_Editor or EoE_Managing_Editor
 
 
 //all these folders must have write permissions
