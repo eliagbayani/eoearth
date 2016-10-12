@@ -510,47 +510,27 @@ ini_set( 'display_errors', 1 );
     $wgShowDebug = true;
     $wgDevelopmentWarnings = true;
 */
-
 $wgShowIPinHeader = false;
-
 //================================================ history
-
 //added 2016 May 14
 //$wgActionLockdown['history'] = array('user'); //only logged-in users can view history - working but used below instead
 $wgActionLockdown['history']              = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 //$wgNamespacePermissionLockdown[*]['move'] = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor'); - this caused probs.
-
-//================================================ Footer maintenance
-/*
-proposed by Jen: https://eol-jira.bibalex.org/browse/DATA-1632
-Privacy policy | Neutrality Policy | Terms of Use | About The Encyclopedia of Earth
-Project:Privacy_policy | Neutrality_Policy | Terms_of_use | Project:About
-
-default footer:
-Privacy policy | About The Encyclopedia of Earth | Disclaimers | Terms of Service
-
-Main source for Footer maintenance: https://www.mediawiki.org/wiki/Manual:Footer
-Just FYI:
-- when editing MediaWiki:Aboutsite, you'll get this:
+//================================================ Footer maintenance: https://www.mediawiki.org/wiki/Manual:Footer
+/* Just FYI: when editing MediaWiki:Aboutsite, you'll get this:
 About {{SITENAME}}
-- I put single dash "-" so this will not appear. Then just added abouttheeoe below, so it will appear last in footer links.
-*/
-
+I then put a single dash "-" so link will not appear. Then just added abouttheeoe below, so it will appear last in footer links. */
 $wgHooks['SkinTemplateOutputPageBeforeExec'][] = 'lfTOSLink';
 function lfTOSLink( $sk, &$tpl )
 {
     $tpl->set( 'neutralitypolicy', $sk->footerLink( 'neutralitypolicy', 'neutralitypolicypage' ) );
     $tpl->data['footerlinks']['places'][] = 'neutralitypolicy';
-
     $tpl->set( 'termsofuse', $sk->footerLink( 'termsofuse', 'termsofusepage' ) );
     $tpl->data['footerlinks']['places'][] = 'termsofuse';
-
     $tpl->set( 'abouttheeoe', $sk->footerLink( 'abouttheeoe', 'abouttheeoepage' ) );
     $tpl->data['footerlinks']['places'][] = 'abouttheeoe';
-    
     return true;
 }
-
 //==================================================
 // $wgReadOnly = 'Upgrading to MediaWiki 1.26.2'; //uncomment this line everytime we upgrade to have database-readonly access.
 //==================================================
