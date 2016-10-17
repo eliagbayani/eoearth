@@ -1,0 +1,50 @@
+==References==
+
+* Weber, Lin. 1998, Old Napa Valley, the History to 1900. Wine Ventures Publishing.
+* California Native Plant Society. 2001. Inventory of Rare and Endangered Plants of California, Sixth Edition.
+* Napa County Wine Industry Growth, Master Environmental Assessment. 1990-2010 Napa County Department of Agriculture. Napa County Agricultural Crop Reports.
+* Ruygt, Jake. A Flora of Napa County. Unpublished. San Francisco Estuary Institute, 2012. Historical Atlas of Napa County.
+
+</div>
+
+<div id="glossaryDisplay" class="publishingInfo borderTop borderBottom">
+  <div class="modRow" style="padding-top: 12px"> <span class="title">Glossary</span></div>
+  <div id="glossaryDisplayContainer" style="line-height: 18px; display: none"></div>
+</div>
+
+<div id="citation" class="marg_b_15">
+  ===Citation===
+  Ruygt, J. (2013). Flora of Napa County, California. Retrieved from http://editors.eol.org/eoearth/wiki/Flora_of_Napa_County,_California
+</div>
+<div id="contentViewImageViewDialog" title="Larger Image" style="display: none">[[Image:index.html]]</div>
+</div>
+
+
+<div id="pmid_1470" class="module-Comments plain comments">
+  <div class="addCommentContainerNoBorder">
+    <div id="reloadAnchorPoint" class="userCommentsHeader">
+      ===<span class="strong">0</span> Comments===
+    </div>
+    <div class="addCommentsStatusBar modRow"></div>
+  </div>
+  <div class="userComments"></div>
+</div>
+</div>
+
+<div id="sidebar" class="sash"></div>
+</div>
+
+<div class="wrapper">
+  <div id="footer_custom">
+    <div id="publish" class="no_print"><br />
+      <div id="ncse_logo" class="mir">[[Image:ncse_logo.gif]] [http://www.ncseonline.org NCSE]</div>
+      <div id="bu_logo" class="mir">[[Image:bu_logo.gif]] [http://www.bu.edu Boston University]</div>
+
+Unless otherwise noted, all text is available under the terms of the [http://creativecommons.org/licenses/by-sa/2.5/ Creative Commons Attribution-Share Alike license]. <br />[[Privacy Policy]] | [[Neutrality           Policy]]<br /> Supported by the [[Environmental Information Coalition]] and the [http://www.ncseonline.org/ National Council for Science and the Environment].
+
+    </div>
+  </div>
+  
+  <div id="trunity_admin_footer"></div>
+  <div id="processing" style="top: 50%; left: 50%; position: absolute; display: none; z-index: 999">[[Image:loading.gif]]<br /> Processing... </div>
+</div>

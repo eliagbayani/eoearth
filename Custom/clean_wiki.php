@@ -1,27 +1,27 @@
 <?php
-/* This will put redirect to applicable pages...
+/* This will remove portions of an article...
 
 This is ran in command-line. Can be ran in two ways:
 Note: in archive, we need to use: 
-$ sudo php edit_wiki.php
+$ sudo php clean_wiki.php
 
 1st: provide a title
-$ php Custom/edit_wiki.php "Agriculture II"
+$ php Custom/clean_wiki.php "Agriculture II"
 
 2nd: will run many titles...
-$ php Custom/edit_wiki.php
+$ php Custom/clean_wiki.php
 */
 
 
-// /* for archive server (remote)
+/* for archive server (remote)
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
 $GLOBALS['domain'] = "http://editors.eol.org";          //for archive
-// */
+*/
 
-/* for mac mini (local)
+// /* for mac mini (local)
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";  //for mac mini
 $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
-*/
+// */
 
 if($title = @$argv[1])
 {
@@ -30,11 +30,12 @@ if($title = @$argv[1])
 }
 else //will run many titles...
 {
+    exit("\nexit muna...\n");
     // process_one();
     process_urls();
 }
 //========================================[start functions]========================================
-function process_one() //you can use command line with interactive title like so: $ php Custom/edit_wiki.php "Agriculture II"
+function process_one() //you can use command line with interactive title like so: $ php Custom/clean_wiki.php "Agriculture II"
 {
     $destination_title = "Black-footed penguin";
     $destination_title = "Scope &amp; Content";
@@ -107,7 +108,7 @@ function process_urls()
                                 echo " --- [$row]";
                                 
                                 /* process_title($row); -- for some reason this does not work, thus using shell below which works */
-                                echo "\n processing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki.php " . "\"$row\"");
+                                echo "\n processing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
                             }
                         }
                     }
@@ -128,93 +129,25 @@ function process_title($destination_title)
     
     if($wiki_path = get_wiki_text($destination_title))
     {
-        $destination_dates = get_dates($wiki_path);
-        if(!$destination_dates) { echo "\nno dates\n"; return; }
-
-        // $post_titles = array("\(About_the_EoE\)");
-        // $post_titles = array("\(Agricultural_\&_Resource_Economics\)");
-        $post_titles = get_post_titles();
-
-        foreach($post_titles as $post_title)
-        {   //Palau_\(About_the_EoE\)
-            $title = $destination_title . "_" . $post_title;
-
-            if($wiki_path = get_wiki_text($title))
-            {
-                $title_dates = get_dates($wiki_path);
-                if($destination_dates == $title_dates) //then put the redirect
-                {
-                    //start saving...
-                    $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
-                    $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[" . str_replace("\\", "", $destination_title) . "]]"); fclose($handle);
-                    echo "\n saving redirect on title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
-
-                    //start edit the search results topic page e.g. "About_the_EoE_\(search_results_for\)"
-                    if(preg_match("/\((.*?)\\\\\)/ims", $post_title, $arr)) //post_title is e.g. "\(About_the_EoE\)"
-                    {
-                        $search_title = $arr[1]; // e.g. "About_the_EoE"
-                        $search_title .= "_\(search_results_for\)";
-                        edit_the_search_results_topic_page($search_title, $title, $destination_title);
-                    }
-                }
-                else echo "\nDates are not equal.\n";
-            }
+        $continue_with_clean = true;
+        if($continue_with_clean) //then start with clean, remove portions of the wiki at the bottom
+        {
+            echo $wiki_path;
+            
+            /*
+            //start saving...
+            $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
+            $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[" . str_replace("\\", "", $destination_title) . "]]"); fclose($handle);
+            echo "\n saving redirect on title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
+            */
         }
+        else echo "\n wiki not found...ERROR \n";
 
     }
     else //The whole-word search is negative
-    {
-        //will search for the first among the 23 options - e.g. Pinniped (About the EoE)
-        echo "\n =========================================================";
-        echo "\n The whole-word search is negative for [$destination_title]"; // e.g. $destination_title = "Pinniped"
-        echo "\n =========================================================\n";
-        $post_titles = get_post_titles();
-        // $post_titles = array("\(About_the_EoE\)"); //debug
-        
-        foreach($post_titles as $post_title)
-        {
-            $title = $destination_title . "_" . $post_title;
-            if($wiki_path = get_wiki_text($title))
-            {
-                $found = $title; //e.g. "Pinniped_\(About_the_EoE\)"
-                if($destination_dates = get_dates($wiki_path)) //proceed only if there are dates found
-                {
-                    second_try($found, $post_title, $destination_title, $destination_dates);
-                    return; //just get the first available post_title among the 23
-                }
-            }
-        }
-        echo "\nStill nothing found any for [$destination_title]\n";
-    }
-    
+    {}
 }
 
-function second_try($found, $post_title_param, $destination_title, $destination_dates)
-{
-    echo "\nfound             : [$found]";
-    echo "\npost_title        : [$post_title_param]";
-    echo "\ndestination_title : [$destination_title]\n";
-    
-    $post_titles = get_post_titles();
-    // $post_titles = array("\(Biodiversity\)"); //debug
-    
-    $post_titles = array_diff($post_titles, array($post_title_param)); //exclude the $post_title_param
-    foreach($post_titles as $post_title)
-    {
-        $title = $destination_title . "_" . $post_title;
-        if($wiki_path = get_wiki_text($title)) //$title e.g. Pinniped_\(Biodiversity\), if exists then put the redirect to $found on it
-        {
-            $title_dates = get_dates($wiki_path);
-            if($destination_dates == $title_dates) //then put the redirect
-            {
-                //start saving...
-                $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
-                $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[" . str_replace("\\", "", $found) . "]]"); fclose($handle);
-                echo "\n saving redirect on title: [$title]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
-            }
-        }
-    }
-}
 
 /*
 $destination_title = "Agricultural_\&_Resource_Economics_\(search_results_for\)";
@@ -261,27 +194,6 @@ function get_wiki_text($title)
         // echo "\nfilesize[$temp_wiki_file]: " . filesize($temp_wiki_file) . "\n";
         return false;
     }
-}
-
-function get_dates($wiki)
-{
-    $html = file_get_contents($wiki);
-    /* >Published:</span> <span>January 5, 2012, 12:00 am</span></div><div><span class="metadata_label">Updated:</span> <span>June 2, 2012, 7:00 am</span> */
-    $dates = "";
-    if(preg_match("/>Published\:<\/span>(.*?)<\/span>/ims", $html, $arr))
-    {
-        $temp = $arr[1];
-        $temp = trim(str_ireplace("<span>", "", $temp));
-        $dates .= $temp;
-    }
-    if(preg_match("/>Updated\:<\/span>(.*?)<\/span>/ims", $html, $arr))
-    {
-        $temp = $arr[1];
-        $temp = trim(str_ireplace("<span>", "", $temp));
-        $dates .= $temp;
-    }
-    echo "\nDates: [$dates]\n";
-    return $dates;
 }
 
 function get_post_titles()
