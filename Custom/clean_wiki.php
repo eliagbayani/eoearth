@@ -45,9 +45,6 @@ function process_one() //you can use command line with interactive title like so
     $destination_title = "Heaviside's dolphin";
     $destination_title = "Capitalism 3.0: Chapter 6";
     $destination_title = "United States";
-    $destination_title = "Saddle-backed dolphin";
-    $destination_title = "Hector's dolphin";
-    $destination_title = "Rough-toothed dolphin";
     $destination_title = "Argentina";
     process_title($destination_title);
 }
@@ -126,13 +123,37 @@ function process_title($destination_title)
     $destination_title = str_replace("(", "\(", $destination_title);
     $destination_title = str_replace(")", "\)", $destination_title);
     $destination_title = str_replace("'", "\'", $destination_title);
-    
-    if($wiki_path = get_wiki_text($destination_title))
+    $title = $destination_title;
+    if($wiki_path = get_wiki_text($title))
     {
         $continue_with_clean = true;
         if($continue_with_clean) //then start with clean, remove portions of the wiki at the bottom
         {
-            echo $wiki_path;
+            $str = file_get_contents($wiki_path);
+            
+            if(are_there_comments($str))
+            {
+                echo "\nthere are comments\n";
+                $comments = get_comments($str);
+                $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
+                if($adjusted_str != $str)
+                {
+                    $adjusted_str .= $comments;
+                    //start saving...
+                    gen_write_file($adjusted_str, $title);
+                }
+            }
+            else
+            {
+                echo "\nthere are NO comments\n";
+                $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
+                if($adjusted_str != $str)
+                {
+                    //start saving...
+                    gen_write_file($adjusted_str, $title);
+                }
+            }
+            
             
             /*
             //start saving...
@@ -146,6 +167,75 @@ function process_title($destination_title)
     }
     else //The whole-word search is negative
     {}
+}
+
+function get_comments($str)
+{
+    if(preg_match("/class=\"module-Comments plain comments\">(.*?)<\/div><\/div><\/div><\/div>/ims", $str, $arr))
+    {
+        return '<div class="module-Comments plain comments">' . $arr[1] . "</div></div></div></div>";
+    }
+    return "";
+}
+
+function gen_write_file($str, $title)
+{
+    $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
+    $handle = fopen($temp_write_file, "w"); fwrite($handle, $str); fclose($handle);
+    echo "\n adjusting bottom part of title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
+}
+
+function adjust_bottom_portion($str, $title)
+{
+    $citation = get_citation_block($str);
+    
+    if(preg_match("/<div id=\"glossaryDisplay\"(.*?) Processing... <\/div><\/div>/ims", $str, $arr))
+    {
+        $replace = '<div id="glossaryDisplay"' . $arr[1] . " Processing... </div></div>";
+        $str = str_replace($replace, "", $str);
+        $str .= $citation;
+        return $str;
+    }
+    else
+    {
+        $items = array();
+        $items[] = '<div id=\"citation\"';
+        $items[] = '<div id=\"contentViewImageViewDialog\"';
+        $items[] = '<div id=\"pmid_1470\" class=\"module-Comments plain comments\"';
+        $items[] = '<div class=\"wrapper\"';
+        foreach($items as $item)
+        {
+            if(preg_match("/" . $item . "(.*?) Processing... <\/div><\/div>/ims", $str, $arr))
+            {
+                $replace = str_replace("\\", "", $item) . $arr[1] . " Processing... </div></div>";
+                $str = str_replace($replace, "", $str);
+                $str .= $citation;
+                return $str;
+            }
+        }
+    }
+    echo "\n[$title]- did not change\n";
+    return $str;
+}
+
+function get_citation_block($str)
+{   /*
+    <div id="citation" class="marg_b_15">
+      ===Citation===
+      Ruygt, J. (2013). Flora of Napa County, California. Retrieved from http://editors.eol.org/eoearth/wiki/Flora_of_Napa_County,_California
+    </div>
+    */
+    if(preg_match("/<div id=\"citation\"(.*?)<\/div>/ims", $str, $arr))
+    {
+        return '<div id="citation"' . $arr[1] . "</div>";
+    }
+    return "";
+}
+
+function are_there_comments($str)
+{
+    if(stripos($str, '===<span class="strong">0</span> Comments===') !== false) return false; //no comments //string is found
+    else return true; //with comments
 }
 
 
