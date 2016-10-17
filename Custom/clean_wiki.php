@@ -235,7 +235,11 @@ function get_citation_block($str)
 function are_there_comments($str)
 {
     if(stripos($str, '===<span class="strong">0</span> Comments===') !== false) return false; //no comments //string is found
-    else return true; //with comments
+    else
+    {
+        if(stripos($str, '<div class="userCommentContainer">') !== false) return true; //with comments //string is found
+        else return false; //no comments
+    }
 }
 
 
