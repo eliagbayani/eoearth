@@ -30,7 +30,7 @@ if($title = @$argv[1])
 }
 else //will run many titles...
 {
-    exit("\nexit muna...\n");
+    // exit("\nexit muna...\n");
     // process_one();
     process_urls();
 }
@@ -61,7 +61,7 @@ function process_urls()
             $urls = $arr2[1];
             // */
             
-            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
             // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
@@ -92,24 +92,19 @@ function process_urls()
                 if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
                 if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4))
                 {
-                    // if(preg_match_all("/href=(.*?)<\/a>/ims", $arr4[1], $arr5)) //many urls
-                    if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) //many urls
+                    if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) //many urls, excluding external links to external servers
                     {
+                        $i = 0;
                         foreach($arr5[1] as $row)
                         {
-                            if(stripos($row, $titlex) !== false)
-                            {
-                                echo "\n$row";
-                                $row = trim(str_replace(" $titlex", "", $row));
-                                echo " --- [$row]";
-                                
-                                /* process_title($row); -- for some reason this does not work, thus using shell below which works */
-                                echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
-                            }
+                            echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
+                            // break; //debug - process only first row/title
+                            $i++;
+                            if($i == 5) break; //debug - process first 10 only
                         }
                     }
                 }
-                // break; //debug
+                // break; //debug - process only one e.g. About_the_EoE_(search_results_for)
             }
         }
     }
@@ -148,14 +143,8 @@ function process_title($destination_title)
                 $adjusted_str .= $comments;
                 save_adjustments_to_wiki($adjusted_str, $title); //start saving...
             }
-
-
-
-            
-            
         }
         else echo "\nwiki not found...ERROR \n";
-
     }
     else //The whole-word search is negative
     {}
@@ -328,34 +317,5 @@ function get_post_titles()
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
 }
-/*
-function get_search_titles()
-{
-    $search_titles = array(
-    "About_the_EoE_\(search_results_for\)",
-    "Agricultural_\&_Resource_Economics_\(search_results_for\)",
-    "Biodiversity_\(search_results_for\)",
-    "Biology_\(search_results_for\)",
-    "Climate_Change_\(search_results_for\)",
-    "Ecology_\(search_results_for\)",
-    "Environmental_\&_Earth_Science_\(search_results_for\)",
-    "Energy_\(search_results_for\)",
-    "Environmental_Law_\&_Policy_\(search_results_for\)",
-    "Environmental_Humanities_\(search_results_for\)",
-    "Food_\(search_results_for\)",
-    "Forests_\(search_results_for\)",
-    "Geography_\(search_results_for\)",
-    "Hazards_\&_Disasters_\(search_results_for\)",
-    "Health_\(search_results_for\)",
-    "Mining_\&_Materials_\(search_results_for\)",
-    "People_\(search_results_for\)",
-    "Physics_\&_Chemistry_\(search_results_for\)",
-    "Pollution_\(search_results_for\)",
-    "Society_\&_Environment_\(search_results_for\)",
-    "Water_\(search_results_for\)",
-    "Weather_\&_Climate_\(search_results_for\)",
-    "Wildlife_\(search_results_for\)");
-    return $search_titles;
-}*/
 
 ?>
