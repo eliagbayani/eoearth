@@ -25,7 +25,7 @@ $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
 
 if($title = @$argv[1])
 {
-    print_r($argv);
+    // print_r($argv);
     process_title($title);
 }
 else //will run many titles...
@@ -37,15 +37,14 @@ else //will run many titles...
 //========================================[start functions]========================================
 function process_one() //you can use command line with interactive title like so: $ php Custom/clean_wiki.php "Agriculture II"
 {
-    $destination_title = "Black-footed penguin";
-    $destination_title = "Scope &amp; Content";
-    $destination_title = "Environment &amp; Security";
-    $destination_title = "Ecoregions (collection)";
-    $destination_title = "Black, Joseph";
-    $destination_title = "Heaviside's dolphin";
-    $destination_title = "Capitalism 3.0: Chapter 6";
+    $destination_title = "Black-footed penguin"; //ok
+    $destination_title = "Scope &amp; Content"; //ok
+    $destination_title = "Ecoregions (collection)"; //ok
+    $destination_title = "Black, Joseph"; //ok
+    $destination_title = "Heaviside's dolphin"; //ok
+    $destination_title = "Capitalism 3.0: Chapter 6"; //ok
     $destination_title = "United States";
-    $destination_title = "Argentina";
+    $destination_title = "Argentina"; //ok
     process_title($destination_title);
 }
 
@@ -105,7 +104,7 @@ function process_urls()
                                 echo " --- [$row]";
                                 
                                 /* process_title($row); -- for some reason this does not work, thus using shell below which works */
-                                echo "\n processing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
+                                echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
                             }
                         }
                     }
@@ -130,43 +129,42 @@ function process_title($destination_title)
         if($continue_with_clean) //then start with clean, remove portions of the wiki at the bottom
         {
             $str = file_get_contents($wiki_path);
+            $str = remove_others($str);
             
             if(are_there_comments($str))
             {
                 echo "\nthere are comments\n";
                 $comments = get_comments($str);
-                $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
-                if($adjusted_str != $str)
-                {
-                    $adjusted_str .= $comments;
-                    //start saving...
-                    gen_write_file($adjusted_str, $title);
-                }
             }
             else
             {
                 echo "\nthere are NO comments\n";
-                $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
-                if($adjusted_str != $str)
-                {
-                    //start saving...
-                    gen_write_file($adjusted_str, $title);
-                }
+                $comments = "";
             }
+
+            $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
+            if($adjusted_str != $str)
+            {
+                $adjusted_str .= $comments;
+                save_adjustments_to_wiki($adjusted_str, $title); //start saving...
+            }
+
+
+
             
             
-            /*
-            //start saving...
-            $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
-            $handle = fopen($temp_write_file, "w"); fwrite($handle, "#REDIRECT [[" . str_replace("\\", "", $destination_title) . "]]"); fclose($handle);
-            echo "\n saving redirect on title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
-            */
         }
-        else echo "\n wiki not found...ERROR \n";
+        else echo "\nwiki not found...ERROR \n";
 
     }
     else //The whole-word search is negative
     {}
+}
+
+function remove_others($str)
+{
+    $str = str_ireplace('<div class="formSection searchBox">  [index.html#  [[Image:searchDown.png|expand search options]]]</div>', "", $str);
+    return $str;
 }
 
 function get_comments($str)
@@ -178,11 +176,11 @@ function get_comments($str)
     return "";
 }
 
-function gen_write_file($str, $title)
+function save_adjustments_to_wiki($str, $title)
 {
     $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
     $handle = fopen($temp_write_file, "w"); fwrite($handle, $str); fclose($handle);
-    echo "\n adjusting bottom part of title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
+    echo "\nadjusting bottom part of title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
 }
 
 function adjust_bottom_portion($str, $title)
@@ -242,6 +240,7 @@ function are_there_comments($str)
     }
 }
 
+// =====================================================================
 
 /*
 $destination_title = "Agricultural_\&_Resource_Economics_\(search_results_for\)";
