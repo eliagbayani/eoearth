@@ -30,7 +30,7 @@ if($title = @$argv[1])
 }
 else //will run many titles...
 {
-    // exit("\nexit muna...\n");
+    exit("\nexit muna...\n");
     // process_one();
     process_urls();
 }
@@ -124,7 +124,8 @@ function process_title($destination_title)
         if($continue_with_clean) //then start with clean, remove portions of the wiki at the bottom
         {
             $str = file_get_contents($wiki_path);
-            $str = remove_others($str);
+            // $str = remove_others($str);
+            // $str = remove_top_portion($str);
             
             if(are_there_comments($str))
             {
@@ -144,15 +145,33 @@ function process_title($destination_title)
                 save_adjustments_to_wiki($adjusted_str, $title); //start saving...
             }
         }
-        else echo "\nwiki not found...ERROR \n";
+        else echo "\nwiki not found...ERROR 1 \n";
     }
-    else //The whole-word search is negative
-    {}
+    else echo "\nwiki not found...ERROR 2 \n";
 }
 
 function remove_others($str)
 {
     $str = str_ireplace('<div class="formSection searchBox">  [index.html#  [[Image:searchDown.png|expand search options]]]</div>', "", $str);
+    return $str;
+}
+
+function remove_top_portion($str)
+{
+    $items = array();
+    $items[] = '<div id=\"lightbox\"><\/div><\/div><\/div><\/div>';
+    $items[] = '<div id=\"lightbox\"><\/div><\/div><\/div>';
+    $items[] = '<div id=\"lightbox\"><\/div><\/div>';
+    $items[] = '<div id=\"lightbox\"><\/div>';
+    foreach($items as $item)
+    {
+        if(preg_match("/<div id=\"wrapper\" class=\"noads\">(.*?)" . $item . "/ims", $str, $arr))
+        {
+            $replace = '<div id="wrapper" class="noads">' . $arr[1] . str_replace("\\", "", $item);
+            $str = str_replace($replace, "", $str);
+            return $str;
+        }
+    }
     return $str;
 }
 
@@ -174,6 +193,10 @@ function save_adjustments_to_wiki($str, $title)
 
 function adjust_bottom_portion($str, $title)
 {
+    $str = remove_others($str);
+    $str = remove_top_portion($str);
+    
+    
     $citation = get_citation_block($str);
     
     if(preg_match("/<div id=\"glossaryDisplay\"(.*?) Processing... <\/div><\/div>/ims", $str, $arr))
@@ -202,6 +225,12 @@ function adjust_bottom_portion($str, $title)
         }
     }
     echo "\n[$title]- did not change\n";
+    return $str;
+}
+
+function remove_html_tags($str) //not used
+{
+    $str = strip_tags($str);
     return $str;
 }
 

@@ -1,0 +1,71 @@
+<div id="wrapper" class="noads">
+  <div id="header">
+    <div id="trunityMessage" style="display: none">
+      <div id="trunityMessageBody" class="modSection"></div>
+    </div>
+    <div id="dashboard" class="clearfix"></div>
+    <div id="user-header" class="portal-scope user-header">
+      {| style="width: 893px"
+      | style="width: 300px" |
+      [[Image:eoe-logo-400x87.png|400px]]
+      |
+      [[Image:spacer.png|1px]]
+      | style="width: 500px" |
+      [[Image:spacer.png|1px]]
+      |}
+    </div>
+    <div class="barContainerWrap">
+      <div class="barContainer"></div>
+    </div>
+    <div id="cartModal" title="Shopping Cart" style="display: none">
+      <div class="modSection">
+        {| id="shoppingCart"
+        |- class="cartHeader"
+        ! Name
+        ! Type
+        ! Price
+        !
+        |}
+        <div id="emptyCart">Your Shopping Cart is Empty</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+================================================
+
+<div id="wrapper" class="noads"><div id="header"><div id="trunityMessage" style="display: none"><div id="trunityMessageBody" class="modSection"></div></div><div id="dashboard" class="clearfix"></div><div id="user-header" class="portal-scope user-header">
+
+{| style="width: 893px"
+| style="width: 300px" |
+[[Image:eoe-logo-400x87.png|400px]]
+|
+[[Image:spacer.png|1px]]
+| style="width: 500px" |
+[[Image:spacer.png|1px]]
+|}
+
+</div><div class="barContainerWrap"><div class="barContainer">
+
+</div></div><div id="cartModal" title="Shopping Cart" style="display: none"><div class="modSection">
+
+{| id="shoppingCart"
+|- class="cartHeader"
+! Name
+! Type
+! Price
+!
+|}
+
+<div id="emptyCart">Your Shopping Cart is Empty</div></div></div></div></div>
+
+================================================
+
+<div id="lightbox"></div>
+<div id="lightbox"></div></div></div>
+
+================================================
+
+
+
