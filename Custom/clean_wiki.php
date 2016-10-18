@@ -32,21 +32,13 @@ else //will run many titles...
 {
     // exit("\nexit muna...\n");
     // process_one();
-    process_urls();
+    
+    /*
+    process_urls(); //this is now done
+    */
+    process_all_links_from_all_pages()
 }
 //========================================[start functions]========================================
-function process_one() //you can use command line with interactive title like so: $ php Custom/clean_wiki.php "Agriculture II"
-{
-    $destination_title = "Black-footed penguin"; //ok
-    $destination_title = "Scope &amp; Content"; //ok
-    $destination_title = "Ecoregions (collection)"; //ok
-    $destination_title = "Black, Joseph"; //ok
-    $destination_title = "Heaviside's dolphin"; //ok
-    $destination_title = "Capitalism 3.0: Chapter 6"; //ok
-    $destination_title = "United States";
-    $destination_title = "Argentina"; //ok
-    process_title($destination_title);
-}
 
 function process_urls()
 {
@@ -262,6 +254,19 @@ function are_there_comments($str)
         if(stripos($str, '<div class="userCommentContainer">') !== false) return true; //with comments //string is found
         else return false; //no comments
     }
+}
+
+function process_one() //you can use command line with interactive title like so: $ php Custom/clean_wiki.php "Agriculture II"
+{
+    $destination_title = "Black-footed penguin"; //ok
+    $destination_title = "Scope &amp; Content"; //ok
+    $destination_title = "Ecoregions (collection)"; //ok
+    $destination_title = "Black, Joseph"; //ok
+    $destination_title = "Heaviside's dolphin"; //ok
+    $destination_title = "Capitalism 3.0: Chapter 6"; //ok
+    $destination_title = "United States";
+    $destination_title = "Argentina"; //ok
+    process_title($destination_title);
 }
 
 // =====================================================================
