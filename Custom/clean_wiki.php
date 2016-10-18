@@ -13,15 +13,15 @@ $ php Custom/clean_wiki.php
 */
 
 
-/* for archive server (remote)
+// /* for archive server (remote)
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
 $GLOBALS['domain'] = "http://editors.eol.org";          //for archive
-*/
+// */
 
-// /* for mac mini (local)
+/* for mac mini (local)
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";  //for mac mini
 $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
-// */
+*/
 
 if($title = @$argv[1])
 {
@@ -30,7 +30,7 @@ if($title = @$argv[1])
 }
 else //will run many titles...
 {
-    exit("\nexit muna...\n");
+    // exit("\nexit muna...\n");
     // process_one();
     process_urls();
 }
@@ -100,7 +100,7 @@ function process_urls()
                             echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
                             // break; //debug - process only first row/title
                             $i++;
-                            if($i == 5) break; //debug - process first 10 only
+                            if($i == 20) break; //debug - process first 10 only
                         }
                     }
                 }
@@ -141,7 +141,10 @@ function process_title($destination_title)
             $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
             if($adjusted_str != $str)
             {
-                $adjusted_str .= $comments;
+                if    (stripos($adjusted_str, '</span> Comments===') !== false){} //string is found
+                elseif(stripos($adjusted_str, '</span> Comment===') !== false){} //string is found
+                else $adjusted_str .= $comments;
+                
                 save_adjustments_to_wiki($adjusted_str, $title); //start saving...
             }
         }
@@ -165,10 +168,12 @@ function remove_top_portion($str)
     $items[] = '<div id=\"lightbox\"><\/div>';
     foreach($items as $item)
     {
+        $item = '<div id=\"content\">' . $item;
         if(preg_match("/<div id=\"wrapper\" class=\"noads\">(.*?)" . $item . "/ims", $str, $arr))
         {
             $replace = '<div id="wrapper" class="noads">' . $arr[1] . str_replace("\\", "", $item);
             $str = str_replace($replace, "", $str);
+            $str = '<div id="content">' . $str;
             return $str;
         }
     }
@@ -251,6 +256,7 @@ function get_citation_block($str)
 function are_there_comments($str)
 {
     if(stripos($str, '===<span class="strong">0</span> Comments===') !== false) return false; //no comments //string is found
+    elseif(stripos($str, '===<span class="strong">0</span> Comment===') !== false) return false; //no comments //string is found
     else
     {
         if(stripos($str, '<div class="userCommentContainer">') !== false) return true; //with comments //string is found
