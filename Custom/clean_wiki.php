@@ -100,7 +100,7 @@ function process_urls()
                             echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
                             // break; //debug - process only first row/title
                             $i++;
-                            if($i == 20) break; //debug - process first 10 only
+                            if($i == 10) break; //debug - process first 10 only
                         }
                     }
                 }
