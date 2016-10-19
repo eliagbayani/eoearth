@@ -34,13 +34,88 @@ else //will run many titles...
     // process_one();
     
     /*
-    process_urls(); //this is now done
+    process_urls("v1"); //this is now done
     */
-    process_all_links_from_all_pages()
+    process_urls("v2");
+    $GLOBALS['processed'] = array();
+    
 }
 //========================================[start functions]========================================
+function process_all_links_from_a_page($destination_title) //this will run clean_wiki for all links in a page
+{
+    $title = format_title($destination_title);
+    echo "\n[$title]\n";
+    if($wiki_path = get_wiki_text($title))
+    {
+        $str = file_get_contents($wiki_path);
+        
+        $str = str_replace("]s]", "s]]", $str);
+        $str = str_replace("]es]", "es]]", $str);
+        $str = str_replace("Antarctic]a]", "Antarctica]]", $str);
+        $str = str_replace("] change]", " change]]", $str);
+        $str = str_replace("] systems]", " systems]]", $str);
+        $str = str_replace("] areas]", " areas]]", $str);
+        $str = str_replace("]s (Mid-latitude cyclone)]", "s (Mid-latitude cyclone)]]", $str);
+        
+        if(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr))
+        {
+            // print_r($arr[1]);
+            $good_titles = get_good_titles($arr[1]);
+            print_r($good_titles);
+            
+            foreach($good_titles as $title)
+            {
+                if(isset($GLOBALS['processed'][$title])) {}
+                else
+                {
+                    $GLOBALS['processed'][$title] = '';
+                    echo "\nprocessing: [$title]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$title\"");
+                }
+            }
+            
+        }
+    }
+}
 
-function process_urls()
+function get_good_titles($raw_titles)
+{
+    $final = array();
+    //remove e.g. "Image:"
+    foreach($raw_titles as $title)
+    {
+        if(is_title_valid($title)) $final[$title] = '';
+    }
+    
+    //remove the pipe e.g. "Content Source Index|More »"
+    $temp = array_keys($final);
+    $final = array();
+    foreach($temp as $t)
+    {
+        $arr = explode("|", $t);
+        foreach($arr as $a) $final[$a] = '';
+    }
+    
+    unset($final['More »']);
+    
+    $final = array_keys($final);
+    $final = array_map("trim", $final);
+    
+    return $final;
+}
+
+function is_title_valid($title)
+{
+    if(substr($title, 0, 1) == "#") return false;
+    
+    $exclude = array("Image:");
+    foreach($exclude as $ex)
+    {
+        if(stripos($title, $ex) !== false) return false; //string is found
+    }
+    return true;
+}
+
+function process_urls($ver)
 {
     $url = $GLOBALS['domain'] . "/eoearth/wiki/Search_Results_for_Main_Topics";
     $html = file_get_contents($url);
@@ -53,7 +128,7 @@ function process_urls()
             $urls = $arr2[1];
             // */
             
-            // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
             // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
@@ -89,10 +164,20 @@ function process_urls()
                         $i = 0;
                         foreach($arr5[1] as $row)
                         {
-                            echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
+                            
+                            if($ver == "v1")
+                            {
+                                echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
+                            }
+                            elseif($ver == "v2")
+                            {
+                                process_all_links_from_a_page($row);
+                            }
+                            
+                            
                             // break; //debug - process only first row/title
                             $i++;
-                            // if($i == 100) break; //debug - process first 10 only
+                            if($i == 10) break; //debug - process first 10 only
                         }
                     }
                 }
@@ -102,14 +187,19 @@ function process_urls()
     }
 }
 
+function format_title($title)
+{
+    $title = str_replace(" ", "_", $title);
+    $title = str_replace("&amp;", "\&", $title);
+    $title = str_replace("(", "\(", $title);
+    $title = str_replace(")", "\)", $title);
+    $title = str_replace("'", "\'", $title);
+    return $title;
+}
+
 function process_title($destination_title)
 {
-    $destination_title = str_replace(" ", "_", $destination_title);
-    $destination_title = str_replace("&amp;", "\&", $destination_title);
-    $destination_title = str_replace("(", "\(", $destination_title);
-    $destination_title = str_replace(")", "\)", $destination_title);
-    $destination_title = str_replace("'", "\'", $destination_title);
-    $title = $destination_title;
+    $title = format_title($destination_title);
     if($wiki_path = get_wiki_text($title))
     {
         $continue_with_clean = true;
