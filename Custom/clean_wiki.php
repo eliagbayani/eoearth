@@ -71,10 +71,14 @@ function process_all_links_from_a_page($destination_title) //this will run clean
             // /*
             foreach($good_titles as $title)
             {
+                if(!$title) continue;
                 if(stripos($title, '[') !== false) continue; //string is found
                 if(stripos($title, ']') !== false) continue; //string is found
                 if(stripos($title, 'class=') !== false) continue; //string is found
                 if(stripos($title, 'width=') !== false) continue; //string is found
+                if(stripos($title, 'align=') !== false) continue; //string is found
+                if(stripos($title, 'colspan=') !== false) continue; //string is found
+                if(stripos($title, '<br') !== false) continue; //string is found
                 if(strlen($title) > 300) continue;
                 
                 if(isset($GLOBALS['processed'][$title])) {}
