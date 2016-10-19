@@ -63,6 +63,7 @@ function process_all_links_from_a_page($destination_title) //this will run clean
             $good_titles = get_good_titles($arr[1]);
             print_r($good_titles);
             
+            // /*
             foreach($good_titles as $title)
             {
                 if(isset($GLOBALS['processed'][$title])) {}
@@ -72,6 +73,7 @@ function process_all_links_from_a_page($destination_title) //this will run clean
                     echo "\nprocessing: [$title]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$title\"");
                 }
             }
+            // */
             
         }
     }
@@ -106,8 +108,10 @@ function get_good_titles($raw_titles)
 function is_title_valid($title)
 {
     if(substr($title, 0, 1) == "#") return false;
+    if(substr($title, 0, 5) == "http:") return false;
     
-    $exclude = array("Image:");
+    
+    $exclude = array("Image:", "Special:", "Media:", "File:");
     foreach($exclude as $ex)
     {
         if(stripos($title, $ex) !== false) return false; //string is found
@@ -129,11 +133,22 @@ function process_urls($ver)
             // */
             
             $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            
             // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
             // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
             // $urls = array("/eoearth/wiki/Ecology_(search_results_for)");
+
+            /*
+            $urls = array();
+            $urls[] = "/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)";
+            $urls[] = "/eoearth/wiki/Biodiversity_(search_results_for)";
+            $urls[] = "/eoearth/wiki/Biology_(search_results_for)";
+            $urls[] = "/eoearth/wiki/Climate_Change_(search_results_for)";
+            $urls[] = "/eoearth/wiki/Ecology_(search_results_for)";
+            */
+
             // $urls = array("/eoearth/wiki/Environmental_%26_Earth_Science_(search_results_for)");
             // $urls = array("/eoearth/wiki/Energy_(search_results_for)");
             // $urls = array("/eoearth/wiki/Environmental_Law_%26_Policy_(search_results_for)");
@@ -278,11 +293,21 @@ function save_adjustments_to_wiki($str, $title)
     echo "\nadjusting bottom part of title: [$title]";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $title . " < $temp_write_file");
 }
 
+function fix_user_profile($str)
+{
+    if(stripos($str, '=User Profile=') !== false) //string is found
+    {
+        //means it is a 'user profile' page
+        $str = str_replace('<div id="sidebar" class="sash"></div></div></div>', '', $str);
+    }
+    return $str;
+}
+
 function adjust_bottom_portion($str, $title)
 {
     $str = remove_others($str);
     $str = remove_top_portion($str);
-    
+    $str = fix_user_profile($str);
     
     $citation = get_citation_block($str);
     
