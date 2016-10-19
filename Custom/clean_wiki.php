@@ -177,7 +177,7 @@ function process_urls($ver)
                             
                             // break; //debug - process only first row/title
                             $i++;
-                            if($i == 10) break; //debug - process first 10 only
+                            // if($i == 10) break; //debug - process first 10 only
                         }
                     }
                 }
@@ -220,7 +220,7 @@ function process_title($destination_title)
                 $comments = "";
             }
 
-            $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for debug
+            $adjusted_str = adjust_bottom_portion($str, $title); //$title here is just for echo
             if($adjusted_str != $str)
             {
                 if    (stripos($adjusted_str, '</span> Comments===') !== false){} //string is found
