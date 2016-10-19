@@ -56,12 +56,17 @@ function process_all_links_from_a_page($destination_title) //this will run clean
         $str = str_replace("] systems]", " systems]]", $str);
         $str = str_replace("] areas]", " areas]]", $str);
         $str = str_replace("]s (Mid-latitude cyclone)]", "s (Mid-latitude cyclone)]]", $str);
-        
+        $str = str_replace("]al]", "al]]", $str);
+        $str = str_replace("plant] species]", "plant species]]", $str);
+        $str = str_replace("]flora]]", "flora]]", $str);
+
         if(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr))
         {
             // print_r($arr[1]);
             $good_titles = get_good_titles($arr[1]);
             print_r($good_titles);
+            
+            // if(in_array("Download Report", $good_titles)) exit("\nelix\n");
             
             // /*
             foreach($good_titles as $title)
@@ -69,7 +74,8 @@ function process_all_links_from_a_page($destination_title) //this will run clean
                 if(stripos($title, '[') !== false) continue; //string is found
                 if(stripos($title, ']') !== false) continue; //string is found
                 if(stripos($title, 'class=') !== false) continue; //string is found
-                
+                if(stripos($title, 'width=') !== false) continue; //string is found
+                if(strlen($title) > 300) continue;
                 
                 if(isset($GLOBALS['processed'][$title])) {}
                 else
@@ -112,6 +118,8 @@ function get_good_titles($raw_titles)
 
 function is_title_valid($title)
 {
+    if(substr($title, 0, 1) == "'") return false;
+    
     if(substr($title, 0, 1) == "#") return false;
     if(substr($title, 0, 5) == "http:") return false;
     
@@ -119,6 +127,11 @@ function is_title_valid($title)
     if(substr($title, 0, 8) == "Special:") return false;
     if(substr($title, 0, 6) == "Media:") return false;
     if(substr($title, 0, 5) == "File:") return false;
+
+    if(substr($title, 0, 6) == "image:") return false;
+    if(substr($title, 0, 8) == "special:") return false;
+    if(substr($title, 0, 6) == "media:") return false;
+    if(substr($title, 0, 5) == "file:") return false;
     
     return true;
 }
