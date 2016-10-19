@@ -66,6 +66,11 @@ function process_all_links_from_a_page($destination_title) //this will run clean
             // /*
             foreach($good_titles as $title)
             {
+                if(stripos($title, '[') !== false) continue; //string is found
+                if(stripos($title, ']') !== false) continue; //string is found
+                if(stripos($title, 'class=') !== false) continue; //string is found
+                
+                
                 if(isset($GLOBALS['processed'][$title])) {}
                 else
                 {
@@ -110,12 +115,11 @@ function is_title_valid($title)
     if(substr($title, 0, 1) == "#") return false;
     if(substr($title, 0, 5) == "http:") return false;
     
+    if(substr($title, 0, 6) == "Image:") return false;
+    if(substr($title, 0, 8) == "Special:") return false;
+    if(substr($title, 0, 6) == "Media:") return false;
+    if(substr($title, 0, 5) == "File:") return false;
     
-    $exclude = array("Image:", "Special:", "Media:", "File:");
-    foreach($exclude as $ex)
-    {
-        if(stripos($title, $ex) !== false) return false; //string is found
-    }
     return true;
 }
 
@@ -253,6 +257,7 @@ function process_title($destination_title)
 function remove_others($str)
 {
     $str = str_ireplace('<div class="formSection searchBox">  [index.html#  [[Image:searchDown.png|expand search options]]]</div>', "", $str);
+    $str = str_ireplace('<div class="formSection searchBox">  [index-topic=51cbfc78f702fc2ba8129e9b.html#  [[Image:searchDown.png|expand search options]]]</div>', "", $str);
     return $str;
 }
 
