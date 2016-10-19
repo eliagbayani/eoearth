@@ -66,8 +66,6 @@ function process_all_links_from_a_page($destination_title) //this will run clean
             $good_titles = get_good_titles($arr[1]);
             print_r($good_titles);
             
-            // if(in_array("Download Report", $good_titles)) exit("\nelix\n");
-            
             // /*
             foreach($good_titles as $title)
             {
@@ -154,21 +152,20 @@ function process_urls($ver)
             // */
             
             // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
-            
-            $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
             // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
             // $urls = array("/eoearth/wiki/Ecology_(search_results_for)");
 
-            /*
+            // /*
             $urls = array();
-            $urls[] = "/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)";
+            $urls[] = "/eoearth/wiki/About_the_EoE_(search_results_for)";
             $urls[] = "/eoearth/wiki/Biodiversity_(search_results_for)";
             $urls[] = "/eoearth/wiki/Biology_(search_results_for)";
             $urls[] = "/eoearth/wiki/Climate_Change_(search_results_for)";
             $urls[] = "/eoearth/wiki/Ecology_(search_results_for)";
-            */
+            // */
 
             // $urls = array("/eoearth/wiki/Environmental_%26_Earth_Science_(search_results_for)");
             // $urls = array("/eoearth/wiki/Energy_(search_results_for)");
