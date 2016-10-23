@@ -290,6 +290,7 @@ function remove_others($str)
 {
     $str = str_ireplace('<div class="formSection searchBox">  [index.html#  [[Image:searchDown.png|expand search options]]]</div>', "", $str);
     $str = str_ireplace('<div class="formSection searchBox">  [index-topic=51cbfc78f702fc2ba8129e9b.html#  [[Image:searchDown.png|expand search options]]]</div>', "", $str);
+    $str = str_ireplace("[[Privacy Policy]] | [[Neutrality Policy]] | [[Terms_of_use]]", "", $str);
     return $str;
 }
 
