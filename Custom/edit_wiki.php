@@ -12,7 +12,6 @@ $ php Custom/edit_wiki.php "Agriculture II"
 $ php Custom/edit_wiki.php
 */
 
-
 // /* for archive server (remote)
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
 $GLOBALS['domain'] = "http://editors.eol.org";          //for archive
