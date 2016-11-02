@@ -159,6 +159,30 @@ function process_title($destination_title)
                 else echo "\nDates are not equal.\n";
             }
         }
+        
+        //--------------------start: a duplicate if => The whole-word search is negative
+        //will search for the first among the 23 options - e.g. Pinniped (About the EoE)
+        echo "\n =========================================================";
+        echo "\n The whole-word search is negative for [$destination_title]"; // e.g. $destination_title = "Pinniped"
+        echo "\n =========================================================\n";
+        $post_titles = get_post_titles();
+        // $post_titles = array("\(About_the_EoE\)"); //debug
+        
+        foreach($post_titles as $post_title)
+        {
+            $title = $destination_title . "_" . $post_title;
+            if($wiki_path = get_wiki_text($title))
+            {
+                $found = $title; //e.g. "Pinniped_\(About_the_EoE\)"
+                if($destination_dates = get_dates($wiki_path)) //proceed only if there are dates found
+                {
+                    second_try($found, $post_title, $destination_title, $destination_dates);
+                    return; //just get the first available post_title among the 23
+                }
+            }
+        }
+        echo "\nStill nothing found any for [$destination_title]\n";
+        //--------------------end: a duplicate if => The whole-word search is negative
 
     }
     else //The whole-word search is negative
@@ -318,6 +342,10 @@ function get_post_titles()
     $search_titles[] = "\(Food_security\)";
     $search_titles[] = "\(Fisheries\)";
     $search_titles[] = "\(Global\)";
+    $search_titles[] = "\(Encyclopedia_of_Earth\)";
+    $search_titles[] = "\(Emissions_scenarios\)";
+    $search_titles[] = "\(Carbon\)";
+    $search_titles[] = "\(Country\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
