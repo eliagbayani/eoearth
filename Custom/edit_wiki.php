@@ -63,8 +63,8 @@ function process_urls()
             $urls = $arr2[1];
             // */
             
-            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
+            // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
             // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
