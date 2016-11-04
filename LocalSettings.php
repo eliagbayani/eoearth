@@ -56,6 +56,7 @@ $wgResourceBasePath = $wgScriptPath;
 // $wgLogo = "$wgResourceBasePath/images/three_balls.png";
 // $wgLogo = "$wgResourceBasePath/resources/assets/eol black bg.png";
 $wgLogo = "$wgResourceBasePath/resources/assets/EoE_logo_white_bg.png";
+$wgLogo = "$wgResourceBasePath/resources/assets/EoE version 5 (2).jpg";
 
 ## UPO means: this is also a user preference option
 
