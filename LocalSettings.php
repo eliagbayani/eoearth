@@ -60,6 +60,22 @@ $wgLogo = "$wgResourceBasePath/resources/assets/EoE version 5 (2).jpg";
 
 ## UPO means: this is also a user preference option
 
+//--start work on footer icones
+$wgFooterIcons = array(); //by default has value, print_r($wgFooterIcons) to investigate
+$eol_logo_footer = "$wgResourceBasePath/resources/assets/EOL_logo_simple_jpg.jpg";
+$wgFooterIcons['eolicon']['myicon'] = array(
+    "src" => $eol_logo_footer, //"/path/to/my/image.png", // you may also use a direct path to the source, e.g. "http://example.com/my/custom/path/to/MyCustomLogo.png"
+    "url" => "http://eol.org/", "alt" => "Encyclopedia of Life",
+    // For HiDPI support, you can specify paths to larger versions of the icon.
+    "srcset" => null,
+    // If you have a non-default sized icon you can specify the size yourself.
+    "height" => "31", "width" => "88", 
+);
+//bring back the default, so they come 2nd and 3rd in order of appearance of icons (creative commons and mediawiki)
+$wgFooterIcons['copyright']['copyright'] = array();
+$wgFooterIcons['poweredby']['mediawiki'] = array('src' => "$wgResourceBasePath/resources/assets/poweredby_mediawiki_88x31.png", 'url' => "http://www.mediawiki.org/", 'alt' => 'Powered by MediaWiki');
+//--end work on footer icones
+
 ## Database settings
 $wgDBtype       = "mysql";
 $wgDBserver     = "localhost";
