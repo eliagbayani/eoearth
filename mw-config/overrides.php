@@ -1,5 +1,4 @@
 <?php
-exit("Un-authorized access");
 /**
  * MediaWiki installer overrides.
  * Modify this file if you are a packager who needs to modify the behavior of

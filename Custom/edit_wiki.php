@@ -77,7 +77,7 @@ function process_urls()
             // $urls = array("/eoearth/wiki/Forests_(search_results_for)");
             // $urls = array("/eoearth/wiki/Geography_(search_results_for)");
             // $urls = array("/eoearth/wiki/Hazards_%26_Disasters_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Health_(search_results_for)");
+            $urls = array("/eoearth/wiki/Health_(search_results_for)");
             // $urls = array("/eoearth/wiki/Mining_%26_Materials_(search_results_for)");
             // $urls = array("/eoearth/wiki/People_(search_results_for)");
             // $urls = array("/eoearth/wiki/Physics_%26_Chemistry_(search_results_for)");
@@ -350,6 +350,8 @@ function get_post_titles()
     $search_titles[] = "\(Minerals\&_Mining\)";
     $search_titles[] = "\(Nuclear_Energy\)";
     $search_titles[] = "\(Periodic_Table\)";
+    $search_titles[] = "\(Humans\)";
+    $search_titles[] = "\(main\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
