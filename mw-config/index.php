@@ -1,4 +1,5 @@
 <?php
+exit("Un-authorized access");
 /**
  * New version of MediaWiki web-based config/installation
  *
