@@ -346,6 +346,10 @@ function get_post_titles()
     $search_titles[] = "\(Emissions_scenarios\)";
     $search_titles[] = "\(Carbon\)";
     $search_titles[] = "\(Country\)";
+    
+    $search_titles[] = "\(Minerals\&_Mining\)";
+    $search_titles[] = "\(Nuclear_Energy\)";
+    $search_titles[] = "\(Periodic_Table\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
