@@ -70,7 +70,7 @@ function process_urls()
             // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
             // $urls = array("/eoearth/wiki/Ecology_(search_results_for)");
             // $urls = array("/eoearth/wiki/Environmental_%26_Earth_Science_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Energy_(search_results_for)");
+            $urls = array("/eoearth/wiki/Energy_(search_results_for)");
             // $urls = array("/eoearth/wiki/Environmental_Law_%26_Policy_(search_results_for)");
             // $urls = array("/eoearth/wiki/Environmental_Humanities_(search_results_for)");
             // $urls = array("/eoearth/wiki/Food_(search_results_for)");
@@ -78,7 +78,7 @@ function process_urls()
             // $urls = array("/eoearth/wiki/Geography_(search_results_for)");
             // $urls = array("/eoearth/wiki/Hazards_%26_Disasters_(search_results_for)");
             // $urls = array("/eoearth/wiki/Health_(search_results_for)");
-            $urls = array("/eoearth/wiki/Mining_%26_Materials_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Mining_%26_Materials_(search_results_for)");
             // $urls = array("/eoearth/wiki/People_(search_results_for)");
             // $urls = array("/eoearth/wiki/Physics_%26_Chemistry_(search_results_for)");
             // $urls = array("/eoearth/wiki/Pollution_(search_results_for)");
