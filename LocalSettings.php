@@ -546,15 +546,33 @@ $wgActionLockdown['history']              = array('EoE_Author', 'EoE_Topic_Edito
 /* Just FYI: when editing MediaWiki:Aboutsite, you'll get this:
 About {{SITENAME}}
 I then put a single dash "-" so link will not appear. Then just added abouttheeoe below, so it will appear last in footer links. */
+
+/*default value for: MediaWiki:Privacy => "Privacy Policy"
+-> then I replaced it with "-" dash so link won't appear.
+*/
 $wgHooks['SkinTemplateOutputPageBeforeExec'][] = 'lfTOSLink';
 function lfTOSLink( $sk, &$tpl )
 {
-    $tpl->set( 'neutralitypolicy', $sk->footerLink( 'neutralitypolicy', 'neutralitypolicypage' ) );
-    $tpl->data['footerlinks']['places'][] = 'neutralitypolicy';
+    //Terms of Use (link as is), About EOL (linking to the EOL homepage), EoE Neutrality Policy (link as is), About the Encyclopedia of Earth (link as is)
     $tpl->set( 'termsofuse', $sk->footerLink( 'termsofuse', 'termsofusepage' ) );
     $tpl->data['footerlinks']['places'][] = 'termsofuse';
+
+    $tpl->set( 'abouteol', $sk->footerLink( 'abouteol', 'abouteolpage' ) );
+    $tpl->data['footerlinks']['places'][] = 'abouteol';
+    /*from https://www.mediawiki.org/wiki/Help_talk:Redirects#Redirect_to_an_external_website
+    sudo mysql -u root -p
+    use wiki_eoearth;
+    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolhomepage", "http://eol.org/", "", "1", 1, 0);
+    select * from interwiki;
+    Info on interwiki table: https://www.mediawiki.org/wiki/Manual:Interwiki_table
+    */
+    
+    $tpl->set( 'neutralitypolicy', $sk->footerLink( 'neutralitypolicy', 'neutralitypolicypage' ) );
+    $tpl->data['footerlinks']['places'][] = 'neutralitypolicy';
+
     $tpl->set( 'abouttheeoe', $sk->footerLink( 'abouttheeoe', 'abouttheeoepage' ) );
     $tpl->data['footerlinks']['places'][] = 'abouttheeoe';
+    
     return true;
 }
 //==================================================
