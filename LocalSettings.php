@@ -71,11 +71,18 @@ $wgFooterIcons['eolicon']['myicon'] = array(
     // For HiDPI support, you can specify paths to larger versions of the icon.
     "srcset" => null,
     // If you have a non-default sized icon you can specify the size yourself.
-    "height" => "31", "width" => "88", 
-);
+    "height" => "31", "width" => "88",);
+//add NCSE
+$ncse_logo_footer = "$wgResourceBasePath/resources/assets/Ncse_logo108x42.gif";
+// $ncse_logo_footer = "$wgResourceBasePath/resources/assets/ncse_logo2.png";
+$wgFooterIcons['ncseicon']['myicon'] = array(
+    "src" => $ncse_logo_footer,
+    "url" => "http://www.ncseonline.org/", "alt" => "National Council for Science and the Environment",
+    "srcset" => null,
+    "height" => "31", "width" => "88",);
 //bring back the default, so they come 2nd and 3rd in order of appearance of icons (creative commons and mediawiki)
-$wgFooterIcons['copyright']['copyright'] = array();
 $wgFooterIcons['poweredby']['mediawiki'] = array('src' => "$wgResourceBasePath/resources/assets/poweredby_mediawiki_88x31.png", 'url' => "http://www.mediawiki.org/", 'alt' => 'Powered by MediaWiki');
+$wgFooterIcons['copyright']['copyright'] = array();
 //--end work on footer icones
 
 ## Database settings
