@@ -75,7 +75,7 @@ function process_urls()
             // $urls = array("/eoearth/wiki/Environmental_Humanities_(search_results_for)");
             // $urls = array("/eoearth/wiki/Food_(search_results_for)");
             // $urls = array("/eoearth/wiki/Forests_(search_results_for)");
-            $urls = array("/eoearth/wiki/Geography_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Geography_(search_results_for)");
             // $urls = array("/eoearth/wiki/Hazards_%26_Disasters_(search_results_for)");
             // $urls = array("/eoearth/wiki/Health_(search_results_for)");
             // $urls = array("/eoearth/wiki/Mining_%26_Materials_(search_results_for)");
@@ -346,7 +346,6 @@ function get_post_titles()
     $search_titles[] = "\(Emissions_scenarios\)";
     $search_titles[] = "\(Carbon\)";
     $search_titles[] = "\(Country\)";
-    
     $search_titles[] = "\(Minerals\&_Mining\)";
     $search_titles[] = "\(Nuclear_Energy\)";
     $search_titles[] = "\(Periodic_Table\)";
@@ -356,7 +355,8 @@ function get_post_titles()
     $search_titles[] = "\(collection\)";
     $search_titles[] = "\(\Coral_reefs_\(collection\)\)";
     $search_titles[] = "\(Countries_of_the_world\)";
-    
+    $search_titles[] = "\(Geology\)";
+    $search_titles[] = "\(Policy\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
