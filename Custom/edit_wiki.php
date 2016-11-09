@@ -357,6 +357,17 @@ function get_post_titles()
     $search_titles[] = "\(Countries_of_the_world\)";
     $search_titles[] = "\(Geology\)";
     $search_titles[] = "\(Policy\)";
+    
+    $search_titles = array();
+    $search_titles[] = "\(Species_richness\)";
+    $search_titles[] = "\(Natural_Sciences\)";
+    $search_titles[] = "\(Atmospheric_Science\)";
+    $search_titles[] = "\(Human_Health\)";
+    $search_titles[] = "\(Uses_Of_Chemicals\)";
+    $search_titles[] = "\(Biosecurity\)";
+    $search_titles[] = "\(Animals_\&_Society\)";
+    $search_titles[] = "\(Land-use_\&_Land-cover_Change\)";
+    $search_titles[] = "\(Minerals_\&_Mining\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
