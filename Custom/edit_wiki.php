@@ -355,9 +355,7 @@ function get_post_titles()
     $search_titles[] = "\(Ecoregions\)";
     $search_titles[] = "\(collection\)";
     $search_titles[] = "\(\Coral_reefs_\(collection\)\)";
-    
-    
-    
+    $search_titles[] = "\(Countries_of_the_world\)";
     
 
     // $search_titles = array("\(About_the_EoE\)");
