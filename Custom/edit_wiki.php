@@ -352,6 +352,13 @@ function get_post_titles()
     $search_titles[] = "\(Periodic_Table\)";
     $search_titles[] = "\(Humans\)";
     $search_titles[] = "\(main\)";
+    $search_titles[] = "\(Ecoregions\)";
+    $search_titles[] = "\(collection\)";
+    $search_titles[] = "\(\Coral_reefs_\(collection\)\)";
+    
+    
+    
+    
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
