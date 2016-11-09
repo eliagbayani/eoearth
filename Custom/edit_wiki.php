@@ -358,7 +358,7 @@ function get_post_titles()
     $search_titles[] = "\(Geology\)";
     $search_titles[] = "\(Policy\)";
     
-    $search_titles = array();
+    // $search_titles = array();
     $search_titles[] = "\(Species_richness\)";
     $search_titles[] = "\(Natural_Sciences\)";
     $search_titles[] = "\(Atmospheric_Science\)";
