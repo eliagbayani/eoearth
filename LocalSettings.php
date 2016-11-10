@@ -562,7 +562,8 @@ function lfTOSLink( $sk, &$tpl )
     /*from https://www.mediawiki.org/wiki/Help_talk:Redirects#Redirect_to_an_external_website
     sudo mysql -u root -p
     use wiki_eoearth;
-    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolhomepage", "http://eol.org/", "", "1", 1, 0);
+    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolhomepage",  "http://eol.org/",      "", "1", 1, 0);
+    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolaboutpage", "http://eol.org/about", "", "1", 1, 0);
     select * from interwiki;
     Info on interwiki table: https://www.mediawiki.org/wiki/Manual:Interwiki_table
     */
