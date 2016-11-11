@@ -65,6 +65,7 @@ $wgLogo = "$wgResourceBasePath/resources/assets/EoE6.png";
 $wgFooterIcons = array(); //by default has value, print_r($wgFooterIcons) to investigate
 $eol_logo_footer = "$wgResourceBasePath/resources/assets/EOL_logo_simple_jpg.jpg";
 $eol_logo_footer = "$wgResourceBasePath/resources/assets/EOL_logo_eps.png";
+$eol_logo_footer = "$wgResourceBasePath/resources/assets/EOL_logoSm.png";
 $wgFooterIcons['eolicon']['myicon'] = array(
     "src" => $eol_logo_footer, //"/path/to/my/image.png", // you may also use a direct path to the source, e.g. "http://example.com/my/custom/path/to/MyCustomLogo.png"
     "url" => "http://eol.org/", "alt" => "Encyclopedia of Life",
