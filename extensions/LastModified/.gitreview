@@ -2,4 +2,4 @@
 host=gerrit.wikimedia.org
 port=29418
 project=mediawiki/extensions/LastModified.git
-defaultbranch=REL1_26
+defaultbranch=REL1_27
