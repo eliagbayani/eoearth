@@ -589,5 +589,5 @@ datevalues = date.toUTCString();
 then a frew lines below...
 html += ' '+datevalues;
 */
-require_once "$IP/extensions/LastModified/LastModified.php";
-
+// require_once "$IP/extensions/LastModified/LastModified.php";
+require_once( "$IP/extensions/LastModified/LastModified.php" );
