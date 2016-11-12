@@ -28,17 +28,10 @@ $( function () {
 		currentSkin = mw.config.get( 'skin' ),
 		html = '';
 
-    //by Eli - start
-    var time_stamp = getMetaLastModifiedTimestamp();
-    date = new Date(time_stamp * 1000);
-    datevalues = date.toUTCString();
-    // by Eli - end
-
 	html += '<div style="' + getDivStyle( currentSkin ) + '" id="mwe-lastmodified">';
 	html += '<a href="' + historyLink + '" title="' + mw.message( 'lastmodified-title-tag' ).escaped() + '">';
 	html += getLastModifiedText( getUtcTimeStamp() - getMetaLastModifiedTimestamp(), getMetaRange() );
 	html += '</a>';
-	html += ' '+datevalues;
 	html += '</div>';
 
 	// Insert the HTML into the web page, based on skin
