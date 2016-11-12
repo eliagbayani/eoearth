@@ -28,10 +28,18 @@ $( function () {
 		currentSkin = mw.config.get( 'skin' ),
 		html = '';
 
+    //by Eli - start
+    var time_stamp = getMetaLastModifiedTimestamp();
+    date = new Date(time_stamp * 1000);
+    datevalues = date.toUTCString();
+    //by Eli - end
+
+
 	html += '<div style="' + getDivStyle( currentSkin ) + '" id="mwe-lastmodified">';
 	html += '<a href="' + historyLink + '" title="' + mw.message( 'lastmodified-title-tag' ).escaped() + '">';
 	html += getLastModifiedText( getUtcTimeStamp() - getMetaLastModifiedTimestamp(), getMetaRange() );
 	html += '</a>';
+    html += ' '+datevalues;
 	html += '</div>';
 
 	// Insert the HTML into the web page, based on skin
@@ -163,7 +171,7 @@ function getDivStyle ( skin ) {
 	if ( skin === 'modern' ) {
 		return "float: right;";
 	} else {
-		return "float: right; font-size: 0.5em;";
+		return "float: right; font-size: .7em;";
 	}
 }
 
@@ -176,7 +184,10 @@ function getHtmlProperty ( skin ) {
 	if ( skin === 'modern' ) {
 		return '#p-cactions';
 	} else {
-		return '#firstHeading';
+        // return '#mw-head';
+        return '#p-personal';
+        return '#p-cactions';
+		return '#firstHeading'; //this was hidden in http://editors.eol.org/eoearth/wiki/MediaWiki:Common.css
 	}
 }
 
