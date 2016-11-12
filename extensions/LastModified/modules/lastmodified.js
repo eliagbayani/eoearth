@@ -34,13 +34,18 @@ $( function () {
     datevalues = date.toUTCString();
     //by Eli - end
 
-
 	html += '<div style="' + getDivStyle( currentSkin ) + '" id="mwe-lastmodified">';
 	html += '<a href="' + historyLink + '" title="' + mw.message( 'lastmodified-title-tag' ).escaped() + '">';
 	html += getLastModifiedText( getUtcTimeStamp() - getMetaLastModifiedTimestamp(), getMetaRange() );
 	html += '</a>';
+	//by Eli - start
     html += ' '+datevalues;
+    //by Eli - end
 	html += '</div>';
+
+    //by Eli - start
+    // html = html.replace("Last", "Wiki last"); 
+    //by Eli - end
 
 	// Insert the HTML into the web page, based on skin
 	$( getHtmlProperty( currentSkin ) ).append( html );

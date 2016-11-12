@@ -586,8 +586,10 @@ function lfTOSLink( $sk, &$tpl )
 var time_stamp = getMetaLastModifiedTimestamp();
 date = new Date(time_stamp * 1000);
 datevalues = date.toUTCString();
-then a frew lines below...
+--------------
 html += ' '+datevalues;
+--------------
+html = html.replace("Last", "Wiki last"); 
 */
 // require_once "$IP/extensions/LastModified/LastModified.php";
 require_once( "$IP/extensions/LastModified/LastModified.php" );
