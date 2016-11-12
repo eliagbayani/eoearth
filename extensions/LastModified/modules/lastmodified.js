@@ -184,9 +184,7 @@ function getHtmlProperty ( skin ) {
 	if ( skin === 'modern' ) {
 		return '#p-cactions';
 	} else {
-        // return '#mw-head';
         return '#p-personal';
-        return '#p-cactions';
 		return '#firstHeading'; //this was hidden in http://editors.eol.org/eoearth/wiki/MediaWiki:Common.css
 	}
 }
