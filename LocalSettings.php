@@ -265,16 +265,6 @@ require_once "$IP/extensions/ConfirmAccount/ConfirmAccount.php";    //downloaded
 require_once("$IP/extensions/EmailUsers/EmailUsers.php");           //DONE[***] copied from MW 1.25.2
 wfLoadExtension( 'EmbedVideo' );                                    //DONE[***] copied from MW 1.25.2
 
-
-/* added this in extensions/LastModified/modules/lastmodified.js
-var time_stamp = getMetaLastModifiedTimestamp();
-date = new Date(time_stamp * 1000);
-datevalues = date.toUTCString();
-then a frew lines below...
-html += ' '+datevalues;
-*/
-require_once "$IP/extensions/LastModified/LastModified.php";
-
 /* seems not needed
 $wgEnableAPI = true;
 $wgEnableWriteAPI = true; //are required in order to use the write API.
@@ -591,4 +581,13 @@ function lfTOSLink( $sk, &$tpl )
 //==================================================
 // $wgReadOnly = 'Upgrading to MediaWiki 1.26.2'; //uncomment this line everytime we upgrade to have database-readonly access.
 //==================================================
+
+/* added this in extensions/LastModified/modules/lastmodified.js
+var time_stamp = getMetaLastModifiedTimestamp();
+date = new Date(time_stamp * 1000);
+datevalues = date.toUTCString();
+then a frew lines below...
+html += ' '+datevalues;
+*/
+require_once "$IP/extensions/LastModified/LastModified.php";
 
