@@ -369,6 +369,9 @@ function get_post_titles()
     $search_titles[] = "\(Land-use_\&_Land-cover_Change\)";
     $search_titles[] = "\(Minerals_\&_Mining\)";
 
+    $search_titles[] = "\(Ornithology\)";
+    $search_titles[] = "\(Atmosphere layers\)";
+
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
 }
