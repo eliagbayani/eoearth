@@ -372,8 +372,9 @@ function get_post_titles()
     $search_titles[] = "\(Ornithology\)";
     $search_titles[] = "\(Atmosphere_layers\)";
     $search_titles[] = "\(Environmental_Chemistry\)";
-
-    
+    $search_titles[] = "\(Soils\)";
+    $search_titles[] = "\(Groundwater\)";
+    $search_titles[] = "\(Atmospheric_composition\)";
 
     // $search_titles = array("\(About_the_EoE\)");
     return $search_titles;
