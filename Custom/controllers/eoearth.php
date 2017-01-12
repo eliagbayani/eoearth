@@ -9,9 +9,9 @@ class eoearth_controller
 
         $this->mediawiki_api = "http://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/api.php";
 
-        $elimit = 10;
-        $this->api_call = $this->mediawiki_api . "?action=query&list=logevents&letype=upload&lelimit=" . $elimit . "&format=json&rawcontinue";
-                                               // ?action=query&list=logevents&letype=upload&lelimit=1                    &rawcontinue&lecontinue=20170105143921|27995
+        $lelimit = 5; //orig 500
+        $this->api_call = $this->mediawiki_api . "?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue";
+                                               // ?action=query&list=logevents&letype=upload&lelimit=1                           &rawcontinue&lecontinue=20170105143921|27995
 
         // $this->exact_path = "http://editors.eol.org/eoearth/wiki/Special:Filepath/Pressure_altitude.jpg";
         $this->exact_path = "http://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/wiki/Special:Filepath/";
@@ -20,66 +20,66 @@ class eoearth_controller
 
     function backup_uploads_today()
     {
+        // /* normal operation
         self::check_backup_folder(BACKUP_FOLDER);
         
-        $today = date('Y-m-d'); //e.g. 2016-07-13
+        $today = date('Y-m-d');                                             //e.g. 2016-07-13
         echo "\nToday: $today\n";
-
-        $yesterday = date('Y-m-d', strtotime('-1 day', strtotime($today))); //e.g. 2016-07-12
-        echo "\n$yesterday\n";
-
-        // exit;
-        
-        
         $range = self::get_range($today);
-        print_r($range);
-
+        self::backup_now($range);
+        
+        $yesterday = date('Y-m-d', strtotime('-1 day', strtotime($today))); //e.g. 2016-07-12
+        echo "\n\nYesterday: $yesterday\n";
+        $range = self::get_range($yesterday);
+        self::backup_now($range);
+        // */
+        
         /* used in initial backup last Jan 12, 2017
-        $range = self::get_range("2016-10-17", "2016-10-25");
-        $range = self::get_range("2016-11-01", "2016-11-30");
-        $range = self::get_range("2016-12-01", "2016-12-30");
+        // $range = self::get_range("2016-10-01", "2016-10-31");
+        // $range = self::get_range("2016-11-01", "2016-11-31");
+        // $range = self::get_range("2016-12-01", "2016-12-31");
         $range = self::get_range("2017-01-01", "2017-01-31");
+        self::backup_now($range);
         */
-        
-        $url = $this->api_call . "&lestart=$range[lestart]&leend=$range[leend]&ledir=newer";
-        // echo "\n" . $url . "\n";
-        $json = Functions::lookup_with_cache($url, $this->download_options);
-        $arr = json_decode($json, true);
-        
-        if($recs = $arr['query']['logevents'])
-        {
-            $path = BACKUP_FOLDER.$today;               //normal operation
-            $path = BACKUP_FOLDER.$range["lestart"];    //only when backing up manual range
-            
-            self::check_backup_folder($path);
-            foreach($recs as $rec)
-            {
-                echo "\n".$rec['title']." -- ".$rec['timestamp'];
-                $filename = str_replace("File:", "", $rec['title']);
-                $remote_image_path = $this->exact_path . str_replace(" ", "_", $filename);
-                $saved_file = "$path/$filename";
-                // echo "\n" . $remote_image_path;
-
-                /*
-                $file_contents = Functions::get_remote_file($remote_image_path, $this->download_options);
-                if($FILE = Functions::file_open($saved_file, 'w')) // normal
-                {
-                    fwrite($FILE, $file_contents);
-                    fclose($FILE);
-                }
-                */
-
-                $imageString = file_get_contents($remote_image_path);
-                if($save = file_put_contents($saved_file, $imageString)) echo "\nSaved OK [$save][$saved_file]";
-                
-                sleep(5);
-            }
-        }
     }
     
-    private function backup_now()
+    private function backup_now($range)
     {
-        
+        print_r($range);
+        $lecontinue = "";
+        while(true)
+        {
+            $url = $this->api_call . "&lestart=$range[lestart]&leend=$range[leend]&ledir=newer";
+            if($lecontinue) $url .= "&lecontinue=$lecontinue";
+            $json = Functions::lookup_with_cache($url, $this->download_options);
+            $arr = json_decode($json, true);
+            // print_r($arr);
+            if($recs = $arr['query']['logevents'])
+            {
+                $path = BACKUP_FOLDER . substr($range["lestart"],0,10);
+                self::check_backup_folder($path);
+                foreach($recs as $rec)
+                {
+                    echo "\n".$rec['title']." -- ".$rec['timestamp'];
+                    $filename = str_replace("File:", "", $rec['title']);
+                    $remote_image_path = $this->exact_path . str_replace(" ", "_", $filename);
+                    $destination_file = "$path/$filename";
+
+                    // /*
+                    if(!file_exists($destination_file))
+                    {
+                        $imageString = file_get_contents($remote_image_path);
+                        if($save = file_put_contents($destination_file, $imageString)) echo "\nSaved OK [$save][$destination_file]";
+                    }
+                    else echo " - already saved.";
+                    sleep(5);
+                    // */
+                }
+            }
+            else echo "\nNo uploads between " . substr($range["lestart"],0,10) . " and " . substr($range["leend"],0,10) . "\n";
+            $lecontinue = @$arr['query-continue']['logevents']['lecontinue'];
+            if(!$lecontinue) break;
+        }//end while
     }
     
     private function get_range($start, $end = null)
@@ -97,5 +97,15 @@ class eoearth_controller
         }
         else echo "\nbackup folder already created...\n";
     }
+    
+    /*
+    $file_contents = Functions::get_remote_file($remote_image_path, $this->download_options);
+    if($FILE = Functions::file_open($destination_file, 'w')) // normal
+    {
+        fwrite($FILE, $file_contents);
+        fclose($FILE);
+    }
+    */
+    
 }
 ?>
