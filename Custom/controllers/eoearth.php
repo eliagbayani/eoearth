@@ -35,11 +35,10 @@ class eoearth_controller
         // */
         
         /* used in initial backup last Jan 12, 2017
-        // $range = self::get_range("2016-10-01", "2016-10-31");
-        // $range = self::get_range("2016-11-01", "2016-11-31");
-        // $range = self::get_range("2016-12-01", "2016-12-31");
-        $range = self::get_range("2017-01-01", "2017-01-31");
-        self::backup_now($range);
+        $range = self::get_range("2016-10-01", "2016-10-31"); self::backup_now($range);
+        $range = self::get_range("2016-11-01", "2016-11-31"); self::backup_now($range);
+        $range = self::get_range("2016-12-01", "2016-12-31"); self::backup_now($range);
+        $range = self::get_range("2017-01-01", "2017-01-31"); self::backup_now($range);
         */
     }
     
@@ -66,13 +65,13 @@ class eoearth_controller
                     $destination_file = "$path/$filename";
 
                     // /*
-                    if(!file_exists($destination_file))
-                    {
+                    // if(!file_exists($destination_file)) //used this during bulk-backup last Jan 12, 2017
+                    // {
                         $imageString = file_get_contents($remote_image_path);
                         if($save = file_put_contents($destination_file, $imageString)) echo "\nSaved OK [$save][$destination_file]";
-                    }
-                    else echo " - already saved.";
-                    sleep(5);
+                    // }
+                    // else echo " - already saved.";
+                    sleep(3);
                     // */
                 }
             }
