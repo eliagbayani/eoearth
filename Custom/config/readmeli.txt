@@ -56,5 +56,19 @@ https://www.mediawiki.org/wiki/Manual:Backing_up_a_wiki
 https://github.com/nischayn22/mw_backup/blob/master/backup.php
 
 ============================================================================================================
+setup crontab in my Mac
+https://ole.michelsen.dk/blog/schedule-jobs-with-crontab-on-mac-osx.html
+
+edit crontab using:
+
+$ env EDITOR=vi crontab -e
+OR
+$ env EDITOR=nano crontab -e
+
+then pasted this command:
+
+20 13 * * *  cd /Library/WebServer/Documents/eoearth && php Custom/apps/backup.php
+
+-> script will run everyday 1:30 AM
 ============================================================================================================
 

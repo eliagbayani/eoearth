@@ -11,6 +11,9 @@ class eoearth_controller
         $this->api_call = $this->mediawiki_api . "?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue";
                                                // ?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue&lecontinue=20170105143921|27995
         $this->exact_path = "http://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/wiki/Special:Filepath/";
+
+        // script runs everyday as cron: 1:30 AM
+        // 20 13 * * *  cd /Library/WebServer/Documents/eoearth && php Custom/apps/backup.php
     }
 
     function backup_uploads_today()
@@ -29,12 +32,13 @@ class eoearth_controller
         self::backup_now($range);
         // */
         
-        /* used in initial backup last Jan 12, 2017
-        $range = self::get_range("2016-10-01", "2016-10-31"); self::backup_now($range);
-        $range = self::get_range("2016-11-01", "2016-11-31"); self::backup_now($range);
-        $range = self::get_range("2016-12-01", "2016-12-31"); self::backup_now($range);
-        $range = self::get_range("2017-01-01", "2017-01-31"); self::backup_now($range);
-        */
+        // /* used in initial backup last Jan 12, 2017
+        // $range = self::get_range("2016-05-01", "2016-05-31"); self::backup_now($range);
+        // $range = self::get_range("2016-10-01", "2016-10-31"); self::backup_now($range);
+        // $range = self::get_range("2016-11-01", "2016-11-31"); self::backup_now($range);
+        // $range = self::get_range("2016-12-01", "2016-12-31"); self::backup_now($range);
+        // $range = self::get_range("2017-01-01", "2017-01-31"); self::backup_now($range);
+        // */
     }
     
     private function backup_now($range)
@@ -46,6 +50,7 @@ class eoearth_controller
             $url = $this->api_call . "&lestart=$range[lestart]&leend=$range[leend]&ledir=newer";
             if($lecontinue) $url .= "&lecontinue=$lecontinue";
             $json = Functions::lookup_with_cache($url, $this->download_options);
+            echo "\n$url\n";
             $arr = json_decode($json, true);
             // print_r($arr);
             if($recs = $arr['query']['logevents'])
