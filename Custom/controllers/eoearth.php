@@ -5,17 +5,12 @@ class eoearth_controller
 {
     function __construct($params)
     {
-        $this->download_options = array('download_timeout_seconds' => 4800, 'download_wait_time' => 300000, 'expire_seconds' => false);
-
+        $this->download_options = array('download_timeout_seconds' => 4800, 'download_wait_time' => 300000, 'expire_seconds' => 0); //0 - expires now - normal operation; 'false' doesn't expire
         $this->mediawiki_api = "http://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/api.php";
-
-        $lelimit = 5; //orig 500
+        $lelimit = 500; //orig 500
         $this->api_call = $this->mediawiki_api . "?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue";
-                                               // ?action=query&list=logevents&letype=upload&lelimit=1                           &rawcontinue&lecontinue=20170105143921|27995
-
-        // $this->exact_path = "http://editors.eol.org/eoearth/wiki/Special:Filepath/Pressure_altitude.jpg";
+                                               // ?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue&lecontinue=20170105143921|27995
         $this->exact_path = "http://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/wiki/Special:Filepath/";
-        
     }
 
     function backup_uploads_today()
@@ -65,12 +60,12 @@ class eoearth_controller
                     $destination_file = "$path/$filename";
 
                     // /*
-                    // if(!file_exists($destination_file)) //used this during bulk-backup last Jan 12, 2017
-                    // {
+                    if(!file_exists($destination_file))
+                    {
                         $imageString = file_get_contents($remote_image_path);
                         if($save = file_put_contents($destination_file, $imageString)) echo "\nSaved OK [$save][$destination_file]";
-                    // }
-                    // else echo " - already saved.";
+                    }
+                    else echo " - already saved.";
                     sleep(3);
                     // */
                 }
