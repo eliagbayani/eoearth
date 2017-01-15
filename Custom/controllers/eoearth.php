@@ -21,15 +21,17 @@ class eoearth_controller
         // /* normal operation
         self::check_backup_folder(BACKUP_FOLDER);
         
-        $today = date('Y-m-d');                                             //e.g. 2016-07-13
+        $today = date('Y-m-d');                                                         //e.g. 2016-07-13 - today
         echo "\nToday: $today\n";
-        $range = self::get_range($today);
-        self::backup_now($range);
+        $range = self::get_range($today); self::backup_now($range);
         
-        $yesterday = date('Y-m-d', strtotime('-1 day', strtotime($today))); //e.g. 2016-07-12
+        $yesterday = date('Y-m-d', strtotime('-1 day', strtotime($today)));             //e.g. 2016-07-12 - yesterday
         echo "\n\nYesterday: $yesterday\n";
-        $range = self::get_range($yesterday);
-        self::backup_now($range);
+        $range = self::get_range($yesterday); self::backup_now($range);
+        
+        $day_before_yesterday = date('Y-m-d', strtotime('-2 day', strtotime($today)));  //e.g. 2016-07-11 - 2 days ago
+        echo "\n\nday_before_yesterday: $day_before_yesterday\n";
+        $range = self::get_range($day_before_yesterday); self::backup_now($range);
         // */
         
         // /* used in initial backup last Jan 12, 2017
