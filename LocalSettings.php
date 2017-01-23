@@ -336,7 +336,7 @@ $wgSMTP = array('host'      => 'ssl://smtp.gmail.com',
                 'IDHost'    => 'gmail.com',
                 'port'      => 465,
                 'username'  => 'eagbayanieol@gmail.com',
-                'password'  => 'erjaeol1309',
+                'password'  => 'asdfghjk173',
                 'auth'      => true);
 */
 
@@ -591,13 +591,13 @@ html += ' '+datevalues;
 --------------
 html = html.replace("Last", "Wiki last"); 
 */
+
+//=================================================
 // require_once "$IP/extensions/LastModified/LastModified.php";
 require_once( "$IP/extensions/LastModified/LastModified.php" );
-
+//=================================================
 // for google analytics extension
 require_once "$IP/extensions/googleAnalytics/googleAnalytics.php";
-// Replace xxxxxxx-x with YOUR GoogleAnalytics UA number
-// $wgGoogleAnalyticsAccount = 'UA-xxxxxxx-x'; 
 $wgGoogleAnalyticsAccount = 'UA-3298646-15';                              
 // Add HTML code for any additional web analytics (can be used alone or with $wgGoogleAnalyticsAccount)
 $wgGoogleAnalyticsOtherCode = '<script type="text/javascript" src="https://analytics.example.com/tracking.js"></script>';
@@ -616,3 +616,37 @@ $wgGoogleAnalyticsAnonymizeIP = false;
 // $wgGroupPermissions['bot']['noanalytics'] = true;
 // To exclude all logged in users give 'noanalytics' permission to 'user' group, i.e.
 // $wgGroupPermissions['user']['noanalytics'] = true;
+//=================================================
+// for ContactPage
+// $wgPasswordSender       = "eagbayani173@gmail.com";
+
+require_once "$IP/extensions/ContactPage/ContactPage.php";
+$wgContactConfig['default'] = array(
+    'RecipientUser' => 'eoe_editors',                       // Must be the name of a valid account which also has a verified e-mail-address added to it.
+    'SenderName'    => 'Contact Form on ' . $wgSitename,    // "Contact Form on" needs to be translated
+    'SenderEmail'   => 'eagbayaninf@gmail.com', //null,     // Defaults to $wgPasswordSender, may be changed as required
+    'RequireDetails' => true,   // Either "true" or "false" as required
+    'IncludeIP'      => true,   // Either "true" or "false" as required
+    'AdditionalFields' => array(
+        'Text' => array(
+            'label-message' => 'emailmessage',
+            'type' => 'textarea',
+            'rows' => 20,
+            'cols' => 80,
+            'required' => true,  // Either "true" or "false" as required
+        ),
+    ),
+    // Added in MW 1.26
+    'DisplayFormat'  => 'table',  // See HTMLForm documentation for available values.
+    'RLModules'      => array(),  // Resource loader modules to add to the form display page.
+    'RLStyleModules' => array(),  // Resource loader CSS modules to add to the form display page.
+);
+
+$wgHooks['SkinTemplateOutputPageBeforeExec'][] = function( $sk, &$tpl ) {
+    $contactLink = Html::element( 'a', array( 'href' => $sk->msg( 'contactpage-url' )->escaped() ),
+    $sk->msg( 'contactpage-label' )->text() );
+    $tpl->set( 'contact', $contactLink );
+    $tpl->data['footerlinks']['places'][] = 'contact';
+    return true;
+};
+//=================================================
