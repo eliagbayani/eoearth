@@ -624,7 +624,7 @@ require_once "$IP/extensions/ContactPage/ContactPage.php";
 $wgContactConfig['default'] = array(
     'RecipientUser' => 'eoe_editors',                       // Must be the name of a valid account which also has a verified e-mail-address added to it.
     'SenderName'    => 'Contact Form on ' . $wgSitename,    // "Contact Form on" needs to be translated
-    'SenderEmail'   => 'eagbayaninf@gmail.com', //null,     // Defaults to $wgPasswordSender, may be changed as required
+    'SenderEmail'   => 'eoe.editors@gmail.com', //null,     // Defaults to $wgPasswordSender, may be changed as required
     'RequireDetails' => false,   // Either "true" or "false" as required
     'IncludeIP'      => true,   // Either "true" or "false" as required
     'AdditionalFields' => array(
