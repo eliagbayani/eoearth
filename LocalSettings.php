@@ -649,4 +649,6 @@ $wgHooks['SkinTemplateOutputPageBeforeExec'][] = function( $sk, &$tpl ) {
     $tpl->data['footerlinks']['places'][] = 'contact';
     return true;
 };
+
+$wgCaptchaTriggers['contactpage'] = true; //to enable Captcha
 //=================================================
