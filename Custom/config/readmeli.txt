@@ -71,4 +71,5 @@ then pasted this command:
 
 -> script will run everyday 1:30 AM
 ============================================================================================================
+robots.txt here is used in webroot of editors.eol.org
 
