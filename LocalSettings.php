@@ -652,3 +652,18 @@ $wgHooks['SkinTemplateOutputPageBeforeExec'][] = function( $sk, &$tpl ) {
 
 // $wgCaptchaTriggers['contactpage'] = true; //to enable Captcha
 //=================================================
+# https://www.mediawiki.org/wiki/Manual:Robots.txt
+# https://www.mediawiki.org/wiki/Help:Controlling_search_engine_indexing
+# https://www.mediawiki.org/wiki/Manual:$wgArticleRobotPolicies
+$wgDefaultRobotPolicy = 'noindex,nofollow';
+$wgNamespaceRobotPolicies = array( NS_MAIN => 'index,follow' );
+/* additional entries in robots.txt
+Disallow: /eoearth/index.php
+Disallow: /eoearth/index.php?
+Disallow: /eoearth/api.php
+Disallow: /eoearth/api.php?
+Disallow: /eoearth/wiki/Template:
+Disallow: /eoearth/wiki/Special:
+Disallow: /eoearth/skins/
+*/
+//=================================================

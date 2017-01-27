@@ -1,4 +1,4 @@
-﻿# robots.txt for http://www.wikipedia.org/ and friends
+# robots.txt for http://www.wikipedia.org/ and friends
 #
 # Please note: There are a lot of pages on this site, and there are
 # some misbehaved spiders out there that go _way_ too fast. If you're
@@ -149,7 +149,19 @@ Disallow: /
 User-agent: *
 Disallow: /eoearth/index.php
 Disallow: /eoearth/index.php?
-Disallow: /LiteratureEditor/index.php
-Disallow: /LiteratureEditor/index.php?
+Disallow: /eoearth/api.php
+Disallow: /eoearth/api.php?
+Disallow: /eoearth/wiki/Template:
+Disallow: /eoearth/wiki/Special:
+Disallow: /eoearth/skins/
 
+Disallow: /LiteratureEditor/
+
+# Disallow: /LiteratureEditor/index.php
+# Disallow: /LiteratureEditor/index.php?
+# Disallow: /LiteratureEditor/api.php
+# Disallow: /LiteratureEditor/api.php?
+# Disallow: /LiteratureEditor/wiki/Template:
+# Disallow: /LiteratureEditor/wiki/Special:
+# Disallow: /LiteratureEditor/skins/
 #----------------------------------------------------------#
