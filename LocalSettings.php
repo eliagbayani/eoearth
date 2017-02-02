@@ -381,6 +381,12 @@ $wgSpecialPageLockdown['*']         = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
+$specs = array('Allpages', 'Prefixindex', 'Listredirects', 'Categories', 'Pageswithprop', 'Trackingcategories');
+foreach($specs as $spec)
+{
+    $wgSpecialPageLockdown[$spec] = array('EoE_Member', 'EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+}
+
 /*
 $wgNamespacePermissionLockdown[NS_ForReview]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_ForReview_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
