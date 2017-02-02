@@ -303,6 +303,9 @@ $wgContentNamespaces[] = NS_TEMPLATE_TALK; //this adds this namespace in VisualE
 $wgContentNamespaces[] = NS_FORREVIEW; //this adds the Template namespace in VisualEditor
 $wgContentNamespaces[] = NS_FORREVIEW_TALK; //this adds this namespace in VisualEditor
 
+$wgContentNamespaces[] = NS_PROJECT; //this adds the Template namespace in VisualEditor
+
+
 ///* not needed on mac mini
 $wgVirtualRestConfig['modules']['parsoid'] = array(
   // URL to the Parsoid instance
