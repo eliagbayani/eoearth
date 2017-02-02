@@ -290,6 +290,9 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 $wgVisualEditorNamespaces = array(NS_MAIN, NS_TALK, NS_USER, NS_USER_TALK, NS_ForReview, NS_ForReview_TALK);
 */
 
+$wgVisualEditorNamespaces[] = NS_TEMPLATE;
+$wgVisualEditorNamespaces[] = NS_TEMPLATE_TALK;
+
 $wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in VisualEditor
 $wgContentNamespaces[] = NS_TEMPLATE_TALK; //this adds this namespace in VisualEditor
 
