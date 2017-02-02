@@ -156,6 +156,16 @@ Disallow: /eoearth/wiki/Special:
 Disallow: /eoearth/skins/
 
 Disallow: /LiteratureEditor/
+Disallow: /cache_LiteratureEditor/
+Disallow: /opendata/
+Disallow: /eol_php_code/
+Disallow: /FreshData/
+Disallow: /gmaps_markers/
+
+#linked folders:
+Disallow: /map_data/
+Disallow: /LiteratureEditor_images/
+Disallow: /eoearth_images/
 
 # Disallow: /LiteratureEditor/index.php
 # Disallow: /LiteratureEditor/index.php?
