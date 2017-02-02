@@ -384,7 +384,7 @@ $wgSpecialPageLockdown['*']         = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
-// /* 2-Feb-2017
+// /* 2-Feb-2017 so that public won't see those articles in FOR REVIEW namespace
 $wgNamespacePermissionLockdown[NS_FORREVIEW]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_FORREVIEW_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 // */
