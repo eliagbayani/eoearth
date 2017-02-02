@@ -667,3 +667,6 @@ Disallow: /eoearth/wiki/Special:
 Disallow: /eoearth/skins/
 */
 //=================================================
+wfLoadExtension( 'TemplateData' );
+$wgTemplateDataUseGUI = true;
+
