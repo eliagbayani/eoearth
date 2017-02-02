@@ -399,7 +399,8 @@ $wgNamespacePermissionLockdown[NS_HELP_TALK]['*'] = array('EoE_Author', 'EoE_Top
 // $wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
 $spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
-// $spaces = array(NS_HELP, NS_HELP_TALK);
+$spaces = array(NS_HELP, NS_HELP_TALK);
+$spaces = array(NS_HELP);
 foreach($spaces as $space)
 {
     $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
