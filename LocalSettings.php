@@ -386,7 +386,7 @@ $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $specs = array('Allpages', 'Prefixindex', 'Listredirects', 'Categories', 'Pageswithprop', 'Trackingcategories');
 foreach($specs as $spec)
 {
-    $wgSpecialPageLockdown[$spec] = array('EoE_Member', 'EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+    $wgSpecialPageLockdown[$spec] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 }
 
 /*
