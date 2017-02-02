@@ -295,10 +295,10 @@ $wgVisualEditorNamespaces[] = NS_TEMPLATE;
 $wgVisualEditorNamespaces[] = NS_TEMPLATE_TALK;
 */
 
-/*
+// /*
 $wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in VisualEditor
 $wgContentNamespaces[] = NS_TEMPLATE_TALK; //this adds this namespace in VisualEditor
-*/
+// */
 
 ///* not needed on mac mini
 $wgVirtualRestConfig['modules']['parsoid'] = array(
