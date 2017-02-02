@@ -20,8 +20,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 // /* 2-Feb-2017
 define("NS_FORREVIEW", 5000); // This MUST be even.
 define("NS_FORREVIEW_TALK", 5001); // This MUST be the following odd integer.
-$wgExtraNamespaces[NS_FORREVIEW]      = "For_Review";
-$wgExtraNamespaces[NS_FORREVIEW_TALK] = "For_Review_talk"; // Note underscores in the namespace name.
+$wgExtraNamespaces[NS_FORREVIEW]      = "Review";
+$wgExtraNamespaces[NS_FORREVIEW_TALK] = "Review_talk"; // Note underscores in the namespace name.
 // */
 // end by eli =====================
 
@@ -304,7 +304,7 @@ $wgContentNamespaces[] = NS_FORREVIEW; //this adds the Template namespace in Vis
 // $wgContentNamespaces[] = NS_FORREVIEW_TALK; //this adds this namespace in VisualEditor
 
 $wgContentNamespaces[] = NS_PROJECT; //this adds the Template namespace in VisualEditor
-
+$wgContentNamespaces[] = NS_HELP; //this adds the Template namespace in VisualEditor
 
 ///* not needed on mac mini
 $wgVirtualRestConfig['modules']['parsoid'] = array(
