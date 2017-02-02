@@ -17,11 +17,11 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 // start by eli =====================
 // Define constants for my additional namespaces.
-/*
-define("NS_ForReview", 5000); // This MUST be even.
-define("NS_ForReview_TALK", 5001); // This MUST be the following odd integer.
-$wgExtraNamespaces[NS_ForReview]      = "ForReview";
-$wgExtraNamespaces[NS_ForReview_TALK] = "ForReview_talk"; // Note underscores in the namespace name.
+/* 2-Feb-2017
+define("NS_FORREVIEW", 5000); // This MUST be even.
+define("NS_FORREVIEW_TALK", 5001); // This MUST be the following odd integer.
+$wgExtraNamespaces[NS_FORREVIEW]      = "Review_page";
+$wgExtraNamespaces[NS_FORREVIEW_TALK] = "Review_page_talk"; // Note underscores in the namespace name.
 */
 // end by eli =====================
 
@@ -287,7 +287,7 @@ $wgHiddenPrefs[] = 'visualeditor-enable';
 
 /*seems not needed
 //from: https://www.mediawiki.org/wiki/Thread:Extension_talk:VisualEditor/Enable_Visual_Editor_for_'create'_page
-$wgVisualEditorNamespaces = array(NS_MAIN, NS_TALK, NS_USER, NS_USER_TALK, NS_ForReview, NS_ForReview_TALK);
+$wgVisualEditorNamespaces = array(NS_MAIN, NS_TALK, NS_USER, NS_USER_TALK, NS_FORREVIEW, NS_FORREVIEW_TALK);
 */
 
 /*seems not needed as well
@@ -299,6 +299,14 @@ $wgVisualEditorNamespaces[] = NS_TEMPLATE_TALK;
 $wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in VisualEditor
 $wgContentNamespaces[] = NS_TEMPLATE_TALK; //this adds this namespace in VisualEditor
 */
+// 2-Feb-2017
+// $wgContentNamespaces[] = NS_FORREVIEW; //this adds the Template namespace in VisualEditor
+// $wgContentNamespaces[] = NS_FORREVIEW_TALK; //this adds this namespace in VisualEditor
+
+$wgContentNamespaces[] = NS_PROJECT; //this adds the Template namespace in VisualEditor
+$wgContentNamespaces[] = NS_HELP; //this adds the Template namespace in VisualEditor
+$wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in VisualEditor
+
 
 ///* not needed on mac mini
 $wgVirtualRestConfig['modules']['parsoid'] = array(
@@ -381,23 +389,25 @@ $wgSpecialPageLockdown['*']         = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
-/*
-$wgNamespacePermissionLockdown[NS_ForReview]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_ForReview_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+/* 2-Feb-2017 so that public won't see those articles in FOR REVIEW namespace
+$wgNamespacePermissionLockdown[NS_HELP]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_HELP_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 */
 
 //so that public won't see articles in Template namespace, or those for review articles
-$wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+// $wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+// $wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
 $spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
+$spaces = array(NS_HELP, NS_HELP_TALK);
+$spaces = array(NS_HELP);
 foreach($spaces as $space)
 {
-    $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+    $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor', 'VisualEditor', 'Visual_Editor', 'Visual Editor', 'bot', 'sysop', 'visualeditor');
     $wgNamespacePermissionLockdown[$space]['createpage']   = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
     $wgNamespacePermissionLockdown[$space]['delete']       = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
     $wgNamespacePermissionLockdown[$space]['undelete']     = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-    $wgNamespacePermissionLockdown[$space]['*']            = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+    $wgNamespacePermissionLockdown[$space]['*']            = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor', 'VisualEditor', 'Visual_Editor', 'Visual Editor', 'bot', 'sysop', 'visualeditor');
 }
 
 /* To modify NS_MEDIAWIKI & NS_MEDIAWIKI_TALK user must be both 'administrator' and 'EoE_Administrator' */
