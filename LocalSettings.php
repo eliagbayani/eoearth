@@ -17,12 +17,12 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 // start by eli =====================
 // Define constants for my additional namespaces.
-// /* 2-Feb-2017
+/* 2-Feb-2017
 define("NS_FORREVIEW", 5000); // This MUST be even.
 define("NS_FORREVIEW_TALK", 5001); // This MUST be the following odd integer.
 $wgExtraNamespaces[NS_FORREVIEW]      = "Review_page";
 $wgExtraNamespaces[NS_FORREVIEW_TALK] = "Review_page_talk"; // Note underscores in the namespace name.
-// */
+*/
 // end by eli =====================
 
 
@@ -300,7 +300,7 @@ $wgContentNamespaces[] = NS_TEMPLATE; //this adds the Template namespace in Visu
 $wgContentNamespaces[] = NS_TEMPLATE_TALK; //this adds this namespace in VisualEditor
 */
 // 2-Feb-2017
-$wgContentNamespaces[] = NS_FORREVIEW; //this adds the Template namespace in VisualEditor
+// $wgContentNamespaces[] = NS_FORREVIEW; //this adds the Template namespace in VisualEditor
 // $wgContentNamespaces[] = NS_FORREVIEW_TALK; //this adds this namespace in VisualEditor
 
 $wgContentNamespaces[] = NS_PROJECT; //this adds the Template namespace in VisualEditor
@@ -388,15 +388,16 @@ $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
 // /* 2-Feb-2017 so that public won't see those articles in FOR REVIEW namespace
-$wgNamespacePermissionLockdown[NS_FORREVIEW]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_FORREVIEW_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_HELP]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+$wgNamespacePermissionLockdown[NS_HELP_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 // */
 
 //so that public won't see articles in Template namespace, or those for review articles
-$wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-$wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+// $wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
+// $wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
-$spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
+// $spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
+$spaces = array(NS_HELP, NS_HELP_TALK);
 foreach($spaces as $space)
 {
     $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
