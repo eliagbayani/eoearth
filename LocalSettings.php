@@ -390,6 +390,7 @@ $wgNamespacePermissionLockdown[NS_ForReview_TALK]['*'] = array('EoE_Author', 'Eo
 $wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
+/*
 $spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
 foreach($spaces as $space)
 {
@@ -399,6 +400,7 @@ foreach($spaces as $space)
     $wgNamespacePermissionLockdown[$space]['undelete']     = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
     $wgNamespacePermissionLockdown[$space]['*']            = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 }
+*/
 
 /* To modify NS_MEDIAWIKI & NS_MEDIAWIKI_TALK user must be both 'administrator' and 'EoE_Administrator' */
 $spaces = array(NS_MEDIAWIKI, NS_MEDIAWIKI_TALK);
