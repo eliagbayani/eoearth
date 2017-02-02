@@ -387,17 +387,17 @@ $wgSpecialPageLockdown['*']         = array('EoE_Author', 'EoE_Topic_Editor', 'E
 $wgSpecialPageLockdown['BlockList'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgSpecialPageLockdown['Export']    = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
-// /* 2-Feb-2017 so that public won't see those articles in FOR REVIEW namespace
+/* 2-Feb-2017 so that public won't see those articles in FOR REVIEW namespace
 $wgNamespacePermissionLockdown[NS_HELP]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 $wgNamespacePermissionLockdown[NS_HELP_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
-// */
+*/
 
 //so that public won't see articles in Template namespace, or those for review articles
 // $wgNamespacePermissionLockdown[NS_TEMPLATE]['*']      = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 // $wgNamespacePermissionLockdown[NS_TEMPLATE_TALK]['*'] = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
 
-// $spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
-$spaces = array(NS_HELP, NS_HELP_TALK);
+$spaces = array(NS_TEMPLATE, NS_TEMPLATE_TALK);
+// $spaces = array(NS_HELP, NS_HELP_TALK);
 foreach($spaces as $space)
 {
     $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Author', 'EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
