@@ -419,7 +419,7 @@ foreach($spaces as $space)
     $wgNamespacePermissionLockdown[$space]['createpage']   = array('EoE_Administrator');
     $wgNamespacePermissionLockdown[$space]['delete']       = array(''); //no one can delete
     $wgNamespacePermissionLockdown[$space]['undelete']     = array(''); //no one can undelete
-    $wgNamespacePermissionLockdown[$space]['move']         = array(''); //no one can move
+    $wgNamespacePermissionLockdown[$space]['move']         = array('EoE_Administrator'); //no one can move
 }
 
 $wgNamespacePermissionLockdown[NS_MAIN]['edit']         = array('EoE_Topic_Editor', 'EoE_Administrator', 'EoE_Managing_Editor');
@@ -686,6 +686,7 @@ Disallow: /eoearth/wiki/Special:
 Disallow: /eoearth/skins/
 */
 //=================================================
+/* not needed for now
 wfLoadExtension( 'TemplateData' );
 $wgTemplateDataUseGUI = true;
-
+*/
