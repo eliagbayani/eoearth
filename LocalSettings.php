@@ -172,6 +172,8 @@ $wgRightsIcon = "$wgResourceBasePath/resources/assets/licenses/cc-by-sa.png";
 # Path to the GNU diff3 utility. Used for conflict resolution.
 $wgDiff3 = "/usr/bin/diff3";
 
+$wgGroupPermissions['Interface_Editor']['editinterface'] = true;
+
 # The following permissions were set based on your choice in the installer
     //initialize false rights
     $rights = array('createaccount', 'createpage', 'edit', 'move', 'writeapi', 'upload', 'changetags', 'applychangetags', 'minoredit', 'move-categorypages', 'movefile', 'move', 'move-subpages', 'move-rootuserpages', 'reupload-shared', 'reupload', 'purge', 'sendemail');
@@ -415,7 +417,7 @@ foreach($spaces as $space)
 $spaces = array(NS_MEDIAWIKI, NS_MEDIAWIKI_TALK);
 foreach($spaces as $space)
 {
-    $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Administrator');
+    $wgNamespacePermissionLockdown[$space]['edit']         = array('EoE_Administrator', 'Interface_Editor');
     $wgNamespacePermissionLockdown[$space]['createpage']   = array('EoE_Administrator');
     $wgNamespacePermissionLockdown[$space]['delete']       = array(''); //no one can delete
     $wgNamespacePermissionLockdown[$space]['undelete']     = array(''); //no one can undelete
