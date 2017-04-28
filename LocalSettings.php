@@ -272,6 +272,8 @@ $wgEnableAPI = true;
 $wgEnableWriteAPI = true; //are required in order to use the write API.
 */
 
+//===================ConfirmEdit=================================== default
+$wgCaptchaTriggers['addurl'] = false; //default is true
 //===================DeleteHistory===================================
 $wgGroupPermissions['sysop']['DeleteHistory'] = true;
 require_once("$IP/extensions/DeleteHistory/DeleteHistory.php");
@@ -671,7 +673,6 @@ $wgHooks['SkinTemplateOutputPageBeforeExec'][] = function( $sk, &$tpl ) {
     return true;
 };
 
-// $wgCaptchaTriggers['contactpage'] = true; //to enable Captcha
 //=================================================
 # https://www.mediawiki.org/wiki/Manual:Robots.txt
 # https://www.mediawiki.org/wiki/Help:Controlling_search_engine_indexing
