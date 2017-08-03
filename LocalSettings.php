@@ -29,6 +29,8 @@ $wgExtraNamespaces[NS_ForReview_TALK] = "ForReview_talk"; // Note underscores in
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
 
+// set_time_limit(30);
+
 $wgSitename = "The Encyclopedia of Earth";
 $wgMetaNamespace = "Project";
 
@@ -90,7 +92,7 @@ $wgFooterIcons['copyright']['copyright'] = array();
 ## Database settings
 $wgDBtype       = "mysql";
 $wgDBserver     = "localhost";
-$wgDBname       = "wiki_eoearth"; //"wiki_eoearth_126";
+$wgDBname       = "wiki_eoearth"; //"wiki_eoearth_126"; orig is wiki_eoearth
 
 $wgDBuser       = $conf['wgDBuser'];//"root";
 $wgDBpassword   = $conf['wgDBpassword'];//"m173";
