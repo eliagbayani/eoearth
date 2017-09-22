@@ -1,7 +1,7 @@
 <?php
 //=== for archive ===
 // /*
-$conf['wgServer']           = "http://editors.eol.org";
+$conf['wgServer']           = "https://editors.eol.org";
 
 // database
 $conf['wgDBuser']           = "root";
@@ -34,8 +34,9 @@ $conf['wgDBuser']       = "root";
 $conf['wgDBpassword']   = "m173";
 
 // cache
-$conf['wgMainCacheType']    = CACHE_MEMCACHED;//CACHE_ACCEL; //CACHE_MEMCACHED;                used in MW 1.25.2
-$conf['wgMemCachedServers'] = array( '127.0.0.1:11211' );//array();     //array( '127.0.0.1:11211' );     used in MW 1.25.2
+$conf['wgMainCacheType']    = CACHE_DB; //CACHE_DB or CACHE_MEMCACHED; ---- CACHE_ACCEL should work OK locally and in eol-archive. MW 1.26.2 and in PHP 5.6.30 & PHP 5.4.16
+//as of Sep 21, 2017 CACHE_DB is the one that works :-)
+$conf['wgMemCachedServers'] = array();     //array( '127.0.0.1:11211' );  ---- array()     should work OK locally and in eol-archive  MW 1.26.2 and in PHP 5.6.30 & PHP 5.4.16
 
 // images
 $conf['images_folder']      = "/Library/WebServer/Documents/eoearth_images";
