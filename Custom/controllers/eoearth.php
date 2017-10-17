@@ -10,7 +10,7 @@ class eoearth_controller
         $lelimit = 500; //orig 500
         $this->api_call = $this->mediawiki_api . "?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue";
                                                // ?action=query&list=logevents&letype=upload&lelimit=" . $lelimit . "&format=json&rawcontinue&lecontinue=20170105143921|27995
-        $this->exact_path = "http://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/wiki/Special:Filepath/";
+        $this->exact_path = "https://" . DOMAIN_SERVER . "/" . MEDIAWIKI_MAIN_FOLDER . "/wiki/Special:Filepath/";
 
         // script runs everyday as cron: 1:30 AM
         // 20 13 * * *  cd /Library/WebServer/Documents/eoearth && php Custom/apps/backup.php
@@ -41,6 +41,10 @@ class eoearth_controller
         // $range = self::get_range("2016-12-01", "2016-12-31"); self::backup_now($range);
         // $range = self::get_range("2017-01-01", "2017-01-31"); self::backup_now($range);
         // */
+        
+        /* used when I missed some backups when we implemented https in editors.eol.org
+        $range = self::get_range("2017-10-12", "2017-10-14"); self::backup_now($range);
+        */
     }
     
     private function backup_now($range)
@@ -66,7 +70,7 @@ class eoearth_controller
                     $remote_image_path = $this->exact_path . str_replace(" ", "_", $filename);
                     $destination_file = "$path/$filename";
 
-                    // /*
+                    /* worked well until editors used SSL - HTTPS
                     if(!file_exists($destination_file))
                     {
                         $imageString = file_get_contents($remote_image_path);
@@ -74,7 +78,23 @@ class eoearth_controller
                     }
                     else echo " - already saved.";
                     sleep(3);
-                    // */
+                    */
+
+                    //new method https compliant =========================start
+                    $destination_file = str_replace(" ", "_", $destination_file);
+                    if(!file_exists($destination_file))
+                    {
+                        echo "\nremote_image_path: [$remote_image_path]";
+                        echo "\ndestination_file: [$destination_file]\n";
+                        $cmd = 'wget --tries=3 -O '.$destination_file.' "'.$remote_image_path.'"'; //working well with shell_exec()
+                        $cmd .= " 2>&1";
+                        $terminal = shell_exec($cmd);
+                        echo "\n$terminal\n";
+                    }
+                    else echo " - already saved.";
+                    sleep(3);
+                    //new method https compliant =========================end
+                    
                 }
             }
             else echo "\nNo uploads between " . substr($range["lestart"],0,10) . " and " . substr($range["leend"],0,10) . "\n";
