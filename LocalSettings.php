@@ -609,6 +609,7 @@ function lfTOSLink( $sk, &$tpl )
     $tpl->set( 'abouteol', $sk->footerLink( 'abouteol', 'abouteolpage' ) ); //old value for 2nd param is 'abouteolpage'
     $tpl->data['footerlinks']['places'][] = 'abouteol';
     */
+    /* added Aug 5, 2019 */
     $tpl->set( 'abouteditors', $sk->footerLink( 'abouteditors', 'abouteditorspage' ) );
     $tpl->data['footerlinks']['places'][] = 'abouteditors';
 
