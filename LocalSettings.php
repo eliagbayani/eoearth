@@ -580,19 +580,52 @@ I then put a single dash "-" so link will not appear. Then just added abouttheeo
 $wgHooks['SkinTemplateOutputPageBeforeExec'][] = 'lfTOSLink';
 function lfTOSLink( $sk, &$tpl )
 {
+    /* obsolete - removed Aug 5, 2019
+    http://editors.eol.localhost/eoearth/wiki/MediaWiki:abouteol
+    http://editors.eol.localhost/eoearth/wiki/MediaWiki:abouteolpage
+
+    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteol
+    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteolpage
+    */
+    
+    /*
+    added Aug 5, 2019
+    http://editors.eol.localhost/eoearth/wiki/MediaWiki:abouteditors        --> where to put the link label
+    http://editors.eol.localhost/eoearth/wiki/MediaWiki:abouteditorspage    --> where to put the actual link text. Which will then become a new page/article with value "#REDIRECT [[abouteditorspage:]]"
+    implement in eol-archive:
+    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteditors
+    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteditorspage
+    --------------------------------------------------------------------------------
+    Legacy entry sample:
+    https://editors.eol.org/eoearth/wiki/MediaWiki:Termsofuse           --> where to put the link label
+    https://editors.eol.org/eoearth/wiki/MediaWiki:Termsofusepage       --> where to put the actual link
+    */
+    
     //Terms of Use (link as is), About EOL (linking to the EOL homepage), EoE Neutrality Policy (link as is), About the Encyclopedia of Earth (link as is)
     $tpl->set( 'termsofuse', $sk->footerLink( 'termsofuse', 'termsofusepage' ) );
     $tpl->data['footerlinks']['places'][] = 'termsofuse';
 
-    $tpl->set( 'abouteol', $sk->footerLink( 'abouteol', 'abouteolpage' ) );
+    /* removed Aug 5, 2019
+    $tpl->set( 'abouteol', $sk->footerLink( 'abouteol', 'abouteolpage' ) ); //old value for 2nd param is 'abouteolpage'
     $tpl->data['footerlinks']['places'][] = 'abouteol';
+    */
+    $tpl->set( 'abouteditors', $sk->footerLink( 'abouteditors', 'abouteditorspage' ) );
+    $tpl->data['footerlinks']['places'][] = 'abouteditors';
+
     /*from https://www.mediawiki.org/wiki/Help_talk:Redirects#Redirect_to_an_external_website
     sudo mysql -u root -p
     use wiki_eoearth;
     INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolhomepage",  "http://eol.org/",      "", "1", 1, 0);
     INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolaboutpage", "http://eol.org/about", "", "1", 1, 0);
+    Aug 5, 2019
+    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("abouteditorspage", "https://editors.eol.org/", "", "1", 1, 0);
+
     select * from interwiki;
     Info on interwiki table: https://www.mediawiki.org/wiki/Manual:Interwiki_table
+    */
+    /* example to update link e.g. abouteol
+    mysql -u root -p
+    UPDATE interwiki SET iw_url = "https://editors.eol.org/" WHERE iw_prefix = "eolaboutpage";
     */
     
     $tpl->set( 'neutralitypolicy', $sk->footerLink( 'neutralitypolicy', 'neutralitypolicypage' ) );
@@ -602,6 +635,11 @@ function lfTOSLink( $sk, &$tpl )
     $tpl->data['footerlinks']['places'][] = 'abouttheeoe';
     
     return true;
+    
+    /* for Eli: to get values on interwiki table
+    mysql -u root -p -e "SELECT * FROM wiki_eoearth.interwiki" > interwiki_contents.txt
+    */
+    
 }
 //==================================================
 // $wgReadOnly = 'Upgrading to MediaWiki 1.26.2'; //uncomment this line everytime we upgrade to have database-readonly access.
