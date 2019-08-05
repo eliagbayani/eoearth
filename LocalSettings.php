@@ -592,9 +592,13 @@ function lfTOSLink( $sk, &$tpl )
     added Aug 5, 2019
     http://editors.eol.localhost/eoearth/wiki/MediaWiki:abouteditors        --> where to put the link label
     http://editors.eol.localhost/eoearth/wiki/MediaWiki:abouteditorspage    --> where to put the actual link text. Which will then become a new page/article with value "#REDIRECT [[abouteditorspage:]]"
-    implement in eol-archive:
-    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteditors
-    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteditorspage
+    actual implementation in eol-archive:
+    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteditors             "About EOL Editors"
+    https://editors.eol.org/eoearth/wiki/MediaWiki:abouteditorspage         "About Editors Page" -> this will become a new page/article and save the value "#REDIRECT [[abouteditorspage:]]"
+    
+    Then a new row was inserted in [interwiki] table in wiki_eoearth MySQL database.
+    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("abouteditorspage", "https://editors.eol.org/", "", "1", 1, 0);
+    
     --------------------------------------------------------------------------------
     Legacy entry sample:
     https://editors.eol.org/eoearth/wiki/MediaWiki:Termsofuse           --> where to put the link label
@@ -618,8 +622,6 @@ function lfTOSLink( $sk, &$tpl )
     use wiki_eoearth;
     INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolhomepage",  "http://eol.org/",      "", "1", 1, 0);
     INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("eolaboutpage", "http://eol.org/about", "", "1", 1, 0);
-    Aug 5, 2019
-    INSERT INTO interwiki (iw_prefix, iw_url, iw_api, iw_wikiid, iw_local, iw_trans) VALUES ("abouteditorspage", "https://editors.eol.org/", "", "1", 1, 0);
 
     select * from interwiki;
     Info on interwiki table: https://www.mediawiki.org/wiki/Manual:Interwiki_table
