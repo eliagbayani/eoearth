@@ -63,6 +63,8 @@ $wgLogo = "$wgResourceBasePath/resources/assets/EoE6.png";
 
 ## UPO means: this is also a user preference option
 
+$wgFavicon = "../favicon.ico"; //per https://www.mediawiki.org/wiki/Manual:$wgFavicon
+
 //--start work on footer icones
 $wgFooterIcons = array(); //by default has value, print_r($wgFooterIcons) to investigate
 $eol_logo_footer = "$wgResourceBasePath/resources/assets/EOL_logo_simple_jpg.jpg";
