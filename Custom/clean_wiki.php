@@ -204,28 +204,19 @@ function process_urls($ver)
             
             print_r($urls);
 
-            foreach($urls as $url)
-            {
+            foreach($urls as $url) {
                 $html = file_get_contents($GLOBALS['domain'].$url);
                 if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
-                if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4))
-                {
-                    if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) //many urls, excluding external links to external servers
-                    {
+                if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4)) {
+                    if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) { //many urls, excluding external links to external servers
                         $i = 0;
-                        foreach($arr5[1] as $row)
-                        {
-                            
-                            if($ver == "v1")
-                            {
+                        foreach($arr5[1] as $row) {
+                            if($ver == "v1") {
                                 echo "\nprocessing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$row\"");
                             }
-                            elseif($ver == "v2")
-                            {
+                            elseif($ver == "v2") {
                                 process_all_links_from_a_page($row);
                             }
-                            
-                            
                             // break; //debug - process only first row/title
                             $i++;
                             // if($i == 10) break; //debug - process first 10 only
