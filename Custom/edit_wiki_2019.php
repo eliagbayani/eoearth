@@ -23,21 +23,20 @@ $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
 // */
 
 if($title = @$argv[1]) {
-    print_r($argv);
+    print_r($argv); echo " -- there is a title param\n";
     process_title($title);
 }
 else { //will run many titles...
     // process_one();
     
-    
-    // /*
-    process_urls("v1"); //this is now done
-    // */
-
     /*
+    process_urls("v1"); //this is now done
+    */
+
+    // /*
     process_urls("v2");
     $GLOBALS['processed'] = array();
-    */
+    // */
     
 }
 //========================================[start functions]========================================
@@ -87,7 +86,6 @@ function process_title($destination_title)
         else { // 2nd title will not be removed
             echo "\nstring NOT found\n";
         }
-        
     }
     else echo("\nWiki not found... Next -> \n");
 }
@@ -123,8 +121,8 @@ function process_urls($ver)
             // $urls = array("/eoearth/wiki/Pollution_(search_results_for)");
             // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
             // $urls = array("/eoearth/wiki/Water_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
-            $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
+            $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
             print_r($urls);
 
             foreach($urls as $url) {
@@ -133,19 +131,22 @@ function process_urls($ver)
                 if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4)) {
                     if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) { //many urls
                         foreach($arr5[1] as $row) { // echo "\n$row";
+                            $row_orig = $row;
+                            // echo "\n[$row]\n"; exit("\n[$titlex]\n");
                             $row = trim(str_replace(" $titlex", "", $row));
-                            echo " --- [$row]";
 
                             if($ver == "v1") {
-                                /* process_title($row); -- for some reason this does not work, thus using shell below which works */
-                                echo "\n processing: [$row]\n";
-                                /*
+                                echo "\n processing v1: [$row]\n";
+                                // /*
                                 shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
-                                */
-                                echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
+                                break;
+                                // */
+                                // echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
                             }
                             elseif($ver == "v2") {
-                                process_all_links_from_a_page($row);
+                                process_all_links_from_a_page($row_orig);
+                                // process_all_links_from_a_page($row);
+                                break;
                             }
 
                         }
@@ -155,6 +156,7 @@ function process_urls($ver)
             }
         }
     }
+    echo "\n\n--end--\n\n";
 }
 function get_wiki_text($title)
 {
@@ -178,40 +180,11 @@ function format_title($title)
     $title = str_replace("'", "\'", $title);
     return $title;
 }
-
-/*
-function get_search_titles()
+function process_all_links_from_a_page($destination_title) //this will run edit_wiki_2019 for all links in a page
 {
-    $search_titles = array(
-    "About_the_EoE_\(search_results_for\)",
-    "Agricultural_\&_Resource_Economics_\(search_results_for\)",
-    "Biodiversity_\(search_results_for\)",
-    "Biology_\(search_results_for\)",
-    "Climate_Change_\(search_results_for\)",
-    "Ecology_\(search_results_for\)",
-    "Environmental_\&_Earth_Science_\(search_results_for\)",
-    "Energy_\(search_results_for\)",
-    "Environmental_Law_\&_Policy_\(search_results_for\)",
-    "Environmental_Humanities_\(search_results_for\)",
-    "Food_\(search_results_for\)",
-    "Forests_\(search_results_for\)",
-    "Geography_\(search_results_for\)",
-    "Hazards_\&_Disasters_\(search_results_for\)",
-    "Health_\(search_results_for\)",
-    "Mining_\&_Materials_\(search_results_for\)",
-    "People_\(search_results_for\)",
-    "Physics_\&_Chemistry_\(search_results_for\)",
-    "Pollution_\(search_results_for\)",
-    "Society_\&_Environment_\(search_results_for\)",
-    "Water_\(search_results_for\)",
-    "Weather_\&_Climate_\(search_results_for\)",
-    "Wildlife_\(search_results_for\)");
-    return $search_titles;
-}*/
-function process_all_links_from_a_page($destination_title) //this will run clean_wiki for all links in a page
-{
+    // exit("\n$destination_title nnn\n");
     $title = format_title($destination_title);
-    echo "\n[$title]\n";
+    echo "\nprocess_all_links_from_a_page: [$title]\n";
     if($wiki_path = get_wiki_text($title)) {
         $str = file_get_contents($wiki_path);
         
@@ -226,9 +199,28 @@ function process_all_links_from_a_page($destination_title) //this will run clean
         $str = str_replace("plant] species]", "plant species]]", $str);
         $str = str_replace("]flora]]", "flora]]", $str);
 
-        if(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr)) { // print_r($arr[1]);
+        // $str = str_replace("_", " ", $str);
+        $str = str_replace("_&_", "_&amp;_", $str);
+        
+
+        #REDIRECT [[Weathering_(Environmental_&_Earth_Science)]]
+        if(preg_match("/REDIRECT \[\[(.*?)\]\]/ims", $str, $arr)) {
+            $title = $arr[1];
+            //Weathering (Weather &amp; Climate) --- has to be of this format
+            $title = str_replace("_", " ", $title);
+            
+            $GLOBALS['processed'][$title] = '';
+            $title = ucfirst($title);
+            echo "\nprocessing v2a: [$title]\n"; //exit;
+            /*
+            $output = shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
+            echo "\n---start debug---\n[$output]\n---end debug---\n";
+            */
+            process_all_links_from_a_page($title);
+        }
+        elseif(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr)) { // print_r($arr[1]);
             $good_titles = get_good_titles($arr[1]);
-            print_r($good_titles); exit;
+            echo "\n good titles: "; print_r($good_titles); //exit;
             // /*
             foreach($good_titles as $title) {
                 if(!$title) continue;
@@ -243,8 +235,13 @@ function process_all_links_from_a_page($destination_title) //this will run clean
                 if(isset($GLOBALS['processed'][$title])) {}
                 else {
                     $GLOBALS['processed'][$title] = '';
-                    echo "\nprocessing: [$title]\n";   
-                    shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
+                    $title = ucfirst($title);
+                    echo "\nprocessing v2 orig: [$title]\n";
+                    echo "\nprocessing v2: [$title]\n";
+                    // /*
+                    $output = shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
+                    echo "\n---start debug---\n[$output]\n---end debug---\n";
+                    // */
                 }
             }
             // */
@@ -289,4 +286,33 @@ function is_title_valid($title)
     if(substr($title, 0, 5) == "file:") return false;
     return true;
 }
+/*
+function get_search_titles()
+{
+    $search_titles = array(
+    "About_the_EoE_\(search_results_for\)",
+    "Agricultural_\&_Resource_Economics_\(search_results_for\)",
+    "Biodiversity_\(search_results_for\)",
+    "Biology_\(search_results_for\)",
+    "Climate_Change_\(search_results_for\)",
+    "Ecology_\(search_results_for\)",
+    "Environmental_\&_Earth_Science_\(search_results_for\)",
+    "Energy_\(search_results_for\)",
+    "Environmental_Law_\&_Policy_\(search_results_for\)",
+    "Environmental_Humanities_\(search_results_for\)",
+    "Food_\(search_results_for\)",
+    "Forests_\(search_results_for\)",
+    "Geography_\(search_results_for\)",
+    "Hazards_\&_Disasters_\(search_results_for\)",
+    "Health_\(search_results_for\)",
+    "Mining_\&_Materials_\(search_results_for\)",
+    "People_\(search_results_for\)",
+    "Physics_\&_Chemistry_\(search_results_for\)",
+    "Pollution_\(search_results_for\)",
+    "Society_\&_Environment_\(search_results_for\)",
+    "Water_\(search_results_for\)",
+    "Weather_\&_Climate_\(search_results_for\)",
+    "Wildlife_\(search_results_for\)");
+    return $search_titles;
+}*/
 ?>
