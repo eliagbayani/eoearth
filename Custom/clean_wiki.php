@@ -60,15 +60,11 @@ function process_all_links_from_a_page($destination_title) //this will run clean
         $str = str_replace("plant] species]", "plant species]]", $str);
         $str = str_replace("]flora]]", "flora]]", $str);
 
-        if(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr))
-        {
-            // print_r($arr[1]);
+        if(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr)) { // print_r($arr[1]);
             $good_titles = get_good_titles($arr[1]);
             print_r($good_titles);
-            
             // /*
-            foreach($good_titles as $title)
-            {
+            foreach($good_titles as $title) {
                 if(!$title) continue;
                 if(stripos($title, '[') !== false) continue; //string is found
                 if(stripos($title, ']') !== false) continue; //string is found
@@ -78,16 +74,13 @@ function process_all_links_from_a_page($destination_title) //this will run clean
                 if(stripos($title, 'colspan=') !== false) continue; //string is found
                 if(stripos($title, '<br') !== false) continue; //string is found
                 if(strlen($title) > 300) continue;
-                
                 if(isset($GLOBALS['processed'][$title])) {}
-                else
-                {
+                else {
                     $GLOBALS['processed'][$title] = '';
                     echo "\nprocessing: [$title]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/clean_wiki.php " . "\"$title\"");
                 }
             }
             // */
-            
         }
     }
 }
@@ -96,16 +89,14 @@ function get_good_titles($raw_titles)
 {
     $final = array();
     //remove e.g. "Image:"
-    foreach($raw_titles as $title)
-    {
+    foreach($raw_titles as $title) {
         if(is_title_valid($title)) $final[$title] = '';
     }
     
     //remove the pipe e.g. "Content Source Index|More »"
     $temp = array_keys($final);
     $final = array();
-    foreach($temp as $t)
-    {
+    foreach($temp as $t) {
         $arr = explode("|", $t);
         foreach($arr as $a) $final[$a] = '';
     }
@@ -114,10 +105,8 @@ function get_good_titles($raw_titles)
     
     $final = array_keys($final);
     $final = array_map("trim", $final);
-    
     return $final;
 }
-
 function is_title_valid($title)
 {
     if(substr($title, 0, 1) == "'") return false;
@@ -134,7 +123,6 @@ function is_title_valid($title)
     if(substr($title, 0, 8) == "special:") return false;
     if(substr($title, 0, 6) == "media:") return false;
     if(substr($title, 0, 5) == "file:") return false;
-    
     return true;
 }
 
