@@ -65,8 +65,8 @@ function process_one() //you can use command line with interactive title like so
 function process_title($destination_title)
 {
     $orig_title = $destination_title;                       echo "\norig: [$orig_title]\n";
-    $destination_title = format_title($destination_title);  echo "\nformatted title: [$destination_title]\n";
-    if($wiki_path = get_wiki_text($destination_title)) {    echo "\nwiki_path: [$wiki_path]\n"; 
+    $destination_title = format_title($destination_title);  //echo "\nformatted title: [$destination_title]\n";
+    if($wiki_path = get_wiki_text($destination_title)) {    //echo "\nwiki_path: [$wiki_path]\n"; 
         $wiki = file_get_contents($wiki_path);
         /* =<span>Argentina</span>= */
         $str = "=<span>$orig_title</span>=";
@@ -79,7 +79,7 @@ function process_title($destination_title)
             $handle = fopen($temp_write_file, "w"); 
             fwrite($handle, $updated_wiki); 
             fclose($handle);
-            echo "\nsaving title: [$orig_title]...\n";   
+            echo "\nsaving title: [$orig_title]...\n";
             shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $destination_title . " < $temp_write_file");
             // */
         }
@@ -100,8 +100,8 @@ function process_urls($ver)
             $urls = $arr2[1];
             */
             
-            // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
+            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
             // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
@@ -121,11 +121,12 @@ function process_urls($ver)
             // $urls = array("/eoearth/wiki/Pollution_(search_results_for)");
             // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
             // $urls = array("/eoearth/wiki/Water_(search_results_for)");
-            $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
             // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
             print_r($urls);
 
             foreach($urls as $url) {
+                $GLOBALS['current_url'] = $url;
                 $html = file_get_contents($GLOBALS['domain'].$url);
                 if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
                 if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4)) {
@@ -139,14 +140,15 @@ function process_urls($ver)
                                 echo "\n processing v1: [$row]\n";
                                 // /*
                                 shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
-                                break;
+                                // break;
                                 // */
                                 // echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
                             }
                             elseif($ver == "v2") {
-                                // process_all_links_from_a_page($row_orig);
+                                // exit("\n[$row_orig][$row]\n");
+                                process_all_links_from_a_page($row_orig);
                                 process_all_links_from_a_page($row);
-                                break;
+                                // break;
                             }
 
                         }
@@ -231,8 +233,9 @@ function process_all_links_from_a_page($destination_title) //this will run edit_
                     echo "\nprocessing v2: [$title]\n";
                     // /*
                     $output = shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
-                    echo "\n---start debug---\n[$output]\n---end debug---\n";
+                    // echo "\n---start debug---\n[$output]\n---end debug---\n";
                     // */
+                    echo "\n------------\n".$GLOBALS['current_url']."\n------------\n";
                 }
             }
             // */
