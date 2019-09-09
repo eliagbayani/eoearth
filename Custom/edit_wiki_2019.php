@@ -3,13 +3,13 @@
 
 This is ran in command-line. Can be ran in two ways:
 Note: in archive, we need to use: 
-$ sudo php edit_wiki.php
+$ sudo php edit_wiki_2019.php
 
 1st: provide a title
-$ php Custom/edit_wiki.php "Agriculture II"
+$ php Custom/edit_wiki_2019.php "Agriculture II"
 
 2nd: will run many titles...
-$ php Custom/edit_wiki.php
+$ php Custom/edit_wiki_2019.php
 */
 
 /* for archive server (remote)
@@ -27,11 +27,21 @@ if($title = @$argv[1]) {
     process_title($title);
 }
 else { //will run many titles...
-    process_one();
-    // process_urls();
+    // process_one();
+    
+    
+    // /*
+    process_urls("v1"); //this is now done
+    // */
+
+    /*
+    process_urls("v2");
+    $GLOBALS['processed'] = array();
+    */
+    
 }
 //========================================[start functions]========================================
-function process_one() //you can use command line with interactive title like so: $ php Custom/edit_wiki.php "Agriculture II"
+function process_one() //you can use command line with interactive title like so: $ php Custom/edit_wiki_2019.php "Agriculture II"
 {
     $destination_title = "Black-footed penguin";
     $destination_title = "Scope &amp; Content";
@@ -49,6 +59,9 @@ function process_one() //you can use command line with interactive title like so
     $destination_title = "Marine biodiversity"; //done
     $destination_title = "Côte d'Ivoire";
     process_title($destination_title);
+    /*
+    http://editors.eol.localhost/eoearth/wiki/Search_Results_for_Main_Topics
+    */
 }
 function process_title($destination_title)
 {
@@ -78,16 +91,16 @@ function process_title($destination_title)
     }
     else echo("\nWiki not found... Next -> \n");
 }
-function process_urls()
+function process_urls($ver)
 {
     $url = $GLOBALS['domain'] . "/eoearth/wiki/Search_Results_for_Main_Topics";
     $html = file_get_contents($url);
     if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr)) {
         //href="/eoearth/wiki/About_the_EoE_(search_results_for)"
         if(preg_match_all("/href=\"(.*?)\"/ims", $arr[1], $arr2)) { //23 urls
-            // /* working but not being used anymore... decided to run these 23 urls one by one in archive... bec it will take time and better to run them one by one for manageability
+            /* working but not being used anymore... decided to run these 23 urls one by one in archive... bec it will take time and better to run them one by one for manageability
             $urls = $arr2[1];
-            // */
+            */
             
             // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
             // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
@@ -111,24 +124,30 @@ function process_urls()
             // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
             // $urls = array("/eoearth/wiki/Water_(search_results_for)");
             // $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
+            $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
             print_r($urls);
 
             foreach($urls as $url) {
                 $html = file_get_contents($GLOBALS['domain'].$url);
                 if(preg_match("/<title>(.*?) \(search results for\)/ims", $html, $arr3)) $titlex = "(".$arr3[1].")"; //the one in parenthesis "About the EoE" in (About the EoE)
                 if(preg_match("/<div id=\"mw-content-text\" lang=\"en\" dir=\"ltr\" class=\"mw-content-ltr\">(.*?)<\/div>/ims", $html, $arr4)) {
-                    // if(preg_match_all("/href=(.*?)<\/a>/ims", $arr4[1], $arr5)) //many urls
                     if(preg_match_all("/title=\"(.*?)\"/ims", $arr4[1], $arr5)) { //many urls
-                        foreach($arr5[1] as $row) {
-                            if(stripos($row, $titlex) !== false) {
-                                echo "\n$row";
-                                $row = trim(str_replace(" $titlex", "", $row));
-                                echo " --- [$row]";
+                        foreach($arr5[1] as $row) { // echo "\n$row";
+                            $row = trim(str_replace(" $titlex", "", $row));
+                            echo " --- [$row]";
 
+                            if($ver == "v1") {
                                 /* process_title($row); -- for some reason this does not work, thus using shell below which works */
-                                echo "\n processing: [$row]\n";   shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki.php " . "\"$row\"");
+                                echo "\n processing: [$row]\n";
+                                /*
+                                shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
+                                */
+                                echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
                             }
+                            elseif($ver == "v2") {
+                                process_all_links_from_a_page($row);
+                            }
+
                         }
                     }
                 }
@@ -189,5 +208,85 @@ function get_search_titles()
     "Wildlife_\(search_results_for\)");
     return $search_titles;
 }*/
+function process_all_links_from_a_page($destination_title) //this will run clean_wiki for all links in a page
+{
+    $title = format_title($destination_title);
+    echo "\n[$title]\n";
+    if($wiki_path = get_wiki_text($title)) {
+        $str = file_get_contents($wiki_path);
+        
+        $str = str_replace("]s]", "s]]", $str);
+        $str = str_replace("]es]", "es]]", $str);
+        $str = str_replace("Antarctic]a]", "Antarctica]]", $str);
+        $str = str_replace("] change]", " change]]", $str);
+        $str = str_replace("] systems]", " systems]]", $str);
+        $str = str_replace("] areas]", " areas]]", $str);
+        $str = str_replace("]s (Mid-latitude cyclone)]", "s (Mid-latitude cyclone)]]", $str);
+        $str = str_replace("]al]", "al]]", $str);
+        $str = str_replace("plant] species]", "plant species]]", $str);
+        $str = str_replace("]flora]]", "flora]]", $str);
 
+        if(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr)) { // print_r($arr[1]);
+            $good_titles = get_good_titles($arr[1]);
+            print_r($good_titles); exit;
+            // /*
+            foreach($good_titles as $title) {
+                if(!$title) continue;
+                if(stripos($title, '[') !== false) continue; //string is found
+                if(stripos($title, ']') !== false) continue; //string is found
+                if(stripos($title, 'class=') !== false) continue; //string is found
+                if(stripos($title, 'width=') !== false) continue; //string is found
+                if(stripos($title, 'align=') !== false) continue; //string is found
+                if(stripos($title, 'colspan=') !== false) continue; //string is found
+                if(stripos($title, '<br') !== false) continue; //string is found
+                if(strlen($title) > 300) continue;
+                if(isset($GLOBALS['processed'][$title])) {}
+                else {
+                    $GLOBALS['processed'][$title] = '';
+                    echo "\nprocessing: [$title]\n";   
+                    shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
+                }
+            }
+            // */
+        }
+    }
+}
+
+function get_good_titles($raw_titles)
+{
+    $final = array();
+    //remove e.g. "Image:"
+    foreach($raw_titles as $title) {
+        if(is_title_valid($title)) $final[$title] = '';
+    }
+    
+    //remove the pipe e.g. "Content Source Index|More »"
+    $temp = array_keys($final);
+    $final = array();
+    foreach($temp as $t) {
+        $arr = explode("|", $t);
+        foreach($arr as $a) $final[$a] = '';
+    }
+    
+    unset($final['More »']);
+
+    $final = array_keys($final);
+    $final = array_map("trim", $final);
+    return $final;
+}
+function is_title_valid($title)
+{
+    if(substr($title, 0, 1) == "'") return false;
+    if(substr($title, 0, 1) == "#") return false;
+    if(substr($title, 0, 5) == "http:") return false;
+    if(substr($title, 0, 6) == "Image:") return false;
+    if(substr($title, 0, 8) == "Special:") return false;
+    if(substr($title, 0, 6) == "Media:") return false;
+    if(substr($title, 0, 5) == "File:") return false;
+    if(substr($title, 0, 6) == "image:") return false;
+    if(substr($title, 0, 8) == "special:") return false;
+    if(substr($title, 0, 6) == "media:") return false;
+    if(substr($title, 0, 5) == "file:") return false;
+    return true;
+}
 ?>
