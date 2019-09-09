@@ -144,8 +144,8 @@ function process_urls($ver)
                                 // echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
                             }
                             elseif($ver == "v2") {
-                                process_all_links_from_a_page($row_orig);
-                                // process_all_links_from_a_page($row);
+                                // process_all_links_from_a_page($row_orig);
+                                process_all_links_from_a_page($row);
                                 break;
                             }
 
@@ -181,8 +181,7 @@ function format_title($title)
     return $title;
 }
 function process_all_links_from_a_page($destination_title) //this will run edit_wiki_2019 for all links in a page
-{
-    // exit("\n$destination_title nnn\n");
+{   // exit("\n[$destination_title]\n");
     $title = format_title($destination_title);
     echo "\nprocess_all_links_from_a_page: [$title]\n";
     if($wiki_path = get_wiki_text($title)) {
@@ -199,26 +198,19 @@ function process_all_links_from_a_page($destination_title) //this will run edit_
         $str = str_replace("plant] species]", "plant species]]", $str);
         $str = str_replace("]flora]]", "flora]]", $str);
 
-        // $str = str_replace("_", " ", $str);
-        $str = str_replace("_&_", "_&amp;_", $str);
-        
-
         #REDIRECT [[Weathering_(Environmental_&_Earth_Science)]]
-        if(preg_match("/REDIRECT \[\[(.*?)\]\]/ims", $str, $arr)) {
+        if(preg_match("/REDIRECT \[\[(.*?)\]\]/ims", $str, $arr)) { //new block --- to accommodate REDIRECTs
             $title = $arr[1];
-            //Weathering (Weather &amp; Climate) --- has to be of this format
+            //Weathering (Weather &amp; Climate) --- $title has to be of this format -- IMPORTANT
+            $title = str_replace("_&_", "_&amp;_", $title);
             $title = str_replace("_", " ", $title);
             
             $GLOBALS['processed'][$title] = '';
             $title = ucfirst($title);
             echo "\nprocessing v2a: [$title]\n"; //exit;
-            /*
-            $output = shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
-            echo "\n---start debug---\n[$output]\n---end debug---\n";
-            */
             process_all_links_from_a_page($title);
         }
-        elseif(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr)) { // print_r($arr[1]);
+        elseif(preg_match_all("/\[\[(.*?)\]\]/ims", $str, $arr)) { // for regular pages, not a REDIRECT
             $good_titles = get_good_titles($arr[1]);
             echo "\n good titles: "; print_r($good_titles); //exit;
             // /*
@@ -236,7 +228,6 @@ function process_all_links_from_a_page($destination_title) //this will run edit_
                 else {
                     $GLOBALS['processed'][$title] = '';
                     $title = ucfirst($title);
-                    echo "\nprocessing v2 orig: [$title]\n";
                     echo "\nprocessing v2: [$title]\n";
                     // /*
                     $output = shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$title\"");
@@ -248,7 +239,6 @@ function process_all_links_from_a_page($destination_title) //this will run edit_
         }
     }
 }
-
 function get_good_titles($raw_titles)
 {
     $final = array();
@@ -256,7 +246,6 @@ function get_good_titles($raw_titles)
     foreach($raw_titles as $title) {
         if(is_title_valid($title)) $final[$title] = '';
     }
-    
     //remove the pipe e.g. "Content Source Index|More »"
     $temp = array_keys($final);
     $final = array();
@@ -264,9 +253,7 @@ function get_good_titles($raw_titles)
         $arr = explode("|", $t);
         foreach($arr as $a) $final[$a] = '';
     }
-    
     unset($final['More »']);
-
     $final = array_keys($final);
     $final = array_map("trim", $final);
     return $final;
