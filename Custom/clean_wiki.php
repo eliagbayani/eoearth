@@ -102,7 +102,7 @@ function get_good_titles($raw_titles)
     }
     
     unset($final['More »']);
-    
+
     $final = array_keys($final);
     $final = array_map("trim", $final);
     return $final;
@@ -110,15 +110,12 @@ function get_good_titles($raw_titles)
 function is_title_valid($title)
 {
     if(substr($title, 0, 1) == "'") return false;
-    
     if(substr($title, 0, 1) == "#") return false;
     if(substr($title, 0, 5) == "http:") return false;
-    
     if(substr($title, 0, 6) == "Image:") return false;
     if(substr($title, 0, 8) == "Special:") return false;
     if(substr($title, 0, 6) == "Media:") return false;
     if(substr($title, 0, 5) == "File:") return false;
-
     if(substr($title, 0, 6) == "image:") return false;
     if(substr($title, 0, 8) == "special:") return false;
     if(substr($title, 0, 6) == "media:") return false;
@@ -216,7 +213,6 @@ function process_urls($ver)
         }
     }
 }
-
 function format_title($title)
 {
     $title = str_replace(" ", "_", $title);
@@ -226,7 +222,6 @@ function format_title($title)
     $title = str_replace("'", "\'", $title);
     return $title;
 }
-
 function process_title($destination_title)
 {
     $title = format_title($destination_title);
