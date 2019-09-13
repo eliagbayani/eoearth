@@ -648,7 +648,13 @@ function lfTOSLink( $sk, &$tpl )
 }
 //==================================================
 // $wgReadOnly = 'Upgrading to MediaWiki 1.26.2'; //uncomment this line everytime we upgrade to have database-readonly access.
+// $wgReadOnly = 'SYSTEM MAINTENANCE ON-GOING. READ-ONLY ACCESS FOR NOW.'; //uncomment this line everytime we upgrade to have database-readonly access.
 //==================================================
+/* good source to suppress/remove/hide page titles/pagetitles:
+http://editors.eol.localhost/eoearth/wiki/MediaWiki:Common.css
+-> good source: https://www.hostknox.com/knowledgebase/680/How-to-make-CSS-modifications-in-MediaWiki.html
+                https://www.hostknox.com/knowledgebase/703/How-to-hide-page-titles-in-MediaWiki.html
+*/
 
 /* added this in extensions/LastModified/modules/lastmodified.js
 var time_stamp = getMetaLastModifiedTimestamp();
