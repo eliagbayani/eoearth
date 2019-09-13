@@ -26,16 +26,18 @@ if($title = @$argv[1]) {
     process_title($title);
 }
 else { //will run many titles...
-    // process_one();
-    
     /*
-    process_urls("v1"); //this is now done
+    process_one();
     */
-
+    
     // /*
+    process_urls("v1"); //this is now done
+    // */
+
+    /*
     process_urls("v2");
     $GLOBALS['processed'] = array();
-    // */
+    */
     
 }
 //========================================[start functions]========================================
@@ -98,9 +100,9 @@ function process_urls($ver)
             /* working but not being used anymore... decided to run these 23 urls one by one in archive... bec it will take time and better to run them one by one for manageability
             $urls = $arr2[1];
             */
-            
-            $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
-            $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
+
+            // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
+            // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biology_(search_results_for)");
             // $urls = array("/eoearth/wiki/Climate_Change_(search_results_for)");
@@ -121,7 +123,7 @@ function process_urls($ver)
             // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
             // $urls = array("/eoearth/wiki/Water_(search_results_for)");
             // $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
+            $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
             print_r($urls);
 
             foreach($urls as $url) {
@@ -139,7 +141,7 @@ function process_urls($ver)
                                 echo "\n processing v1: [$row]\n";
                                 // /*
                                 shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
-                                // break;
+                                break; //just process one, temporary.
                                 // */
                                 // echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
                             }
