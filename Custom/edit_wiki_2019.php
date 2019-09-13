@@ -101,6 +101,7 @@ function process_urls($ver)
             $urls = $arr2[1];
             */
 
+            $urls = array();
             // $urls = array("/eoearth/wiki/About_the_EoE_(search_results_for)");
             // $urls = array("/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)");
             // $urls = array("/eoearth/wiki/Biodiversity_(search_results_for)");
@@ -121,9 +122,13 @@ function process_urls($ver)
             // $urls = array("/eoearth/wiki/Physics_%26_Chemistry_(search_results_for)");
             // $urls = array("/eoearth/wiki/Pollution_(search_results_for)");
             // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Water_(search_results_for)");
-            // $urls = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
-            $urls = array("/eoearth/wiki/Wildlife_(search_results_for)");
+            $urls[] = array("/eoearth/wiki/Water_(search_results_for)");
+            $urls[] = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
+
+            // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)"); done
+
+
+            // $urls = array("/eoearth/wiki/Wildlife_(main)"); --- diff WIP
             print_r($urls);
 
             foreach($urls as $url) {
@@ -149,7 +154,7 @@ function process_urls($ver)
                                 // exit("\n[$row_orig][$row]\n");
                                 process_all_links_from_a_page($row_orig);
                                 process_all_links_from_a_page($row);
-                                // break;
+                                break;
                             }
 
                         }
