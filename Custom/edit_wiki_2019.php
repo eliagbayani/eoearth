@@ -149,7 +149,7 @@ function process_urls($ver)
                                 // exit("\n[$row_orig][$row]\n");
                                 process_all_links_from_a_page($row_orig);
                                 process_all_links_from_a_page($row);
-                                break;
+                                // break;
                             }
 
                         }
