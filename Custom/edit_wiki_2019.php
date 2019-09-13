@@ -30,14 +30,14 @@ else { //will run many titles...
     process_one();
     */
     
-    /*
-    process_urls("v1"); //this is now done
-    */
-
     // /*
+    process_urls("v1"); //this is now done
+    // */
+
+    /*
     process_urls("v2");
     $GLOBALS['processed'] = array();
-    // */
+    */
     
 }
 //========================================[start functions]========================================
@@ -141,7 +141,7 @@ function process_urls($ver)
                                 echo "\n processing v1: [$row]\n";
                                 // /*
                                 shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
-                                break; //just process one, temporary.
+                                // break; //just process one, temporary.
                                 // */
                                 // echo("\nphp " . $GLOBALS['doc_root'] . "/eoearth/Custom/edit_wiki_2019.php " . "\"$row\"");
                             }
