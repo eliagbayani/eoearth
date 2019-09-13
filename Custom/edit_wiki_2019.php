@@ -122,8 +122,8 @@ function process_urls($ver)
             // $urls = array("/eoearth/wiki/Physics_%26_Chemistry_(search_results_for)");
             // $urls = array("/eoearth/wiki/Pollution_(search_results_for)");
             // $urls = array("/eoearth/wiki/Society_%26_Environment_(search_results_for)");
-            $urls[] = array("/eoearth/wiki/Water_(search_results_for)");
-            $urls[] = array("/eoearth/wiki/Weather_%26_Climate_(search_results_for)");
+            $urls[] = "/eoearth/wiki/Water_(search_results_for)";
+            $urls[] = "/eoearth/wiki/Weather_%26_Climate_(search_results_for)";
 
             // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)"); done
 
