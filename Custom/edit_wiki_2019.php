@@ -1,6 +1,5 @@
 <?php
-/* This will put redirect to applicable pages...
-
+/* 
 This is ran in command-line. Can be ran in two ways:
 Note: in archive, we need to use: 
 $ sudo php edit_wiki_2019.php
