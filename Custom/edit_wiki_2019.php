@@ -30,14 +30,14 @@ else { //will run many titles...
     process_one();
     */
     
-    // /*
-    process_urls("v1"); //this is now done
-    // */
-
     /*
+    process_urls("v1"); //this is now done
+    */
+
+    // /*
     process_urls("v2");
     $GLOBALS['processed'] = array();
-    */
+    // */
     
 }
 //========================================[start functions]========================================
@@ -103,17 +103,16 @@ function process_urls($ver)
 
             $urls = array();
             
-            $urls[] = "/eoearth/wiki/About_the_EoE_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Biodiversity_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Biology_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Climate_Change_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Ecology_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Environmental_%26_Earth_Science_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Energy_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Environmental_Law_%26_Policy_(search_results_for)";
-            $urls[] = "/eoearth/wiki/Environmental_Humanities_(search_results_for)";
-
+            // $urls[] = "/eoearth/wiki/About_the_EoE_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Agricultural_%26_Resource_Economics_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Biodiversity_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Biology_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Climate_Change_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Ecology_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Environmental_%26_Earth_Science_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Energy_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Environmental_Law_%26_Policy_(search_results_for)";
+            // $urls[] = "/eoearth/wiki/Environmental_Humanities_(search_results_for)";
             // $urls[] = "/eoearth/wiki/Food_(search_results_for)";
             // $urls[] = "/eoearth/wiki/Forests_(search_results_for)";
             // $urls[] = "/eoearth/wiki/Geography_(search_results_for)";
@@ -124,11 +123,9 @@ function process_urls($ver)
             // $urls[] = "/eoearth/wiki/Physics_%26_Chemistry_(search_results_for)";
             // $urls[] = "/eoearth/wiki/Pollution_(search_results_for)";
             // $urls[] = "/eoearth/wiki/Society_%26_Environment_(search_results_for)";
-
             // $urls[] = "/eoearth/wiki/Water_(search_results_for)";
             // $urls[] = "/eoearth/wiki/Weather_%26_Climate_(search_results_for)";
-
-            // $urls = array("/eoearth/wiki/Wildlife_(search_results_for)"); done
+            $urls[] = "/eoearth/wiki/Wildlife_(search_results_for)";
 
 
             // $urls = array("/eoearth/wiki/Wildlife_(main)"); --- diff WIP
@@ -157,7 +154,7 @@ function process_urls($ver)
                                 // exit("\n[$row_orig][$row]\n");
                                 process_all_links_from_a_page($row_orig);
                                 process_all_links_from_a_page($row);
-                                break;
+                                // break;
                             }
 
                         }
