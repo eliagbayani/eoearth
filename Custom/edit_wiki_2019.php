@@ -11,15 +11,15 @@ $ php Custom/edit_wiki_2019.php "Agriculture II"
 $ php Custom/edit_wiki_2019.php
 */
 
-/* for archive server (remote)
+// /* for archive server (remote)
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
 $GLOBALS['domain'] = "http://editors.eol.org";          //for archive
-*/
+// */
 
-// /* for mac mini (local)
+/* for mac mini (local)
 $GLOBALS['doc_root'] = "/Library/WebServer/Documents";  //for mac mini
 $GLOBALS['domain'] = "http://editors.eol.localhost";    //for mac mini
-// */
+*/
 
 if($title = @$argv[1]) {
     print_r($argv); echo " -- there is a title param\n";
