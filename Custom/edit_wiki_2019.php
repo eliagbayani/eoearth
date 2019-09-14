@@ -26,19 +26,18 @@ if($title = @$argv[1]) {
     process_title($title);
 }
 else { //will run many titles...
-    /*
+    // /*
     process_one();
-    */
+    // */
     
     /*
     process_urls("v1"); //this is now done
     */
 
-    // /*
+    /*
     process_urls("v2");
     $GLOBALS['processed'] = array();
-    // */
-    
+    */
 }
 //========================================[start functions]========================================
 function process_one() //you can use command line with interactive title like so: $ php Custom/edit_wiki_2019.php "Agriculture II"
@@ -58,10 +57,43 @@ function process_one() //you can use command line with interactive title like so
     $destination_title = "Biodiversity"; //not found
     $destination_title = "Marine biodiversity"; //done
     $destination_title = "Côte d'Ivoire";
+    /*
     process_title($destination_title);
+    */
+    
     /*
     http://editors.eol.localhost/eoearth/wiki/Search_Results_for_Main_Topics
     */
+    
+    // /* a different block all together...
+    $titles[] = 'Project:About';
+    $titles[] = 'Agricultural &amp; Resource Economics';
+    $titles[] = 'Biodiversity (main)';
+    $titles[] = 'Biology';
+    $titles[] = 'The Climate Change Collection';
+    $titles[] = 'Ecology (collection)';
+    $titles[] = 'Environmental &amp; Earth Science';
+    $titles[] = 'Energy (main)';
+    $titles[] = 'Environmental Law &amp; Policy';
+    $titles[] = 'Environmental Humanities';
+    $titles[] = 'Food (main)';
+    $titles[] = 'Forests';
+    $titles[] = 'Geography (main)';
+    $titles[] = 'Hazards &amp; Disasters';
+    $titles[] = 'Health (main)';
+    $titles[] = 'Mining &amp; Materials';
+    $titles[] = 'People (main)';
+    $titles[] = 'Physics &amp; Chemistry';
+    $titles[] = 'Pollution (main)';
+    $titles[] = 'Society &amp; Environment';
+    $titles[] = 'Water (main)';
+    $titles[] = 'Weather &amp; Climate';
+    $titles[] = 'Wildlife (main)';
+    foreach($titles as $title) {
+        $GLOBALS['current_url'] = $title; //just for debug
+        process_all_links_from_a_page($title);
+    }
+    // */
 }
 function process_title($destination_title)
 {
@@ -71,15 +103,25 @@ function process_title($destination_title)
         $wiki = file_get_contents($wiki_path);
         /* =<span>Argentina</span>= */
         $str = "=<span>$orig_title</span>=";
+        $str2 = "=$orig_title=";
         if(stripos($wiki, $str) !== false) { //string is found
             echo "\nstring is found\n";
             $updated_wiki = str_replace($str, "", $wiki);
             // /*
             //start saving...
             $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
-            $handle = fopen($temp_write_file, "w"); 
-            fwrite($handle, $updated_wiki); 
-            fclose($handle);
+            $handle = fopen($temp_write_file, "w"); fwrite($handle, $updated_wiki); fclose($handle);
+            echo "\nsaving title: [$orig_title]...\n";
+            shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $destination_title . " < $temp_write_file");
+            // */
+        }
+        elseif(stripos($wiki, $str2) !== false) { //string is found
+            echo "\nstring is found\n";
+            $updated_wiki = str_replace($str2, "", $wiki);
+            // /*
+            //start saving...
+            $temp_write_file = $GLOBALS['doc_root'] . "/eoearth/Custom/temp/write.wiki";
+            $handle = fopen($temp_write_file, "w"); fwrite($handle, $updated_wiki); fclose($handle);
             echo "\nsaving title: [$orig_title]...\n";
             shell_exec("php " . $GLOBALS['doc_root'] . "/eoearth/maintenance/edit.php -m " . $destination_title . " < $temp_write_file");
             // */
@@ -249,6 +291,7 @@ function process_all_links_from_a_page($destination_title) //this will run edit_
             // */
         }
     }
+    else echo "\nNot found 333\n";
 }
 function get_good_titles($raw_titles)
 {
