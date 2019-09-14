@@ -11,6 +11,8 @@ $ php Custom/edit_wiki_2019.php "Agriculture II"
 $ php Custom/edit_wiki_2019.php
 */
 
+exit("\nDone so far. As of Sep 14, 2019\n");
+
 // /* for archive server (remote)
 $GLOBALS['doc_root'] = "/var/www/html";                 //for archive
 $GLOBALS['domain'] = "http://editors.eol.org";          //for archive
