@@ -43,7 +43,18 @@ class eoearth_controller
         // */
         
         /* used when I missed some backups when we implemented https in editors.eol.org
-        $range = self::get_range("2017-10-12", "2017-10-14"); self::backup_now($range);
+        $range = self::get_range("2016-05-01", "2016-05-01"); self::backup_now($range);
+        */
+        
+        /* GOOD RECOVERY. Make backup from TODAY() to 2016-05-01. Run only if you think the daily backup missed something.
+        $real_today = date('Y-m-d'); //ran in Mar 29, 2020
+        $vardate = date('Y-m-d');
+        $less = 0;
+        while($vardate >= '2016-05-01') { //next value for '2016-05-01' is >= Mar 29, 2020.
+            $range = self::get_range($vardate); self::backup_now($range);
+            $less++;
+            $vardate = date('Y-m-d', strtotime('-'.$less.' day', strtotime($real_today)));
+        }
         */
     }
     
@@ -86,7 +97,13 @@ class eoearth_controller
                     {
                         echo "\nremote_image_path: [$remote_image_path]";
                         echo "\ndestination_file: [$destination_file]\n";
-                        $cmd = 'wget --tries=3 -O '.$destination_file.' "'.$remote_image_path.'"'; //working well with shell_exec()
+
+                        /* this was ok with Yosemite. Not anymore with Mojave */
+                        // $cmd = 'wget --tries=3 -O '.$destination_file.' "'.$remote_image_path.'"'; //working well with shell_exec()
+                        
+                        /* started using this with Mojave */
+                        $cmd = '/opt/local/bin/wget --tries=3 -O '.$destination_file.' "'.$remote_image_path.'"'; //working well with shell_exec()
+                        
                         $cmd .= " 2>&1";
                         $terminal = shell_exec($cmd);
                         echo "\n$terminal\n";
