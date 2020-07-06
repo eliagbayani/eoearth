@@ -9,7 +9,7 @@
 #
 # Further documentation for configuration settings may be found at:
 # https://www.mediawiki.org/wiki/Manual:Configuration_settings
-
+//exit("<hr>Undergoing System Maintenance.<hr>Will be back shortly.<hr>");
 # Protect against web entry
 if ( !defined( 'MEDIAWIKI' ) ) {
     exit;
